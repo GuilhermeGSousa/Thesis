@@ -3,60 +3,55 @@
 %     File: Thesis_Background.tex                                      %
 %     Tex Master: Thesis.tex                                           %
 %                                                                      %
-%     Author: Andre C. Marta                                           %
-%     Last modified :  2 Jul 2015                                      %
+%     Author: Guilherme Sousa                                          %
+%                                                                      %
 %                                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Background}
 \label{chapter:background}
 
-Insert your chapter material here...
+On this chapter the aircraft model used for this work will be described firstly. A theoretical model of the plane's dynamics will be discussed, and implementation detail will be provided on the chapter \ref{chapter:implementation}. The control strategy used will then follow, giving an overview of the feedback linearisation approach, as well as its limitations, namely its sensitivity to inversion errors and external interferences. An attempt to solve these limitation will be made, suggesting some solutions and finally describing the chosen methodology for this case.
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Theoretical Overview}
-\label{section:overview}
-
-Some overview of the underlying theory about the topic...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Theoretical Model 1}
-\label{section:theory1}
+\section{Airplane Model}
+\label{section:background/model}
 
-The research should be supported with a comprehensive list of references.
-These should appear whenever necessary, in the limit, from the first to the last chapter.
-
-A reference can be cited in any of the following ways:
-%
-\begin{itemize}
-  \item Citation mode \#1 - \quad \cite{jameson:adjointns}
-  \item Citation mode \#2 - \quad \citet{jameson:adjointns}
-  \item Citation mode \#3 - \quad \citep{jameson:adjointns}
-  \item Citation mode \#4 - \quad \citet*{jameson:adjointns}
-  \item Citation mode \#5 - \quad \citep*{jameson:adjointns}
-  \item Citation mode \#6 - \quad \citealt{jameson:adjointns}
-  \item Citation mode \#7 - \quad \citealp{jameson:adjointns}
-  \item Citation mode \#8 - \quad \citeauthor{jameson:adjointns}
-  \item Citation mode \#9 - \quad \citeyear{jameson:adjointns}
-  \item Citation mode \#10 - \quad \citeyearpar{jameson:adjointns}
-\end{itemize}
-%
-Several citations can be made simultaneously as \citep{nocedal:opt,marta:ijcfd}. \\
-
-This is often the default bibliography style adopted (numbers following the citation order), according to the options:\\
-{\tt \textbackslash usepackage\{natbib\}} in file {\tt Thesis\_Preamble.tex},\\
-{\tt \textbackslash bibliographystyle\{abbrvnat\}} in file {\tt Thesis.tex}.\\
-%
-Notice however that this style can be changed from numerical citation order to authors' last name with the options: \\
-{\tt \textbackslash usepackage[numbers]\{natbib\}} in file {\tt Thesis\_Preamble.tex},\\
-{\tt \textbackslash bibliographystyle\{abbrvunsrtnat\}} in file {\tt Thesis.tex}.
+The work made in this thesis was built on top of the work done by H. Escamilla Nuñez and  F. Mora Camino on 4D trajectory tracking \cite{hector}. The model used in this work of a six degree of freedom transport aircraft will be described in this section. The first step before describing the dynamics of a commercial aircraft will be to define the frames pf reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft's body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the axial directions of the wind frame. This frame is aligned to the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from the wind frame to the body frame by
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Theoretical Model 2}
-\label{section:theory2}
+\begin{equation}
+R_{WB}=
+\begin{bmatrix}
+c_\alpha c_\beta & -c_\alpha s_\beta & -s_\alpha \\
+s_\beta & c_\beta & 0 \\
+s_\alpha c_\beta & -s_\alpha s_\beta & c_\alpha
+\end{bmatrix}
+\label{eq:wind2body}
+\end{equation}
 
-Other models...
+To describe the attitude of the plane Euler angles will also be used, 
+
+
+
+\section{Feedback linearisation}
+\label{section:background/NLI}
+% Aqui vamos nos!
+
+Feedback linearisation, also known as dynamic inversion, is an approach based on the idea of algebraically transforming a non-linear system into a linear one, from which linear control laws can be used to control the resulting system. Unlike Jacobian linearisation, that assumes linearity of the system around an equilibrium value, feedback linearisation implements a feedback loop that cancels non-linearities of the given system. 
+
+
+
+\section{Limitations of feedback linearisation}
+\label{section:background/limitations}
+
+\subsection{Control improvement}
+\label{section:background/improvements}
+
+\section{Neural Networks}
+\label{section:background/NN}
+
+
 

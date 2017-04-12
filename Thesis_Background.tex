@@ -51,7 +51,7 @@ c_\theta c_\psi & s_\phi s_\theta s_\psi + c_\phi c_\psi & c_\phi s_\theta s_\ps
 \subsection{Fast Dynamics}
 \label{section:background/model/fast_dynamics}
 
-The considered actuators of the aircraft are given by $\delta = [\delta_{ail} \delta_{ele} \delta_{rud}]^T$, each applying a torque along an axis of the body frame. These torques are giver by
+The considered actuators of the aircraft that control its attitude are given by $\delta = [\delta_{ail} \delta_{ele} \delta_{rud}]^T$, each applying a torque along an axis of the body frame. These torques are giver by
 
 \begin{equation}
 \begin{bmatrix}
@@ -94,12 +94,117 @@ C_{n\beta} \beta + C_{n_p} p \dfrac{b}{2V_a} + C_{n_r} r \dfrac{b}{2V_a}
 \end{bmatrix}
 \label{eq:cmoment}
 \end{equation}
-Where $p, q, r$ are the body's angular rates ($\Omega = [p q r]^T$). The method of obtaining of the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as
-\begin{gather}
-ola\\
-ola
+Where $p, q, r$ are the body's angular rates ($\Omega = [p q r]^T$) and $V_a$ is the airspeed. The method of obtaining of the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft's inertial matrix.
+\begin{subequations}
+	\begin{equation}
+		\dot{\Omega} = I^{-1} M_{ext} - I^{-1}\Omega \times (I\Omega)
+	\end{equation}
+	\begin{equation}
+		\dot{\Omega} = 
+		\dfrac{1}{2}\rho S I^{-1} V_a^2\left(
+		\begin{bmatrix}
+			bC_l\\
+			\bar{c}C_m\\
+			bC_n
+		\end{bmatrix}
+		+ C_\delta \delta\right)
+		- I^{-1}\Omega \times (I\Omega)	
+	\end{equation}
+
 \label{eq:fast_dynamics}
-\end{gather}
+\end{subequations}
+
+These two equations can be rearranged to account for the effect of the wind, allowing further on to simulate the behaviour of the airplane in the presence of wind disturbances. Let $\vec{V_G} = [u \quad v \quad w]^T$ be the speed of the CG relative to the ground, $\vec{V}$ the speed of the CG relative to the air mass and $\vec{W}$ the speed of the wind relative to the ground, then as per Etkin and Reid \cite{Etkin+Reid} 
+\begin{equation}
+\vec{V_G} = \vec{V} + \vec{W} = 
+\begin{bmatrix}
+V_ac_\alpha c_\beta + V_{w_x}\\
+V_as_\beta+V_{w_y}\\
+V_as_\alpha c_\beta + V_{w_z}
+\end{bmatrix}
+\label{eq:windtriangle}
+\end{equation}
+Therefore $\alpha$ and $\beta$ can be computed by 
+\begin{subequations}
+	\begin{equation}
+		\alpha = arctan\left(\dfrac{w}{u}\right)
+		\label{eq:alpha}
+	\end{equation}
+	\begin{equation}
+		\beta = arctan\left(\dfrac{v}{V_a}\right)
+		\label{eq:beta}
+	\end{equation}
+\end{subequations}
+
+From these three equations comes that 
+
+\begin{equation}
+\begin{bmatrix}
+\dot{\alpha}\\
+\dot{\beta}
+\end{bmatrix}
+= 
+\begin{bmatrix}
+H_{11} & 1 & H_{13}\\
+H_{21} & 0 & H_{23}
+\end{bmatrix}
+\begin{bmatrix}
+p\\
+q\\
+r
+\end{bmatrix}
++
+\begin{bmatrix}
+Q_1\\
+Q_2
+\end{bmatrix}
+\label{eq:alphabetadot}
+\end{equation}
+
+SEE ANNEX HERE
+
+The relationship between the euler angles and the rotation rates is also one that will prove useful when implementing the model on a Matlab simulation, and is given by
+
+\begin{equation}
+\begin{bmatrix}
+\dot{\phi}\\
+\dot{\theta}\\
+\dot{psi}
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & tg_\theta s_\phi & tg_\theta c_\phi\\
+0 & c_\phi & -s_\phi\\
+0 & \dfrac{s_\phi}{c_\theta} & \dfrac{c_\phi}{c_\theta}
+\end{bmatrix}
+\begin{bmatrix}
+p\\
+q\\
+r
+\end{bmatrix}
+\label{eq:euler2omega}
+\end{equation}
+
+\section{Guidance Dynamics}
+\label{background/model/guidance_dynamics}
+
+This subsection on the forces applied to aircraft, introducing a new actuation variable, the thrust force $T$. These forces are applied along the three axis of the wind frame, lift, drag and lateral force, given by
+\begin{equation}
+\begin{bmatrix}
+D\\
+Y\\
+L
+\end{bmatrix}
+= \dfrac{1}{2}\rhoSV_a^2
+\begin{bmatrix}
+C_D\\
+C_Y\\
+C_L
+\end{bmatrix}
+\label{eq:forces}
+\end{equation}
+Once again, the method used to compute these coefficients will be given in 
+
 
 \section{Feedback linearisation}
 \label{section:background/NLI}

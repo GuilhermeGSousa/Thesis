@@ -278,9 +278,65 @@ $\xi_i$ and $\xi_T$ being time constants. As the responsiveness of the resultant
 \label{section:background/NLI}
 % Aqui vamos nos!
 
-Feedback linearisation, also known as dynamic inversion, is an approach based on the idea of algebraically transforming a non-linear system into a linear one, from which linear control laws can be used to control the resulting system. Unlike Jacobian linearisation, that assumes linearity of the system around an equilibrium value, feedback linearisation implements a feedback loop that cancels non-linearities of the given system. 
+Feedback linearisation, also known as dynamic inversion, is an approach based on the idea of algebraically transforming a non-linear system into a linear one, from which linear control laws can be used to control the resulting system. Unlike Jacobian linearisation, that assumes linearity of the system around an equilibrium value, feedback linearisation implements a feedback loop that cancels non-linearities of the given system \cite{Slotine+Li}. Given a nonlinear system 
 
+\begin{equation}
+\dot{x} = f(x,u)
+\label{eq:nonlinear_system}
+\end{equation}
 
+one must find both a state transformation $z=z(x)$ and an input transformation $\upsilon = \upsilon(x,u)$ in order for the transformed system to be a linear and time-invariant system $\dot{z} = Az+B\upsilon$. This process is called Input-State linearisation. 
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=1\textwidth]{Figures/NLI}
+  \caption[Feedback linearisation example]{Feedback linearisation example}
+  \label{fig:nli}
+\end{figure}
+
+EXPLAIN NECESSARY MATHEMATICAL CONCEPTS HERE
+
+\subsection{SISO systems}
+\label{section:background/SISO_NLI}
+
+Although an aircraft is always considered as a MIMO system, a description of this control concept will firstly be provided for a general SISO case, before generalising to a MIMO case. Nonlinear systems that can be represented as $\dot{x}=f(x)+g(x)u$ will be discussed in this section. From \cite{Slotline+Li}, a definition of Input-State linearisation is to find a \emph{diffeomorphism} $\phi:\Omega \rightarrow R^n$ and nonlinear control law
+\begin{equation}
+u=\alpha(x) + \beta(x)\upsilon
+\label{eq:nli_control_law}
+\end{equation}
+
+such that the new state variables $z=\phi(x)$ and \emph{pseudo-input} $\upsilon$ satisfy the linear time invariant system $\dot{z} = Az+B\upsilon$, where the following equations are satisfied
+
+\begin{equation}
+	\begin{cases}
+		\dot{z_i}=z_{i+1} & if\quad i<n-1\\
+		\dot{z_n}=\upsilon & if\quad i=n-1
+	\end{cases}
+\end{equation}
+
+In order to find such a function and control law, one must find a state $z_1$ such that 
+\begin{subequations}
+	\begin{equation}
+		\nabla z_1 ad_f^ig=0 \qquad i=0, ..., n-2
+	\end{equation}
+	\begin{equation}
+		\nabla z_1 ad_f^{n-1}g\neq 0
+	\end{equation}
+\end{subequations}
+
+The remaining states are then obtained from $z(x) = [z_1 \quad L_fz_1 \quad ... \quad L_f^{n-1}z_1]^T$ and the input transformation from
+
+\begin{subequations}
+	\begin{equation}
+		\alpha (x) = - \dfrac{L_f^nz_1}{L_gL_f^{n-1}z_1}
+	\end{equation}
+	\begin{equation}
+		\beta (x) = \dfrac{1}{L_gL_f^{n-1}z_1}
+	\end{equation}
+\end{subequations}
+
+\subsection{SISO systems}
+\label{section:background/MIMO_NLI}
 
 \section{Limitations of feedback linearisation}
 \label{section:background/limitations}

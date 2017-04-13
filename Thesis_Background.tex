@@ -39,7 +39,7 @@ s_\alpha c_\beta & -s_\alpha s_\beta & c_\alpha
 To describe the attitude of the plane Euler angles will also be used, namely $\phi\{-\pi,\pi\}; \theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}; \psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth's frame is given by
 
 \begin{equation}
-R_{WB}=
+R_{BE}=
 \begin{bmatrix}
 c_\theta c_\psi & s_\phi s_\theta c_\psi - c_\phi s_\psi & c_\phi s_\theta c_\psi + s_\phi s_\psi \\
 c_\theta c_\psi & s_\phi s_\theta s_\psi + c_\phi c_\psi & c_\phi s_\theta s_\psi - s_\phi c_\psi \\
@@ -124,7 +124,7 @@ V_as_\alpha c_\beta + V_{w_z}
 \end{bmatrix}
 \label{eq:windtriangle}
 \end{equation}
-Therefore $\alpha$ and $\beta$ can be computed by 
+and $\alpha$ and $\beta$ can be computed by 
 \begin{subequations}
 	\begin{equation}
 		\alpha = arctan\left(\dfrac{w}{u}\right)
@@ -136,7 +136,7 @@ Therefore $\alpha$ and $\beta$ can be computed by
 	\end{equation}
 \end{subequations}
 
-From these three equations comes that 
+From these three equations, differentiating \ref{eq:alpha} and \ref{eq:beta} comes that 
 
 \begin{equation}
 \begin{bmatrix}
@@ -163,7 +163,7 @@ Q_2
 
 SEE ANNEX HERE
 
-The relationship between the euler angles and the rotation rates is also one that will prove useful when implementing the model on a Matlab simulation, and is given by
+The angular rates are also related to the Euler angles. The relationship between the euler angles and the rotation rates is also one that will prove useful when implementing the model on a Matlab simulation, and is given by
 
 \begin{equation}
 \begin{bmatrix}
@@ -186,16 +186,16 @@ r
 \end{equation}
 
 \section{Guidance Dynamics}
-\label{background/model/guidance_dynamics}
+\label{section:background/model/guidance_dynamics}
 
-This subsection on the forces applied to aircraft, introducing a new actuation variable, the thrust force $T$. These forces are applied along the three axis of the wind frame, lift, drag and lateral force, given by
+This subsection on the forces applied to aircraft, introducing a new actuation variable, the thrust force $T$. These forces are applied along the three axis of the wind frame, lift, drag and side force, given by
 \begin{equation}
 \begin{bmatrix}
 D\\
 Y\\
 L
 \end{bmatrix}
-= \dfrac{1}{2}\rhoSV_a^2
+= \dfrac{1}{2} \rho SV_a^2
 \begin{bmatrix}
 C_D\\
 C_Y\\
@@ -203,9 +203,77 @@ C_L
 \end{bmatrix}
 \label{eq:forces}
 \end{equation}
-Once again, the method used to compute these coefficients will be given in 
+Once again, the method used to compute these coefficients will be given in the chapter \ref{chapter:implementation} in detail. These coefficients, similarly to the moment coefficient, are functions of the angle of attack, sideslip angle and airspeed, the three most relevant variables when determining aerodynamic forces and moments. Although aerodynamic forces are usually expressed on the wind frame, as the thrust is always applied along the $x$ axis of the body frame, it is necessary to rotate the aerodynamic forces to this frame. This way the sum of the airplane's forces can be obtained. 
 
+\begin{equation}
+\begin{bmatrix}
+F_{xa}\\
+F_{ya}\\
+F_{za}
+\end{bmatrix}
+= R_{WB}
+\begin{bmatrix}
+-D\\
+Y\\
+-L
+\end{bmatrix}
+\label{eq:body_forces}
+\end{equation}
+From Newton's Second Law comes the aircraft's acceleration
 
+\begin{equation}
+\begin{bmatrix}
+\dot{u}\\
+\dot{v}\\
+\dot{w}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\dfrac{1}{m}(F_{xa} + T) - gs_\theta +rv-qw\\
+\dfrac{1}{m}F_{ya} + gc_\theta s_\phi + pw - ru\\
+\dfrac{1}{m}F_{za} + gc_\theta c_\phi + qu - pv
+\end{bmatrix}
+\label{eq:boddy_acc}
+\end{equation}
+
+An expression in the Earth frame can also be obtained
+
+\begin{equation}
+\begin{bmatrix}
+\ddot{x_E}\\
+\ddot{y_E}\\
+\ddot{z_E}
+\end{bmatrix}
+= \dfrac{1}{m} R_{BE}
+\begin{bmatrix}
+F_{xa}+T\\
+F_{ya}\\
+F_{za}
+\end{bmatrix}
++
+\begin{bmatrix}
+0\\
+0\\
+g
+\end{bmatrix}
+\end{equation}
+
+\subsection{Actuator Dynamics}
+\label{section:background/model/actuator_dynamics}
+
+Finally, to simulate the delay response in actuation in order to have a realistic simulation, first order systems were introduced to the actuator dynamics as per \cite{hector}. For the control surfaces $\delta_i$, given a desired $\delta_i^d$ comes
+
+\begin{equation}
+\dot{\delta_i} = \dfrac{1}{\xi_i}(\delta_i^d-\delta_i)
+\end{equation}
+
+Similarly for the thrust
+
+\begin{equation}
+\dot{T} = \dfrac{1}{\xi_T}(T^d-T)
+\end{equation}
+
+$\xi_i$ and $\xi_T$ being time constants. As the responsiveness of the resultant thrust will be much slower than that of the control surfaces, $\xi_T>>\xi_i$.
 \section{Feedback linearisation}
 \label{section:background/NLI}
 % Aqui vamos nos!

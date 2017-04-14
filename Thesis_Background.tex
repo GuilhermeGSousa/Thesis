@@ -94,7 +94,7 @@ C_{n\beta} \beta + C_{n_p} p \dfrac{b}{2V_a} + C_{n_r} r \dfrac{b}{2V_a}
 \end{bmatrix}
 \label{eq:cmoment}
 \end{equation}
-Where $p, q, r$ are the body's angular rates ($\Omega = [p q r]^T$) and $V_a$ is the airspeed. The method of obtaining of the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft's inertial matrix.
+Where $p, q, r$ are the body's angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method of obtaining of the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft's inertial matrix.
 \begin{subequations}
 	\begin{equation}
 		\dot{\Omega} = I^{-1} M_{ext} - I^{-1}\Omega \times (I\Omega)
@@ -299,7 +299,7 @@ EXPLAIN NECESSARY MATHEMATICAL CONCEPTS HERE
 \subsection{SISO systems}
 \label{section:background/SISO_NLI}
 
-Although an aircraft is always considered as a MIMO system, a description of this control concept will firstly be provided for a general SISO case, before generalising to a MIMO case. Nonlinear systems that can be represented as $\dot{x}=f(x)+g(x)u$ will be discussed in this section. From \cite{Slotline+Li}, a definition of Input-State linearisation is to find a \emph{diffeomorphism} $\phi:\Omega \rightarrow R^n$ and nonlinear control law
+Although an aircraft is always considered as a MIMO system, a description of this control concept will firstly be provided for a general SISO case, before generalising to a MIMO case. Nonlinear systems that can be represented as $\dot{x}=f(x)+g(x)u$ will be discussed in this section. From \cite{Slotine+Li}, a definition of Input-State linearisation is to find, for a nonlinear system of relative degree $n$, a \emph{diffeomorphism} $\phi:\Omega \rightarrow R^n$ and nonlinear control law
 \begin{equation}
 u=\alpha(x) + \beta(x)\upsilon
 \label{eq:nli_control_law}
@@ -312,6 +312,7 @@ such that the new state variables $z=\phi(x)$ and \emph{pseudo-input} $\upsilon$
 		\dot{z_i}=z_{i+1} & if\quad i<n-1\\
 		\dot{z_n}=\upsilon & if\quad i=n-1
 	\end{cases}
+	\label{eq:SISO_state}
 \end{equation}
 
 In order to find such a function and control law, one must find a state $z_1$ such that 
@@ -335,11 +336,33 @@ The remaining states are then obtained from $z(x) = [z_1 \quad L_fz_1 \quad ... 
 	\end{equation}
 \end{subequations}
 
-\subsection{SISO systems}
+\subsection{MIMO systems}
 \label{section:background/MIMO_NLI}
+
+These concepts can also be extended to to MIMO systems in a similar manner, by similarly differentiating the outputs until the inputs explicitly appear. This time however, there are individual relative degrees per output. The sum of these relative degrees is called total degree $r$ and must satisfy $r<n$, $n$ being the order of the system. Given a MIMO system 
+\begin{gather}
+\dot{x} = f(x) + G(x)u\\
+y=h(x)
+\end{gather}
+the $\phi$ functions are defined as $\phi^i_j(x)=L^{j-1}_fh_i(
+x)$ and satisfy a condition similar to \ref{eq:SISO_state} 
+\begin{equation}
+\dot{\phi}^i_1(x)=\phi^i_2,...,\dot{\phi}^i_{r_i-1}=\phi^i_{r_i} \quad \text{and} \quad \dot{\phi}^i_{r_i}=L_f^{r_i}h_i(x)+\sum^m_{j=1}L_{g_j}L^{r_i-1}_fh_i(x)u_j
+\end{equation}
+As this equation holds for $1<i<p$, $p$ being the number of outputs of the system, giving an expression for the pseudo control input $\upsilon$
+\begin{equation}
+\upsilon = 
+\begin{bmatrix}
+\dot{\phi}^1_{r_1}\\
+\vdots\\
+\dot{\phi}^p_{r_p}\\
+\end{bmatrix}
+\end{equation}
+
 
 \section{Limitations of feedback linearisation}
 \label{section:background/limitations}
+
 
 \subsection{Control improvement}
 \label{section:background/improvements}

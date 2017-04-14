@@ -359,10 +359,19 @@ As this equation holds for $1<i<p$, $p$ being the number of outputs of the syste
 \end{bmatrix}
 \end{equation}
 
+It is also interesting to note the resulting system is not only linear, but also completely decoupled, as each new pseudo input only affects one output.
 
 \section{Limitations of feedback linearisation}
 \label{section:background/limitations}
-
+Although feedback control answers to many of the problems of linear controllers such as PID and LQR, it has a big downside. Indeed, being a model based controller, it requires the system model to be quite accurately known. Let $\upsilon$ be the vector of pseudo inputs, for a second order $\ddot{x} = f(x,\dot{x},u)$, if it is input-output linearisable and the exact system is known, then it comes that, from \cite{YANG+LIN_Adaptive_Flight_Control}
+\begin{equation}
+\ddot{x}=\upsilon
+\end{equation}
+However, even for simpler models, a real system is difficult to accurately describe, and an approximation $\hat{f}$ of $f$ is usually chosen, resulting in $\upsilon=\hat{f}(x,\dot{x},u)$. Therefore, defining a dynamic inversion error, $\Delta(x,\dot{x},u)=f(x,\dot{x},u)-\hat{f}(x,\dot{x},u)$, comes that, as stated in \cite{YANG+LIN_Adaptive_Flight_Control}
+\begin{equation}
+\ddot{x}=\upsilon + \Delta(x,\dot{x},u)
+\end{equation}
+There can be many causes for a dynamic inversion error to be present, as not only modelling incertitudes can lead to larger errors, but also external interference (wind gusts) and actuator faults. The goal of this section will be to present the reader with some solutions to minimize this error. 
 
 \subsection{Control improvement}
 \label{section:background/improvements}
@@ -370,5 +379,71 @@ As this equation holds for $1<i<p$, $p$ being the number of outputs of the syste
 \section{Neural Networks}
 \label{section:background/NN}
 
+Artificial Neural Networks (NN) are a biologically inspired simulation of brain's nervous system. They are composed of simulated neurons and synapses. The sum of the inputs of a neuron are summed and the result is fed into an activation function, which then return a bounded value, either between -1 and 1 or 0 and 1. The inputs and outputs of a neuron are multiplied by a weight, representing the synapses between neurons. We get the following equation for one neuron
+\begin{equation}
+y(x_1,x_2,...,x_n)=f((\sum ^n_{i=1} w_i x_i)+b)
+\end{equation}
+where $b$ is the bias term and $f$ a given activation function. Neuron are then set in three different types of layers: the input, the output and the hidden layers. These are connected between each other, and the hidden part can be composed of several layers. The weights can then be tuned based on experience, making it suitable for intelligent learning. To tune these weights learning algorithms are used. There are two types of learning algorithms: batch and online training. It is called training to the process of iteratively reaching the ideal set of weights that will minimise the error between the output of the neural network and that of a given unknown function.
 
+Batch training is mostly based one a property NN is that, according to the Universal Approximation Theorem showed in 1989 by George Cybenko, a feed forward neural network can approximate any continuous function. The network is trained by providing input and output pairs. The weights are found in order to approximate the output of the neural network to that of the original function. Once these weights are computed, the network can then be used to compute outputs from inputs that were not part of the initial knowledge of input-output pairs.
+
+Although this learning method approach is used in many of NN applications, it cannot however be easily used to improve an existing feedback linearisation  controller, as it requires an \textit{a priori} knowledge of the modelling error for each given input.
+
+Online training, contrary to batch training, can deal with dynamically changing environments. This training paradigm is not based on an \textit{a priori} knowledge set, and instead relies on update laws that compute the new weights after each control iteration. It is this method that will be retained to adaptively correct the inversion error from the feedback linearisation. Training a network online, however, is less trivial when compared to batch training. An algorithm named backpropagation will be presented to provide a way of training a network online.  
+
+
+%Backprop
+The backpropagation algorithm is one of the most common NN training algorithm, commonly used in batch training, used to update the weights of each layer of a network, in order to minimize a cost function. However, research has been done in order to use backpropagation techniques to create online adaptive and augmented control such as \cite{online_adaptiveNN}, \cite{UAV_adaptive}, \cite{UAV_adaptive2}. Indeed, it is also possible to use such algorithms to continuously update the weights of a network as the data is generated. Backpropagation can only be implemented if the activation function of the NN is differentiable. 
+
+The backpropagation algorithm can be described by a two phase cycle, Propagation and Weight update. During this last phase the gradient descent algorithm is used to optimize a cost function. As such, a cost function $E$ must be chosen, and must be a function of the outputs of the neural network. A commonly used error function is 
+\begin{equation}
+E=\frac{1}{2} (y_d-y)^2
+\end{equation}
+
+Where $y_d$ is the desired output of the network and $y$ is the actual output of the network. The $\frac{1}{2}$ factor is added to be cancelled when differentiating. For a given neuron $i$, the sum of its inputs $sum_i$ is given by
+\begin{equation}\label{eq:def_sum}
+sum_i = \sum ^n_{k=1} w_{ki} x_k
+\end{equation}
+Where $w_{ki}$ is the weight of the $k^{th}$ input of neuron $i$, and $x_k$ are the outputs of the neurons form the previous layer. Given an activation function $f(x)$, we define the output of neuron $i$ as 
+\begin{equation}\label{eq:NN_output}
+x_i = f(sum_i)
+\end{equation}
+
+In order to use the gradient descent algorithm, the derivative of the cost function with respect to a given weight $w_{ij}$ must be computed. To do so, the chain rule is used as such
+\begin{equation}\label{eq:gradient}
+\frac{\partial E}{\partial w_{ij}} = \frac{\partial E}{\partial x_j}\frac{\partial x_j}{\partial sum_j}\frac{\partial sum_j}{\partial w_{ij}}
+\end{equation}
+These three factors can now be easily computed. The last two factors are independent of weather $x_j$ is a hidden or output layer and will for this reason be calculated firstly. From \ref{eq:def_sum} and \ref{eq:NN_output} comes that
+\begin{equation}
+\frac{\partial x_j}{\partial sum_j} = \frac{\partial f(sum_j)}{\partial sum_j}
+\end{equation}
+For an output layer, where values may be unbounded, linear output functions may be used, for which the equation above has a trivial solution. For output layers of classification neural networks or for hidden layers in general, logistic or tangent sigmoid functions can be used instead. For the first case let $f(x)=\frac{1}{1+e^{-x}}$, then
+
+\begin{equation}
+\frac{\partial f(sum_j)}{\partial sum_j}=f(sum_j)(1-f(sum_j))
+\end{equation}
+For the case of a tangent sigmoid activation function $f(x)=tanh(x)$ comes
+\begin{equation}
+\frac{\partial f(sum_j)}{\partial sum_j}=1-f^2(sum_j)
+\end{equation}
+
+For the term $\frac{\partial sum_j}{\partial w_{ij}}$, from \ref{eq:def_sum} this partial derivative is easily computed
+
+\begin{equation}
+\frac{\partial sum_j}{\partial w_{ij}} = \frac{\partial \left(\sum ^n_{k=1} w_{kj} x_k\right)}{\partial w_{ij}} = x_i
+\end{equation}
+
+For the output layer, the first term of equation \ref{eq:gradient} can easily be evaluated, as $x_j=y$ for such a case, giving
+\begin{equation}
+\frac{\partial E}{\partial x_j}=\frac{\partial (\frac{1}{2} (y_d-y)^2)}{\partial y}= y-y_d
+\end{equation}
+For input layers however, this derivative is less obvious to estimate. One can consider that the error function $E$ is a function of the inputs of all neurons that take $x_j$ as input. Let $S$ be such a set of inputs, from the total derivative to $x_j$ comes that
+\begin{equation}
+\frac{\partial E}{\partial x_j} = \sum _{s\in S}\left( \frac{\partial E}{\partial x_s}\frac{\partial x_s}{\partial sum_s}\frac{\partial sum_s}{\partial x_j}\right)=\sum _{s\in S}\left( \frac{\partial E}{\partial x_s}\frac{\partial f(sum_s)}{\partial sum_s}w_{js}\right)
+\end{equation}
+Note that the term $ \frac{\partial E}{\partial x_s} $ represent the all the derivatives of the errors with respect to the outputs of the next layer of neurons. Taking into account that the last layer is easily evaluated without this method, the derivatives of all hidden neurons can be computed. Knowing the value of \ref{eq:gradient}, an update law for the weights can now be stated from the gradient descent algorithm
+\begin{equation}\label{eq:update_law}
+\Delta w_{ij} = - \alpha \frac{\partial E}{\partial w_{ij}}
+\end{equation}
+Where $\alpha$ is a learning coefficient, and its choice is crucial to assure a fast convergence of the solution. Indeed, while a exceedingly large learning coefficient can cause this algorithm to miss the minimum error, a small learning coefficient will also increase the convergence rate. The $-1$ factor is added in the equation above to converge to a local minima, removing it would make this algorithm maximize the cost function. A limitation of the backstepping algorithm that must also be taken into account is that it only guarantees local minima convergence. 
 

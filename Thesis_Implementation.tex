@@ -11,13 +11,28 @@
 \chapter{Implementation}
 \label{chapter:implementation}
 
-Insert your chapter material here...
+This section will go in depth on the implementation of the concepts presented in the chapter \ref{chapter:background}. The plane model to be controlled was firstly implemented and verified. The first goal after this first step was to design a controller that would allow the aircraft to follow a trajectory from several position waypoints through time. The influence of certain parameters and knowledge of the exact plane model will be studied and discussed in chapter \ref{chapter:results}. The final goal will be to improve the controller and its robustness by reducing tracking error through the use of an adaptive neural network.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Plane Model}
 \label{section:model}
 
-Description of the numerical implementation of the models explained in Chapter~\ref{chapter:background}...
+The chosen commercial aircraft that will be simulated is the Boeing 737-200, an aircraft with over 30 years of service for which information of flight parameters is readily available.
+\begin{table}[htbp]
+  \centering
+  \caption{Boeing 737-2 parameters}
+    \begin{tabular}{rr}
+    \toprule
+    Weight $m$ & $52390$ kg \\
+    Wing Span $b$ & $28.35$ m \\
+    Wing Area $S$ & $102.0$ m$^{2}$ \\
+    Wing mean chord $\bar{c}$ & $4.35$ m \\
+    Length $l$ & $30.53$ m \\
+    \bottomrule
+    \end{tabular}%
+  \label{tab:b737_parameters}
+\end{table}%
+
 \subsection{Aerodynamic Coefficients}
 \label{section:model/aero_coef}
 

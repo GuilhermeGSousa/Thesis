@@ -52,7 +52,11 @@ C_{M_{\delta_{ele}}}=-0.003 \quad rad^{-1}\\
 C_{N_{\delta_{ail}}}= -0.002 \quad rad^{-1}\\
 C_{N_{\delta_{rud}}}= -0.07 \quad rad^{-1}
 \end{gather*}
-The remaining aerodynamic coefficients from equation \ref{eq:cmoment} were obtained from the work of Hector Escamilla Nuñez in \cite{hector}. In this work, neural networks were used to interpolate data from the USAF Stability and Control Digital Data Compendium. A two layer feed forward network, with a hidden sigmoid activation function and a linear output activation function, was then trained using the gathered data with the Bayesian Regulation training algorithm \cite{hector}. Indeed as stated previously, neural networks can approximate any continuous function according to the Universal Approximation Theorem. This method is therefore optimal to accurately approximate the variation of these coefficients that mainly vary with the angle of attack $\alpha$ and airspeed $V_a$.
+The remaining aerodynamic coefficients from equation \ref{eq:cmoment} were obtained from the work of Hector Escamilla Nuñez in \cite{hector}. In this work, neural networks were used to interpolate data from the USAF Stability and Control Digital Data Compendium. A two layer feed forward network, with a hidden sigmoid activation function and a linear output activation function, was then trained using the gathered data with the Bayesian Regulation training algorithm \cite{hector}. Indeed as stated previously, neural networks can approximate any continuous function according to the Universal Approximation Theorem. This method is therefore optimal to accurately approximate the variation of these coefficients that mainly vary with the angle of attack $\alpha$ and airspeed $V_a$. The only exception to this method was the drag coefficient, given for this aircraft by
+\begin{equation}
+C_D=0.0176+0.0515 C_L^2
+\label{eq:cd_cl}
+\end{equation}
 
 The sum of the moments can be computed and used to obtain the rotation rates $p$, $q$ and $r$. Equation \ref{eq:euler2omega} can also be used and integrated to obtain the Euler angles. These will also be necessary for frame of reference changes, namely from body to earth and vice-versa. The aerodynamic forces were computed from equation \ref{eq:forces} using the outputs of the neural networks. The body forces and acceleration relative to the earth frame were then obtain from equations \ref{eq:body_forces} and \ref{eq:boddy_acc}. 
 The effects of the wind were also taken into account by adding the wind speed to the integration of the acceleration of the aircraft relative to the earth as per \ref{eq:windtriangle}. At this point the values of $\alpha$ and $\beta$ were also obtained for their respective equations \ref{eq:alpha} and \ref{eq:beta}. 
@@ -68,10 +72,46 @@ A simplified block diagram of the plane simulator is given by figure \ref{fig:pl
 \subsection{Verification and Validation}
 \label{section:model/verification}
 
-To validate such a model in cruise conditions, no actuation was given to the control surfaces, with $\delta_{act_i}=0$.  
+To validate such a model in cruise conditions, no actuation was given to the control surfaces, with $\delta_{act_i}=0$. Assuming cruise conditions comes that
+In order to verify the model described so far, the required thrust to have cruise conditions will be computed for a given plausible value of $\alpha$. From this point the airspeed of the aircraft can also be computed. Submitting the Simulink model to the required thrust and comparing its angle of attack and airspeed, the model of the airplane can be verified.
+\begin{gather}
+	T=D\\
+	W=L\\
+	L'=M=N=0
+\label{eq:cruise_cond}
+\end{gather}
+The graph of $C_L$ versus alpha was also obtained from its respective neural network, given by \ref{fig:cl_alpha}
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=1\textwidth]{Figures/CL_alpha.png}
+  \caption[$C_L$ versus $\alpha$ graph]{$C_L$ versus $\alpha$ graph from Neural Network}
+  \label{fig:cl_alpha}
+\end{figure}
+From the cruise conditions \ref{eq:cruise_cond}, knowing that $L=\dfrac{1}{2}\rho S V^2 C_L$, solving for the airspeed V comes that
 
-Basic test cases to compare the implemented model against other numerical tools (verification) and experimental data (validation)...
+\begin{equation}
+V=\sqrt{\dfrac{2mg}{\rho S C_L}}
+\label{eq:cruise_speed}
+\end{equation}
+The required thrust can also be computed from both \ref{eq:cruise_cond}, \ref{eq:cruise_speed} and \ref{eq:cd_cl}, knowing the $C_L$ for a given angle of attack. Proposing some values of $\alpha$, the following results are obtained
 
+\begin{table}[htbp]
+  \centering
+  \caption{Required cruise conditions for different values of $\alpha$}
+    \begin{tabular}{ccccc}
+    \toprule
+    $\alpha (^o)$ & $C_D$ & $C_L$ & $V (ms^{-1})$     & $T (N)$ \\
+    \midrule
+    0     & 0.017677131 & 0.0387 & 682.0847686 & 208297.9977 \\
+    2     & 0.073163231 & 0.1859 & 311.2104268 & 47539.40075 \\
+    4     & 0.023345134 & 0.334 & 232.1777513 & 31873.82496 \\
+    6     & 0.029604436 & 0.4828 & 193.1124187 & 27962.3589 \\
+    \bottomrule
+    \end{tabular}%
+  \label{tab:cruise_cond}%
+\end{table}%
+
+By choosing an angle of attack of $\alpha=4^o$ and giving the modelled aircraft the required thrust, the following results were obtained for airspeed and angle of attack at a 
 \section{Feedback Linearisation}
 \label{section:FBL}
 

@@ -64,23 +64,136 @@ The effects of the wind were also taken into account by adding the wind speed to
 A simplified block diagram of the plane simulator is given by figure \ref{fig:plane_model}.
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=1\textwidth]{Figures/PlaneModel.png}
+  \includegraphics[width=0.75\textwidth]{Figures/PlaneModel.png}
   \caption[Plane dynamics simulator diagram]{Plane dynamics simulator diagram}
   \label{fig:plane_model}
 \end{figure}
  
-\subsection{Verification and Validation}
+
+\section{Controller Implementation}
+\label{section:control_implement}
+
+To invert such a complex system, two layers of inversion are proposed by H. Escamilla \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion control. To invert the fast dynamics the equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics \ref{eq:actuator_dynamics} and the effects of the wind. Doing so yields the jerk vector given by, as per \cite{hector}
+
+\begin{equation}
+\begin{bmatrix}
+\ddot{p}\\
+\ddot{q}\\
+\ddot{r}
+\end{bmatrix}
+= \dfrac{1}{2}\rho SI^{-1} \left\lbrace V_a^2 C_\delta \xi
+\begin{bmatrix}
+\delta^d_{ail}-\delta_{ail}\\
+\delta^d_{ele}-\delta_{ele}\\
+\delta^d_{rud}-\delta_{rud}
+\end{bmatrix}
++V_a^2C_c\dot{R_a}+2V_a\dot{V_a}\left(
+\begin{bmatrix}
+bC_l\\
+\bar{c}C_m\\
+bC_n
+\end{bmatrix}
++ C_\delta 
+\begin{bmatrix}
+\delta_{ail}\\
+\delta_{ele}\\
+\delta_{rud}
+\end{bmatrix}
+\right) \right \rbrace + I^{-1}\left(\dfrac{1}{4}\rho SV_aC_k-In\right)\dot{\Omega}
+\label{eq:jerk}
+\end{equation}
+
+Where
+
+\begin{gather*}
+I=
+\begin{bmatrix}
+A & 0 & -E\\
+0 & B & 0\\
+-E & 0 & C
+\end{bmatrix}\\
+I_n=
+\begin{bmatrix}
+-Eq & (C-B)r-Ep & (C-B)q\\
+(A-C)r+2Ep & 0 & (A-C)p-2Er\\
+(B-A)q & (B-A)p+Er & Eq
+\end{bmatrix}\\
+\xi=
+\begin{bmatrix}
+\dfrac{1}{\xi_{ail}} & 0 & 0\\
+0 & \dfrac{1}{\xi_{ele}} & 0\\
+0 & 0 & \dfrac{1}{\xi_{rud}}
+\end{bmatrix}\\
+C_c=
+\begin{bmatrix}
+0 & bC_{l_\beta} & -\dfrac{b^2}{2V_a^2}(C_{l_p}p+C_{l_r}r)\\
+\bar{c}C_{m_\alpha} & 0 & -\dfrac{\bar{c}^2}{2V_a^2}C_{m_q}q\\
+0 & bC_{n_\beta} & -\dfrac{b^2}{2V_a^2}(C_{n_p}p+C_{n_r}r)
+\end{bmatrix}\\
+C_k=
+\begin{bmatrix}
+b^2C_{l_p} & 0 & b^2C_{l_r}\\
+0 & \bar{c}^2C_{m_q} & 0\\
+b^2C_{n_p} & 0 & b^2C_{n_r}
+\end{bmatrix}\\
+\dot{Ra} =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T
+\end{gather*}
+
+To do a feedback linearisation, a pseudo input must be chosen, in this case $\tau = \ddot{\Omega}$. The feedback control law will therefore be, solving equation \ref{eq:jerk} to $\delta^d$,
+
+\begin{equation}
+\begin{bmatrix}
+\delta^d_{ail}\\
+\delta^d_{ele}\\
+\delta^d_{rud}
+\end{bmatrix}
+=\dfrac{1}{V_a^2}\xi^-1C_\delta\left\lbrace\dfrac{2I}{\rho S}\tau - \dfrac{2}{\rho S}(\dfrac{1}{4}\rho S V_aC_k - I_n)\dot{\Omega} -2V_a\dot{V_a} \left(
+\begin{bmatrix}
+bC_l\\
+\bar{c}C_m\\
+bC_n
+\end{bmatrix}
++ C_\delta \delta\right)-V_a^2C_c\dot{R_a} \right\rbrace+ \delta
+\end{equation}
+
+(Check if conditions from MIMO NLI are respected)
+
+The wind effects will appear in the terms including $\dot{Ra} =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. SEE ANNEX HERE 
+
+Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\Omega=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]_T$. As mentioned in section \ref{section:background/NLI}, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs comes a control law for $\tau$, firstly considering without neural network adaptation
+\begin{equation}
+\tau = -K_P (\Omega-\Omega^d)-K_D (\dot{\Omega}-\dot{\Omega}^d)+\ddot{\Omega}
+\label{eq:linear_controller}
+\end{equation}
+Where the $K_P$ and $K_D$ coefficients are chosen to assure stability of KD NOT EMPIRICALLY?
+
+From this point the next step shall be to obtain the desired values of $\Omega$. These were obtained using another PD controller, using Euler angle reference values to control rotation rates. Among these reference values to be followed, $\tau_r$ was set to zero. This was made to make use of the decoupling through feedback linearisation of the plane's movement, using a roll and pitch motion to turn the aircraft. This results in the following control of rotation rate
+\begin{subequations}
+\begin{equation}
+p= k_P (\phi^d-\phi) + k_d (\dot{\phi^d-\dot{\phi}})
+\end{equation}
+\begin{equation}
+q= k_P (\theta^d-\theta) + k_d (\dot{\theta^d-\dot{\theta}})
+\end{equation}
+\begin{equation}
+r=0
+\end{equation}
+\end{subequations}
+\section{Neural Network}
+\label{section:NN}
+
+\section{Verification and Validation}
 \label{section:model/verification}
 
-To validate such a model in cruise conditions, no actuation was given to the control surfaces, with $\delta_{act_i}=0$. Assuming cruise conditions comes that
-In order to verify the model described so far, the required thrust to have cruise conditions will be computed for a given plausible value of $\alpha$. From this point the airspeed of the aircraft can also be computed. Submitting the Simulink model to the required thrust and comparing its angle of attack and airspeed, the model of the airplane can be verified.
+The goal in this section will be to validate the behaviour of the model in cruise conditions. Assuming cruise conditions comes that
+
 \begin{gather}
 	T=D\\
 	W=L\\
 	L'=M=N=0
 \label{eq:cruise_cond}
 \end{gather}
-The graph of $C_L$ versus alpha was also obtained from its respective neural network, given by \ref{fig:cl_alpha}
+In order to verify the model described so far, the required thrust to have cruise conditions will be computed for a given plausible value of $\alpha$. From this point the airspeed of the aircraft can also be computed. The graph of $C_L$ versus alpha was also obtained from its respective neural network, given by \ref{fig:cl_alpha}
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=1\textwidth]{Figures/CL_alpha.png}
@@ -100,31 +213,14 @@ The required thrust can also be computed from both \ref{eq:cruise_cond}, \ref{eq
   \caption{Required cruise conditions for different values of $\alpha$}
     \begin{tabular}{ccccc}
     \toprule
-    $\alpha (^o)$ & $C_D$ & $C_L$ & $V (ms^{-1})$     & $T (N)$ \\
+    $\alpha (^o)$ & $C_D$ & $C_L$ & $V (ms^{-1})$ & $T (N)$ \\
     \midrule
-    0     & 0.017677131 & 0.0387 & 682.0847686 & 208297.9977 \\
-    2     & 0.073163231 & 0.1859 & 311.2104268 & 47539.40075 \\
-    4     & 0.023345134 & 0.334 & 232.1777513 & 31873.82496 \\
-    6     & 0.029604436 & 0.4828 & 193.1124187 & 27962.3589 \\
+    0     & 0.017677131 & 0.0387 & 707.4010791 & 224047.3585 \\
+    2     & 0.019379779 & 0.1859 & 322.7613368 & 51133.84325 \\
+    4     & 0.023345134 & 0.334 & 240.7952785 & 34283.79709 \\
+    6     & 0.029604436 & 0.4828 & 200.279994 & 30076.58604 \\
     \bottomrule
+
     \end{tabular}%
   \label{tab:cruise_cond}%
 \end{table}%
-
-By choosing an angle of attack of $\alpha=4^o$ and giving the modelled aircraft the required thrust, the following results were obtained for airspeed and angle of attack at a 
-\section{Feedback Linearisation}
-\label{section:FBL}
-
-\section{Linear Controller}
-\label{section:linear_controller}
-
-\subsection{Fast Loop Control}
-\label{section:linear_controller/fast_loop}
-
-\subsection{Guidance Control}
-\label{section:linear_controller/guidance}
-
-\section{Neural Network}
-\label{section:NN}
-
-

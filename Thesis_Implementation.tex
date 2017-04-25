@@ -165,7 +165,7 @@ Should all of the parameters mentioned in the equations above be known and no in
 \tau = -K_P (\Omega-\Omega^d)-K_D (\dot{\Omega}-\dot{\Omega}^d)+\ddot{\Omega}
 \label{eq:linear_controller}
 \end{equation}
-Where the $K_P$ and $K_D$ coefficients are chosen to assure stability of KD NOT EMPIRICALLY?
+Where the $K_P$ and $K_D$ coefficients are chosen to assure stability and reference tracking (HOW TO NOT EMPIRICALLY?)
 
 From this point the next step shall be to obtain the desired values of $\Omega$. These were obtained using another PD controller, using Euler angle reference values to control rotation rates. Among these reference values to be followed, $\tau_r$ was set to zero. This was made to make use of the decoupling through feedback linearisation of the plane's movement, using a roll and pitch motion to turn the aircraft. This results in the following control of rotation rate
 \begin{subequations}
@@ -179,8 +179,52 @@ q= k_P (\theta^d-\theta) + k_d (\dot{\theta^d-\dot{\theta}})
 r=0
 \end{equation}
 \end{subequations}
+
+It is now possible to control the attitude of the aircraft, and the fast control loop design is finished. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far to achieve the goal of position tracking over time. Firstly the dynamics for the speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
+\begin{subequations}
+\begin{equation}
+\dot{V_a} = \dfrac{1}{m}(T\cos \alpha -D - mg\sin \gamma)
+\label{eq:va_dot}
+\end{equation}
+\begin{equation}
+\dot{\gamma} = \dfrac{1}{mV_a}(T\sin \alpha +L - mg\cos \gamma)
+\label{eq:gamma_dot}
+\end{equation}
+These equation can easily be obtained from the sum of forces in figure \ref{fig:flight_path_angle}. For the yaw rate comes that (SEE ANNEX)
+\begin{equation}
+\dot{\psi} = \dfrac{g}{V_a} \tan \phi
+\label{eq:psi_dot}
+\end{equation}
+\end{subequations}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.75\textwidth]{Figures/flight_path_angle.png}
+  \caption[Aircraft frames of reference]{$\gamma$ representation and frames of reference}
+  \label{fig:flight_path_angle}
+\end{figure}
+
+After choosing the desired dynamics to control these variables, the equations above must be solved for both the thrust reference $T$, the desired AoA and $\psi$. From these last two, knowing the current roll angle $\theta$, the input for the fast dynamics controller is obtained. The desired dynamics were chosen as first order systems as
+\begin{subequations}
+\begin{equation}
+\dot{V_a} = \dfrac{1}{\tau_{V_a}}(V_a^d-V_a)
+\label{eq:va_dot_des}
+\end{equation}
+\begin{equation}
+\dot{\gamma} = \dfrac{1}{\tau_{\gamma}}(\gamma^d-\gamma)
+\label{eq:gamma_dot_des}
+\end{equation}
+\begin{equation}
+\dot{\psi} = \dfrac{1}{\tau_{\psi}}(\psi^d-\psi)
+\label{eq:psi_dot_des}
+\end{equation}
+\end{subequations}
+
+FINISH CONTROL WITH A METHOD TO GET Va GAMMA and PSI FROM X,Y,Z
 \section{Neural Network}
 \label{section:NN}
+
+As 
 
 \section{Verification and Validation}
 \label{section:model/verification}
@@ -196,7 +240,7 @@ The goal in this section will be to validate the behaviour of the model in cruis
 In order to verify the model described so far, the required thrust to have cruise conditions will be computed for a given plausible value of $\alpha$. From this point the airspeed of the aircraft can also be computed. The graph of $C_L$ versus alpha was also obtained from its respective neural network, given by \ref{fig:cl_alpha}
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=1\textwidth]{Figures/CL_alpha.png}
+  \includegraphics[width=0.75\textwidth]{Figures/CL_alpha.png}
   \caption[$C_L$ versus $\alpha$ graph]{$C_L$ versus $\alpha$ graph from Neural Network}
   \label{fig:cl_alpha}
 \end{figure}

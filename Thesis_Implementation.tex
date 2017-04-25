@@ -224,7 +224,7 @@ FINISH CONTROL WITH A METHOD TO GET Va GAMMA and PSI FROM X,Y,Z
 \section{Neural Network}
 \label{section:NN}
 
-As 
+Over the years, intelligent control techniques using neural networks have become a growing research topic, addressing the limitations of state-of-the-art model based controllers such as linear quadratic Gaussian, model predictive control, backstepping and gain scheduling \citep{SotA_IFCS}. Indeed, variation in the plat dynamics (e.g., due to payload changes, actuator or sensor degradation) deteriorate the performance and reference tracking error of the controller. To compensate for such errors, adaptive online neural networks have been studied and implemented in several works \cite{quad_NLI+NN}, \cite{NN_PID}, \cite{UAV_adaptive} and \cite{NN_NLI} to name a few. These however, have been applied almost exclusively to UAV aircrafts, especially multicopters. For this work a feedforward network with one hidden layer, one of the most widely implemented neural network architecture \cite{SotA_IFCS} was used.
 
 \section{Verification and Validation}
 \label{section:model/verification}

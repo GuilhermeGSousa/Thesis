@@ -371,6 +371,7 @@ Although feedback control answers to many of the problems of linear controllers 
 However, even for simpler models, a real system is difficult to accurately describe, and an approximation $\hat{f}$ of $f$ is usually chosen, resulting in $\upsilon=\hat{f}(x,\dot{x},u)$. Therefore, defining a dynamic inversion error, $\Delta(x,\dot{x},u)=f(x,\dot{x},u)-\hat{f}(x,\dot{x},u)$, comes that, as stated in \cite{YANG+LIN_Adaptive_Flight_Control}
 \begin{equation}
 \ddot{x}=\upsilon + \Delta(x,\dot{x},u)
+\label{eq:system+error}
 \end{equation}
 There can be many causes for a dynamic inversion error to be present, as not only modelling incertitudes can lead to larger errors, but also external interference (wind gusts) and actuator faults. The goal of this section will be to present the reader with some solutions to minimize this error. 
 

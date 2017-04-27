@@ -155,18 +155,25 @@ bC_l\\
 bC_n
 \end{bmatrix}
 + C_\delta \delta\right)-V_a^2C_c\dot{R_a} \right\rbrace+ \delta
+\label{eq:control_law}
 \end{equation}
 
-(Check if conditions from MIMO NLI are respected)
 
-The wind effects will appear in the terms including $\dot{Ra} =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. SEE ANNEX HERE 
+Indeed, by replacing \ref{eq:control_law} in the jerk equation \ref{eq:jerk}, the equation $\ddot{\Omega} = \tau$ is obtained, resulting in a successfully inverted system.
+
+
+The wind effects will appear in the terms including $\dot{Ra} =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. 
+
+
+SEE ANNEX HERE 
 
 Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\ddot{\Omega}=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]_T$. As mentioned in section \ref{section:background/NLI}, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs comes a control law for $\tau$, firstly considering without neural network adaptation
 \begin{equation}
 \tau = -K_P (\Omega-\Omega^d)-K_D (\dot{\Omega}-\dot{\Omega}^d)+\ddot{\Omega}^d
 \label{eq:linear_controller}
 \end{equation}
-Where the $K_P$ and $K_D$ coefficients are chosen to assure stability and reference tracking (HOW TO NOT EMPIRICALLY?)
+Where the $K_P$ and $K_D$ coefficients are chosen to assure stability and reference tracking 
+(HOW TO NOT EMPIRICALLY?)
 
 From this point the next step shall be to obtain the desired values of $\Omega$. These were obtained using another PD controller, using Euler angle reference values to control rotation rates. Among these reference values to be followed, $\tau_r$ was set to zero. This was made to make use of the decoupling through feedback linearisation of the plane's movement, using a roll and pitch motion to turn the aircraft. This results in the following control of rotation rate
 \begin{subequations}
@@ -191,7 +198,8 @@ It is now possible to control the attitude of the aircraft, and the fast control
 \dot{\gamma} = \dfrac{1}{mV_a}(T\sin \alpha +L - mg\cos \gamma)
 \label{eq:gamma_dot}
 \end{equation}
-These equation can easily be obtained from the sum of forces in figure \ref{fig:flight_path_angle}. For the yaw rate comes that (SEE ANNEX)
+These equation can easily be obtained from the sum of forces in figure \ref{fig:flight_path_angle}. For the yaw rate comes that 
+(SEE ANNEX explanation)
 \begin{equation}
 \dot{\psi} = \dfrac{g}{V_a} \tan \phi
 \label{eq:psi_dot}
@@ -244,10 +252,10 @@ There are quite some challenges in designing a feed forward neural network. Besi
 \item \textbf{Redundancy}: A large value of redundant and irrelevant input variables will not only increase the needed computational effort of the NN, but will also increase the difficulty to train the weights of the network and add noise to the system.
 \end{itemize}
 
-Another consideration about the chosen inputs that must also be taken into account is the range of values these might take. The sigmoid function $sing(x)$ used reaches around 75\% when $x=1$ and 100\% when $x=2$, as can be seen in figure \ref{fig:sigmoid}. For some cases the inputs might need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The average of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$ the following equation is used
+Another consideration about the chosen inputs that must also be taken into account is the range of values these might take. The sigmoid function $sing(x)$ used reaches around 75\% when $x=1$ and 100\% when $x=2$, as can be seen in figure \ref{fig:sigmoid}. For some cases the inputs might therefore need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained before even starting training, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The average of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$ the following equation is used
 
 \begin{equation}
-y=\dfrac{x-x_{min}}{x_{max}-x_{min}}
+y=2\dfrac{x-x_{min}}{x_{max}-x_{min}}-1
 \label{eq:normalisation}
 \end{equation}
 
@@ -264,14 +272,17 @@ For this  particular case, the state variables of the fast dynamics where used a
 
 As mentioned in section \ref{section:background/NN}, a backpropagation algorithm was used to train both set of weights online. This algorithm, however, must have an error function that will be minimized by iteratively changing the values of the weights $V$ and $W$. As seen previously, due to inversion errors an error $\Delta$ will be present, where $\tau = \ddot{\Omega}^d + \Delta$. This error must be computed on each iteration to train the network to approximate this error. The error can be expressed as $\Delta=\tau - \ddot{\Omega}^d$. From the control law used to obtain $\tau$ (\ref{eq:linear_controller}) comes that
 \begin{equation}
-\Delta = -K_P(\Omega-\Omega^d)-K_D(\ddot{\Omega}-\ddot{\Omega}^d)
+\Delta = -K_P(\Omega-\Omega^d)-K_D(\dot{\Omega}-\dot{\Omega}^d)
 \end{equation}
 Finally the cost function used to train the network is given by
 
 \begin{equation}
 J=(\Delta-y_{NN})^2
+\label{eq:NN_cost}
 \end{equation}
 
+The values of $\dot{V}$ and $\dot{W}$ must now be computing, using the gradient descent method described in section \ref{section:background/NN}. As the name suggest, the back propagation algorithm firstly computes the weight update values for the last layers, propagating the errors to update the previous weight set. The weights are constantly updated until the error's absolute value in lesser than a given value $\xi$, in which case these are kept constant as $\dot{V}=\dot{W}=0$. 
+One of the parameters that must be tuned that has the largest impact on the performance of the network is the learning rate $\alpha$. This coefficient can also be thought of as the step size in incrementing the weight sets. Let $V^*$ and $W^*$ be the two ideal set of weights that, for a given input, result in an absolutely minimal cost function. A small value will allow the weights to converge to their ideal value, although taking many iterations to do so. A large learning rate however might converge faster, but might also overshoot and miss its optimal value. The results of the variation of this rate will be studied in chapter \ref{chapter:results}.
 
 \section{Verification and Validation}
 \label{section:model/verification}

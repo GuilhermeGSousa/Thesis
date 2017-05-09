@@ -11,7 +11,7 @@
 \chapter{Background}
 \label{chapter:background}
 
-On this chapter the aircraft model used for this work will be described firstly. A theoretical model of the plane's dynamics will be discussed, and implementation detail will be provided on the chapter \ref{chapter:implementation}. The control strategy used will then follow, giving an overview of the feedback linearisation approach, as well as its limitations, namely its sensitivity to inversion errors and external interferences. An attempt to solve these limitation will be made, suggesting some solutions and finally describing the chosen methodology for this case.
+In this chapter the aircraft model used for this work will be described firstly. A theoretical model of the plane dynamics will be discussed, and implementation details will be provided in chapter \ref{chapter:implementation}. The control strategy used will then follow, giving an overview of the feedback linearisation approach, as well as its limitations, namely its sensitivity to inversion errors and external interferences. An attempt to solve these limitation will be made, suggesting some solutions and finally describing the chosen methodology for this case.
 
 
 
@@ -27,7 +27,7 @@ The first step before describing the dynamics of a commercial aircraft will be t
 
 
 \begin{equation}
-R_{WB}=
+R_{BW}=
 \begin{bmatrix}
 c_\alpha c_\beta & -c_\alpha s_\beta & -s_\alpha \\
 s_\beta & c_\beta & 0 \\
@@ -36,10 +36,10 @@ s_\alpha c_\beta & -s_\alpha s_\beta & c_\alpha
 \label{eq:wind2body}
 \end{equation}
 
-To describe the attitude of the plane Euler angles will also be used, namely $\phi\{-\pi,\pi\}; \theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}; \psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth's frame is given by
+To describe the attitude of the plane Euler angles , roll, pitch and yaw, will also be used, namely $\phi\{-\pi,\pi\}; \theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}; \psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
 
 \begin{equation}
-R_{BE}=
+R_{EB}=
 \begin{bmatrix}
 c_\theta c_\psi & s_\phi s_\theta c_\psi - c_\phi s_\psi & c_\phi s_\theta c_\psi + s_\phi s_\psi \\
 c_\theta c_\psi & s_\phi s_\theta s_\psi + c_\phi c_\psi & c_\phi s_\theta s_\psi - s_\phi c_\psi \\
@@ -51,7 +51,7 @@ c_\theta c_\psi & s_\phi s_\theta s_\psi + c_\phi c_\psi & c_\phi s_\theta s_\ps
 \subsection{Fast Dynamics}
 \label{section:background/model/fast_dynamics}
 
-The considered actuators of the aircraft that control its attitude are given by $\delta = [\delta_{ail} \delta_{ele} \delta_{rud}]^T$, each applying a torque along an axis of the body frame. These torques are giver by
+The considered actuators of the aircraft that control its attitude are given by the control surface deflection $\delta = [\delta_{ail} \delta_{ele} \delta_{rud}]^T$, each applying a torque along an axis of the body frame. These torques are given by
 
 \begin{equation}
 \begin{bmatrix}
@@ -69,7 +69,7 @@ bC_n
 \label{eq:torque}
 \end{equation}
 
-where $\bar{c}$ and $b$ represent the wing chord length and span respectively, $C_\delta$ and the moment coefficients $[C_l C_m C_n]^T$ are given by
+where $\bar{c}$ and $b$ represent the wing mean chord and its span respectively, $C_\delta$ and the moment coefficients $[C_l C_m C_n]^T$ are given by
 
 \begin{equation}
 C_\delta = 
@@ -94,7 +94,7 @@ C_{n\beta} \beta + C_{n_p} p \dfrac{b}{2V_a} + C_{n_r} r \dfrac{b}{2V_a}
 \end{bmatrix}
 \label{eq:cmoment}
 \end{equation}
-Where $p, q, r$ are the body's angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method of obtaining of the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft's inertial matrix.
+Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method for obtaining of the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft inertial matrix.
 \begin{subequations}
 	\begin{equation}
 		\dot{\Omega} = I^{-1} M_{ext} - I^{-1}\Omega \times (I\Omega)
@@ -169,7 +169,7 @@ The angular rates are also related to the Euler angles. The relationship between
 \begin{bmatrix}
 \dot{\phi}\\
 \dot{\theta}\\
-\dot{psi}
+\dot{\psi}
 \end{bmatrix}
 =
 \begin{bmatrix}
@@ -185,7 +185,7 @@ r
 \label{eq:euler2omega}
 \end{equation}
 
-\section{Guidance Dynamics}
+\section{Translation Dynamics}
 \label{section:background/model/guidance_dynamics}
 
 This subsection on the forces applied to aircraft, introducing a new actuation variable, the thrust force $T$. These forces are applied along the three axis of the wind frame, lift, drag and side force, given by
@@ -268,7 +268,7 @@ Finally, to simulate the delay response in actuation in order to have a realisti
 \label{eq:actuator_dynamics}
 \end{equation}
 
-Similarly for the thrust
+Similarly for thrust
 
 \begin{equation}
 \dot{T} = \dfrac{1}{\xi_T}(T^d-T)
@@ -291,7 +291,7 @@ one must find both a state transformation $z=z(x)$ and an input transformation $
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=1\textwidth]{Figures/NLI}
-  \caption[Feedback linearisation example]{Feedback linearisation example}
+  \caption[Feedback linearisation example]{Feedback linearisation example \cite{Slotine+Li}}
   \label{fig:nli}
 \end{figure}
 

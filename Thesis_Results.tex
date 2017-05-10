@@ -71,11 +71,31 @@ Following these constant reference values the results obtained were
 \end{minipage}
 \caption[AoA and thrust validation]{Angle of Attack (degrees) and thrust (Newton) of the controlled aircraft}
 \end{figure}
+
+This simulation, made over 800 seconds, shows clearly that the angle oscillates around a $6^o$ degree angle of attack, with an amplitude of around $0.4^o$ degrees. As for the thrust, it also oscillates around $30000N$ with an amplitude of $2000N$. These values correspond to the theoretical values in table \ref{tab:cruise_cond} for $\alpha=6^o$, indicating that not only the modelled plane is well behaved, but also that the coefficient neural networks are able to simulate an accurate model of the aerodynamic coefficient's variation.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Feedback linearisation controller}
 \label{section:results/fl_contro}
 
-Quest for the optimal solution...
+Once the model has been tested and validated, the described nonlinear inversion controller can now be tested. Reference tracking will firstly be observed with simple constant reference values, without any guidance control law. Reiterating the example from the previous section in cruise conditions for $V_a^d=200 ms^{-1}$, $\gamma^d = 0^o$ and $\psi^d = 0^o$ comes that
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/nli_test_const.png}
+\caption[Constant reference following of feedback linearisation controller]{Reference (blue) following over $1000s$ of simulation time for $V_a^d=200 ms^{-1}$, $\psi^d = 0^o$ and $\gamma^d = 0^o$ respectively and measured values (yellow)}
+\label{fig:const_ref}
+\end{figure}
+
+As seen in the figure \ref{fig:const_ref} the reference is followed with minimal osculations for the three variables, although with the presence of some steady state error in the case of the airspeed $V_a$. To be able to follow trajectories however, a good control of the aircraft's heading will be necessary. Proposing this time the following variation in $\psi^d$
+\begin{equation}
+\psi^d = \begin{cases}
+0^o & t < 100\\
+90^o & 100 \leq t < 500\\
+0^o & t > 500 \\
+\end{cases}
+\end{equation}
+
 
 \section{Disturbances and Errors}
 \label{section:results/disturbances_errors}

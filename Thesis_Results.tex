@@ -94,20 +94,76 @@ As seen in the figure \ref{fig:const_ref} the reference is followed with minimal
 90^o & 100 \leq t < 500\\
 0^o & t > 500 \\
 \end{cases}
+\label{eq:test_traj}
 \end{equation}
 
 The comparing the measured heading $\psi$ and its desired value comes 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/heading_test.png}
-\caption[]{}
+\caption[Desired and measured heading]{Desired (blue) and measured (green) heading}
 \label{fig:heading_test}
 \end{figure}
 
-Although the reference value is reached after each step, the convergence takes around $100s$ for a $90^o$ perturbation to converge, without overshoot. These conversion times can be explained by the high inertia and mass of the commercial aircraft.
+Although the reference value is reached after each step, the convergence takes around $100s$ for a $90^o$ perturbation to converge, without overshoot. These conversion times can be explained by the high inertia and mass of the commercial aircraft. The resulting airplane trajectory can be seen in figure \ref{fig:trajectory}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/trajectory.png}
+\caption[Plane trajectory]{Plane trajectory for the mention control input}
+\label{fig:trajectory}
+\end{figure}
+
 \section{Disturbances and Errors}
 \label{section:results/disturbances_errors}
 
+From the results obtained in the previous section, it can be concluded the controller performs correctly following the desired reference. These results however were obtain supposing the exact model of the aircraft was known, without any kind of external perturbation or simulated system failure. It is these perturbations that will be simulated in this section and studied. To do so the same testing reference as described in equation \ref{eq:test_traj} will be used to compare the effects of different types of disturbances with the undisturbed system. 
+
+\subsection{Inversion errors}
+
+This error will be the most frequent when implementing such a controller, as some system parameters estimations may have considerable errors, namely the aircraft's inertial matrix. Fortunately, the controller used is, as will be demonstrated, tolerant to errors in the estimation of this parameter, but can result in an unstable system in extreme cases. To simulate estimation errors, the entries of the inertial matrix $A$,$B$,$C$ and $E$ were multiplied by a reducing factor $\zeta \in [0;1]$ when computing the nonlinear inversion in \ref{eq:control_law}.
+
+Changing the values of $\zeta$ to $0.5$ and $0.05$, increasing the inversion error, results in the following trajectories in figure \ref{fig:inversion_error}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/inversion_error.png}
+\caption[Plane trajectory with inertia estimation errors]{Plane trajectory for for $\zeta = 0.5$ (red) and $\zeta= 0.05$ (yellow)}
+\label{fig:inversion_error}
+\end{figure}
+
+Indeed, a 50\% error in estimating the inertia of the aircraft when computing the feedback linearisation law results in a negligible reference tracking error, as can be seen in figure \ref{fig:ref_zeta_05}. This however is not the case if $\zeta$ is reduced even further to $\zeta = 0.05$ and error of the system relative to its references becomes much greater (figure \ref{fig:ref_zeta_005}. As can be seen in this figure, the aircraft is unable to follow yaw commands in this case as it easily goes unstable. This establishes a first goal to measure the performance of the designed neural network, to try to approach the case of $\zeta = 0.05$ to the reduced errors of a nonlinear inversion with no inertia estimation errors.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/ref_zeta_05.png}
+\caption[Reference tracking for $\zeta=0.5$]{$V_a$, $\gamma$ and $\psi$ for measured and desired values for $\zeta=0.5$}
+\label{fig:ref_zeta_05}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/ref_zeta_005.png}
+\caption[Reference tracking for $\zeta=0.05$]{$V_a$, $\gamma$ and $\psi$ for measured and desired values for $\zeta=0.05$}
+\label{fig:ref_zeta_005}
+\end{figure}
+
+\subsection{System failures}
+
+One other cause for inversion errors that can have a much greater impact on flight trajectory are system failures. This subsection will focus on methods to simulate these failures and observe the behaviour of the airplane trajectory for these cases. The reference trajectory that will be used shall be the same as used previously. The first failure to be simulated will be a control surfaces failure, that will lead to reduced controllability of the aircraft. In this work this was replicated in a simulated environment by reducing each moment coefficients for the elevon, aileron and rudder, namely $C_{\delta_{ele}}$, $C_{\delta_{ail}}$ and $C_{\delta_{rud}}$.
+
+By setting each of these coefficients to 20\% of their initial values, the effect of the errors in followed trajectory become visible in figure \ref{fig:reduced_act}. This figure show that the reduced controllability results in a $20km$ difference to that of the undisturbed system. This sets the second goal for the performance of the neural network, to reduce this error as much as possible.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/reduced_act.png}
+\caption[Trajectory with reduced actuation]{Trajectory with 20\% reduced actuation (blue) and trajectory without failures (red)}
+\label{fig:reduced_act}
+\end{figure}
+
+\subsection{Wind disturbances}
+
+TODO?
 
 \section{Neural Network}
 \label{section:results/NN}

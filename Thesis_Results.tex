@@ -54,7 +54,7 @@ The required thrust can also be computed from both \ref{eq:cruise_cond}, \ref{eq
     6     & 0.029604436 & 0.4828 & 200.279994 & 30076.58604 \\
     \bottomrule
 
-    \end{tabular}%
+    \end{tabular}
   \label{tab:cruise_cond}%
 \end{table}%
 
@@ -69,7 +69,7 @@ Following these constant reference values the results obtained were
 \begin{minipage}{0.49\textwidth}
 \includegraphics[width=\textwidth]{Figures/Results/thrust_check.PNG}
 \end{minipage}
-\caption[AoA and thrust validation]{Angle of Attack (degrees) and thrust (Newton) of the controlled aircraft}
+\caption[AoA and thrust validation]{Angle of Attack (degrees) and thrust (N) of the controlled aircraft}
 \end{figure}
 
 This simulation, made over 800 seconds, shows clearly that the angle oscillates around a $6^o$ degree angle of attack, with an amplitude of around $0.4^o$ degrees. As for the thrust, it also oscillates around $30000N$ with an amplitude of $2000N$. These values correspond to the theoretical values in table \ref{tab:cruise_cond} for $\alpha=6^o$, indicating that not only the modelled plane is well behaved, but also that the coefficient neural networks are able to simulate an accurate model of the aerodynamic coefficient's variation.
@@ -121,11 +121,11 @@ From the results obtained in the previous section, it can be concluded the contr
 
 \subsection{Inversion errors}
 
-This error will be the most frequent when implementing such a controller, as some system parameters estimations may have considerable errors, namely the aircraft's inertial matrix. Fortunately, the controller used is, as will be demonstrated, tolerant to errors in the estimation of this parameter, but can result in an unstable system in extreme cases. To simulate estimation errors, the entries of the inertial matrix $A$,$B$,$C$ and $E$ were multiplied by a reducing factor $\zeta \in [0;1]$ when computing the nonlinear inversion in \ref{eq:control_law}.
+This error will be the most frequent when implementing such a controller, as some system parameters estimations may have considerable errors, namely the aircraft's inertial matrix. Fortunately, the controller used is, as will be demonstrated, tolerant to errors in the estimation of this parameter, but can result in an unstable system in extreme cases. To simulate estimation errors, the entries of the inertial matrix $A$,$B$,$C$ and $E$ were multiplied by a reducing factor $\zeta \in [0;1]$ when computing the nonlinear inversion in \ref{eq:control_law}. The inertial matrix used in this equation $I_{est}$ is therefore given by $I_{est} = \zeta I$.
 
 Changing the values of $\zeta$ to $0.5$ and $0.05$, increasing the inversion error, results in the following trajectories in figure \ref{fig:inversion_error}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/inversion_error.png}
 \caption[Plane trajectory with inertia estimation errors]{Plane trajectory for for $\zeta = 0.5$ (red) and $\zeta= 0.05$ (yellow)}
@@ -134,14 +134,14 @@ Changing the values of $\zeta$ to $0.5$ and $0.05$, increasing the inversion err
 
 Indeed, a 50\% error in estimating the inertia of the aircraft when computing the feedback linearisation law results in a negligible reference tracking error, as can be seen in figure \ref{fig:ref_zeta_05}. This however is not the case if $\zeta$ is reduced even further to $\zeta = 0.05$ and error of the system relative to its references becomes much greater (figure \ref{fig:ref_zeta_005}. As can be seen in this figure, the aircraft is unable to follow yaw commands in this case as it easily goes unstable. This establishes a first goal to measure the performance of the designed neural network, to try to approach the case of $\zeta = 0.05$ to the reduced errors of a nonlinear inversion with no inertia estimation errors.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/ref_zeta_05.png}
 \caption[Reference tracking for $\zeta=0.5$]{$V_a$, $\gamma$ and $\psi$ for measured and desired values for $\zeta=0.5$}
 \label{fig:ref_zeta_05}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/ref_zeta_005.png}
 \caption[Reference tracking for $\zeta=0.05$]{$V_a$, $\gamma$ and $\psi$ for measured and desired values for $\zeta=0.05$}
@@ -154,13 +154,34 @@ One other cause for inversion errors that can have a much greater impact on flig
 
 By setting each of these coefficients to 20\% of their initial values, the effect of the errors in followed trajectory become visible in figure \ref{fig:reduced_act}. This figure show that the reduced controllability results in a $20km$ difference to that of the undisturbed system. This sets the second goal for the performance of the neural network, to reduce this error as much as possible.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/reduced_act.png}
 \caption[Trajectory with reduced actuation]{Trajectory with 20\% reduced actuation (blue) and trajectory without failures (red)}
 \label{fig:reduced_act}
 \end{figure}
 
+One second type of flight perturbation that will be included in this subsection is the effects of icing conditions in aircraft flight. According to the FAA guide to flight in icing conditions, ice contamination of an airfoil has an important influence on both the Lift and Drag curves \cite{icing_cond}. Ways to simulate these perturbations in a modelled environment will be studied, and as for the the other described disturbances an online neural network will be used to improve the control of the aircraft in such conditions. The main drawbacks that can be caused by icing are
+
+\begin{itemize}
+\item \textbf{Stall }As seen in figure \ref{fig:icing_lift}, ice contamination of the airfoil leads to a significant reduction in the value of the maximum $C_L$, causing the aircraft to reach stall conditions ata much lower angle of attack. Reducing speed (e.g for an approach) makes this effect more noticeable for the pilot. The usual reduction on $C_{L_{max}}$ is of 30\% \cite{icing_cond}.
+
+\item \textbf{Drag }Drag will increase directly with the amount of ice accumulated on the wing, reaching usual values of 100\% of the initial drag coefficient.
+
+\item \textbf{Roll }Icing on the main wings will also affect roll control. As the thickness of the wing decreases towards its tip, so increases its efficiency to collect ice, leading to a partial stall in the tip of the wings. 
+\end{itemize}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{Figures/Results/icing_lift.PNG}
+\caption[Effects of icing on the lift coefficient]{Effects of icing on the lift coefficient \cite{icing_cond}}
+\label{fig:icing_lift}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{Figures/Results/icing_drag.PNG}
+\caption[Effects of icing on the drag coefficient]{Effects of icing on the drag coefficient \cite{icing_cond}}
+\label{fig:icing_drag}
+\end{figure}
 \subsection{Wind disturbances}
 
 TODO?

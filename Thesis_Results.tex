@@ -168,20 +168,33 @@ One second type of flight perturbation that will be included in this subsection 
 
 \item \textbf{Drag }Drag will increase directly with the amount of ice accumulated on the wing, reaching usual values of 100\% of the initial drag coefficient.
 
-\item \textbf{Roll }Icing on the main wings will also affect roll control. As the thickness of the wing decreases towards its tip, so increases its efficiency to collect ice, leading to a partial stall in the tip of the wings. 
+\item \textbf{Roll }Icing on the main wings will also affect roll control. As the thickness of the wing decreases towards its tip, so increases its efficiency to collect ice, leading to a partial stall in the tip of the wings, according to the AOPA manual \cite{icing_aopa}.
 \end{itemize}
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.7\textwidth]{Figures/Results/icing_lift.PNG}
-\caption[Effects of icing on the lift coefficient]{Effects of icing on the lift coefficient \cite{icing_cond}}
+\caption[Effects of icing on lift coefficient]{Effects of icing on lift coefficient \cite{icing_cond}}
 \label{fig:icing_lift}
 \end{figure}
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.7\textwidth]{Figures/Results/icing_drag.PNG}
-\caption[Effects of icing on the drag coefficient]{Effects of icing on the drag coefficient \cite{icing_cond}}
+\caption[Effects of icing on drag coefficient]{Effects of icing on drag coefficient \cite{icing_cond}}
 \label{fig:icing_drag}
 \end{figure}
+
+Following these indications to simulate heavy icing condition, the lift coefficient $C_{L_{max}}$ was reduced by 30\%, and the stall angle reduced from $15^o$ (see figure \ref{fig:cl_alpha}) resulting in figure \ref{fig:cl_icing}. The value of the drag coefficient was also augmented by 50\% from equation \ref{eq:cd_cl}. Finally, in order to simulate roll control limitations, the value of $C_{\delta_{ail}}$ was reduced by 30\%. These values were chosen in order to deteriorate the control of the aircraft, while allowing for reference following without reaching actuator saturation (for both control surface deflections and thrust). For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)$ degrees, t being the simulation time. A sinusoidal reference was used to make the effects of simulated icing more noticeable, and the same references of $V_a^d=200ms^{-1}$ and $\gamma^d=0$ as previously were used. For this case, the results obtained were, for both icing and non icing conditions,
+
+TODO 
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{Figures/Results/cl_icing.PNG}
+\caption[Lift coefficient simulation in icing conditions]{Lift coefficient simulation in icing conditions}
+\label{fig:cl_icing}
+\end{figure}
+
 \subsection{Wind disturbances}
 
 TODO?

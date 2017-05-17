@@ -11,7 +11,11 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-Insert your chapter material here...
+Due to their inherent non-linear dynamics, designing control systems for both rotary and fixed wing aircraft is a non-trivial task, where using linear control approaches reveal to be inaccurate. Feedback linearisation is an approach to non-linear control design that algebraically transforms a non-linear system onto a linear one. From the linearised system linear control techniques can be used. However this approach, as well as other state-of-the art control systems such as model predictive control, backstepping and gain scheduling require the \textit{a priori} exact mathematical model of the system to be controlled \cite{SotA_IFCS}. The lack of such a model leads to errors in the calculation of the model inversion, necessary to implement feedback linearisation. Indeed, while feedback linearisation control shows good tracking, it has poor disturbance rejection, that ultimately lead to these inversion errors \cite{SotA_ControlAlgorithm}. One solution to this problem that has gained momentum over the last years is the use augmentation algorithms, namely neural networks and other intelligent algorithms, to minimize and cancel this error\cite{NLI+NN}, \cite{NLI+NN_IFCS}, \cite{NLI+NN_chinese}. 
+
+This paper aims to discuss the existing alternatives to augment the precision, robustness and overall performance of feedback linearisation control. A second goal of this work will be to extend the solutions used to increase the robustness of feedback linearisation control to provide an adaptive control in cases of system failures and strong external disturbances.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Motivation}
@@ -31,8 +35,10 @@ Brief description of the solutions to be studied and how they will be used to im
 \section{Objectives}
 \label{section:objectives}
 
-Goals: create systems able to adapt to changes of the airplane's dynamic
+This work can be divided in three progressive goals, that must be sequentially achieved. Firstly, the model of a commercial aircraft will be studied thoroughly, defining both its fast and slow dynamics, as well as methods to obtain its aerodynamic coefficients. Once a model is established, it will be then implemented in a simulation environment, in this case Simulink. The first goal will be achieved once the simulation of a commercial aircraft is validated and its results are theoretically coherent. A controller using feedback linearisation will then be designed and tested to control the aircraft's plant. The desired objective in this case is to obtain a stable reference following with reduced error.
 
+The third and final objective of this work will indeed be built on top of the previous two. After studying the different types of errors and external perturbations that both the linearised model of the aircraft may be submitted to, its behaviour in such conditions will be discussed. A decrease of the accurateness of the controller and stability are expected of the airplane in these conditions.
+These tests will serve not only to verify the impact of a reduced knowledge of the exact model of the plane, but also the test the robustness of the aircraft to external perturbations such as wind and icing conditions. An online neural network will then be used to improve the robustness and stability of the aircraft in cases in which the default NLI controller performed poorly of even became unstable. The overall final objective will be to have an adaptive controller for a commercial aircraft based on feedback linearisation, without the limitations of model based controllers, capable of following 4D trajectories and displaying increased robustness to external disturbances. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Thesis Outline}

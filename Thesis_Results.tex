@@ -183,10 +183,9 @@ One second type of flight perturbation that will be included in this subsection 
 \label{fig:icing_drag}
 \end{figure}
 
-Following these indications to simulate heavy icing condition, the lift coefficient $C_{L_{max}}$ was reduced by 30\%, and the stall angle reduced from $15^o$ (see figure \ref{fig:cl_alpha}) resulting in figure \ref{fig:cl_icing}. The value of the drag coefficient was also augmented by 50\% from equation \ref{eq:cd_cl}. Finally, in order to simulate roll control limitations, the value of $C_{\delta_{ail}}$ was reduced by 30\%. These values were chosen in order to deteriorate the control of the aircraft, while allowing for reference following without reaching actuator saturation (for both control surface deflections and thrust). For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)$ degrees, t being the simulation time. A sinusoidal reference was used to make the effects of simulated icing more noticeable, and the same references of $V_a^d=200ms^{-1}$ and $\gamma^d=0$ as previously were used. For this case, the results obtained were, for both icing and non icing conditions,
+Following these indications to simulate heavy icing condition, the lift coefficient $C_{L_{max}}$ was reduced by 30\%, and the stall angle reduced from $15^o$ (see figure \ref{fig:cl_alpha}) resulting in figure \ref{fig:cl_icing}. The value of the drag coefficient was also augmented by 200\% from equation \ref{eq:cd_cl}. Finally, in order to simulate roll control limitations, the value of $C_{\delta_{ail}}$ was reduced by 30\%. These values were chosen in order to deteriorate the control of the aircraft, while allowing for the possibility of reference following without reaching actuator saturation (for both control surface deflections and thrust). 
 
-TODO 
-
+For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)$ degrees, t being the simulation time. A sinusoidal reference was used to make the effects of simulated icing more noticeable, and the same references of $V_a^d=200ms^{-1}$ and $\gamma^d=0$ as previously were used. For this case, the results obtained were, for both icing and non icing conditions,
 
 \begin{figure}[H]
 \centering
@@ -195,9 +194,16 @@ TODO
 \label{fig:cl_icing}
 \end{figure}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{Figures/Results/ref_icing.PNG}
+\caption[Reference following in icing conditions]{$V_a$, $\gamma$ and $\psi$ for measured and desired values in icing conditions}
+\label{fig:ref_icing}
+\end{figure}
+
 \subsection{Wind disturbances}
 
-TODO?
+TODO
 
 \section{Neural Network}
 \label{section:results/NN}

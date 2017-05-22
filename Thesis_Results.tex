@@ -140,7 +140,6 @@ Indeed, a 50\% error in estimating the inertia of the aircraft when computing th
 \caption[Reference tracking for $\zeta=0.5$]{$V_a$, $\gamma$ and $\psi$ for measured and desired values for $\zeta=0.5$}
 \label{fig:ref_zeta_05}
 \end{figure}
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/ref_zeta_005.png}
@@ -189,7 +188,7 @@ For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{Figures/Results/cl_icing.PNG}
+\includegraphics[width=0.5\textwidth]{Figures/Results/cl_icing.PNG}
 \caption[Lift coefficient simulation in icing conditions]{Lift coefficient simulation in icing conditions}
 \label{fig:cl_icing}
 \end{figure}
@@ -201,12 +200,43 @@ For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)
 \label{fig:ref_icing}
 \end{figure}
 
-\subsection{Wind disturbances}
+From figure \ref{fig:ref_icing}, the system in such high drag conditions can be considered marginally stable, as it easily increases the error to either of the three commanded inputs to significantly high values. The impact of the increased drag in noticeable in the reduced speed in the simulation, going under $70ms^{-1}$ for the desired $V_a^d=200ms^{-1}$.
 
-TODO
+%\subsection{Wind disturbances}
+
+%TODO
+
+These perturbations change the expected behaviour of the aircraft, causing the feedback linearisation control law to perform poorly. In the next section of this work the results of the online neural network will be shown, demonstrating its ability to increase the stability of the aircraft in situations of strong perturbations, or even in cases of a poorly designed linear or feedback linearisation controller. Note however that that the conditions used here to induce the aircraft into unstable or marginally stable conditions mimic extreme perturbations, and the described controller can be said to perform well in cases when little to none of these perturbations are present.
+
 
 \section{Neural Network}
 \label{section:results/NN}
+
+The application of neural networks to improve the overall performance of a controller has been studied for a few years, for different kinds of systems such as multicopters, UAVs and launch based vehicles (\cite{quad_NLI+NN}, \cite{YANG+LIN_Adaptive_Flight_Control}, \cite{NN_PID2}) as well as to improve different types of control laws. These go from simple PIDs in \cite{NN_PID}, \cite{NN_PID2} to  backstepping and nonlinear inversion techniques \cite{NN_backlash} and \citep{NN_NLI}. The applicability of this adaptive control technique has not, however, been studied to commercial aircraft, being usually applied to non manned vehicles. Most of the works that aim to use NN to create an adaptive controller improving upon another control law usually face the similar limitation of needing large amounts of flight data to batch train the network. This work therefore aims to solve this very problem introducing online training based on the backtracking algorithm. 
+
+In the previous section, the simulated controlled aircraft was submitted to conditions that severely limited its correct performance. These will be studied once again, this time using the online NN described in section \ref{section:NN}, comparing the results with the new adaptive component of the control law. The neural network architecture used has a single single hidden layer and used two activation functions, a sigmoid function for the hidden layer output and a linear function for the output of the network, as explained previously. 
+
+
+\subsection{Inversion Errors}
+
+The first adaptive capability of this method that will be described is the compensation of inversion error due to an incorrect estimation of the plane's inertia. Taking the previous example of \ref{fig:ref_zeta_005}, it can be observed that the aircraft becomes unstable at $t=600s$, leading to a significant increase of airspeed from the desired $200ms^{-1}$ to $350ms^{-1}$. The heading of the aircraft also becomes uncontrollable, oscillating and slowly increasing. 
+
+This is caused due to the $\Delta$ component of equation \ref{eq:inversion_error}. At each time step the online Neural Network will converge to this value, compensating this error and therefore decreasing the reference following errors and preventing the aircraft from becoming unstable. Using the same conditions as used to obtain \ref{fig:ref_zeta_005} comes that:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/ref_zeta_005_NN.png}
+\caption[Reference tracking for $\zeta=0.05$ with NN correction]{$V_a$, $\gamma$ and $\psi$ for measured and desired values for $\zeta=0.05$ with NN correction}
+\label{fig:ref_zeta_005_NN}
+\end{figure}
+
+This first result shows in contrast to the non adaptive control some improvements, mainly when comparing after $t=600s$. Comparing the airspeed, the value $V_a$ remains close to the desired value of $200ms^{-1}$ without reaching greater values as seen previously. Regarding the yaw, besides an expected delay reaching the desired values, the system follows the reference with little to no error, this time without becoming unstable after $t=600s$.
+
+\subsection{System Failures}
+
+\subsubsection{Actuator failure}
+
+\subsubsection{Icing conditions}
 
 \section{Guidance controller}
 \label{section:results/guidance_control}

@@ -287,6 +287,7 @@ For this  particular case, the state variables of the fast dynamics where used a
 As mentioned in section \ref{section:background/NN}, a backpropagation algorithm was used to train both set of weights online. This algorithm, however, must have an error function that will be minimized by iteratively changing the values of the weights $V$ and $W$. As seen previously, due to inversion errors an error $\Delta$ will be present, where $\tau = \ddot{\Omega}^d + \Delta$. This error must be computed on each iteration to train the network to approximate this error. The error can be expressed as $\Delta=\tau - \ddot{\Omega}^d$. From the control law used to obtain $\tau$ (\ref{eq:linear_controller}) comes that
 \begin{equation}
 \Delta = -K_P(\Omega-\Omega^d)-K_D(\dot{\Omega}-\dot{\Omega}^d)
+\label{eq:inversion_error}
 \end{equation}
 Finally the cost function used to train the network is given by
 

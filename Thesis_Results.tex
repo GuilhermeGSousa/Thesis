@@ -200,7 +200,7 @@ For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)
 \label{fig:ref_icing}
 \end{figure}
 
-From figure \ref{fig:ref_icing}, the system in such high drag conditions can be considered marginally stable, as it easily increases the error to either of the three commanded inputs to significantly high values. The impact of the increased drag in noticeable in the reduced speed in the simulation, going under $70ms^{-1}$ for the desired $V_a^d=200ms^{-1}$.
+From figure \ref{fig:ref_icing}, the system in such high drag conditions can be considered marginally stable, as it easily increases the error to either of the three commanded inputs to significantly high values. The impact of the increased drag in noticeable in the reduced speed in the simulation, going under $100ms^{-1}$ for the desired $V_a^d=200ms^{-1}$. The reduced roll capabilities and lift also cause errors and oscillations in heading and flight path angle following.
 
 %\subsection{Wind disturbances}
 
@@ -230,15 +230,52 @@ This is caused due to the $\Delta$ component of equation \ref{eq:inversion_error
 \label{fig:ref_zeta_005_NN}
 \end{figure}
 
-This first result shows in contrast to the non adaptive control some improvements, mainly when comparing after $t=600s$. Comparing the airspeed, the value $V_a$ remains close to the desired value of $200ms^{-1}$ without reaching greater values as seen previously. Regarding the yaw, besides an expected delay reaching the desired values, the system follows the reference with little to no error, this time without becoming unstable after $t=600s$.
+This first result shows for the adaptive control some improvements, mainly when comparing after $t=600s$. Comparing the airspeed, the value $V_a$ remains close to the desired value of $200ms^{-1}$ without reaching greater values, as observed previously. Regarding the yaw, besides an expected delay reaching the desired values, the system follows the reference with little to no error, this time without becoming unstable after $t=600s$. Although the network does seem to provide an adaptive component to the controller, it can only do so if the aircraft is operating within its limitation and the physically possible. Giving, for example, very low $V_a$ commands that wont provide the necessary lift for the aircraft will result, as would be expected, in an uncontrollable aircraft. Indeed, as seen in table \ref{tab:cruise_cond}, a $V_a$ value close to $200ms^{-1}$ is needed to maintain the necessary lift. The same also happens if, by simulating actuation failures, the values of $C_{\delta_{ail}}, C_{\delta_{ele}}, C_{\delta_{rud}}$ are too excessively reduced, or if the system is subjected to extreme icing and wind conditions that would render the aircraft unflyable. For these results the conditions were chosen so that while these would increase the command error of the baseline controller, the airplane would still be flyable allowing the network to improve its controllability and reduce this error.
+
+The designed controller, as detailed in section \ref{section:control_implement}, includes a linear controller for the system linearised by the nonlinear inversion, more precisely a PD controller for the plane's fast dynamics. A poorly tuned controller however will lead to an undesired behaviour. Using once again the condition used so far (see figure \ref{fig:ref_zeta_05}, with a perfect inertia estimation $\zeta = 1$ from a reduced controller, compared to the same controller corrected by the NN, comes that:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.1\textwidth]{Figures/Results/ref_bad_control.png}
+\caption[Poorly tuned controller comparison]{$V_a$, $\gamma$ and $\psi$ for measured and desired values. In purple can be seen the three references, in blue can be seen the measured values where in equation \ref{eq:linear_controller} $K_D=0$ and $K_P = [1,1,1]^T$. In yellow the same controller is used, while applying NN adaptive corrections}
+\label{fig:ref_bad_control}
+\end{figure}
+
+The first observation that can be taken from figure \ref{fig:ref_bad_control} is that the difference the purple and yellow graphs is considerably smaller than that of the blue graph, particularly noticeable in the first $V_a$ plot. In the two last ones oscillations around the desired value are reduced, as is the yaw convergence time for the NN adaptive controller by $30s$.
+It is also curious to observe the oscillations of yellow neural network adapted plot decrease with time. This is explained as the weights of the network do not converge instantly to their optimal values.
+
 
 \subsection{System Failures}
 
+The next objective will be to observe if the designed controller is capable of adapting to system failures. Simulation of these failures was described previously in section \ref{section:results/disturbances_errors}, where actuator failures and icing conditions were tested. 
+
 \subsubsection{Actuator failure}
+
+In the same conditions as previously, the aerodynamic coefficients of the control surfaces were reduced to 20\% of their initial values. Applying the adaptive correction through the online neural network, the following trajectories were obtained
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/reduced_act_NN.png}
+\caption[Trajectory with reduced actuation corrected with NN correction]{Trajectory with 20\% reduced actuation (yellow) and trajectory without failures (green). The corrected trajectory by the NN can be seen in purple}
+\label{fig:reduced_act_NN}
+\end{figure}
+
+The first observation that can be drawn from figure \ref{fig:reduced_act_NN} is that such an actuator failure severely reduces the controllability of the aircraft. The main consequence for this case will be, as could be expected, an increase in the convergence time to the desired heading. Note that the desired trajectory is not followed as this correction is only applied to the fast dynamics, and a guidance control law is not yet implemented. Comparing the two cases where the failures were implemented however, it can be observed that system corrected by the neural network converged to the desired heading slightly faster, resulting in a $2000m$ reduction in distance when comparing the non corrected control trajectory.
+
 
 \subsubsection{Icing conditions}
 
+Once again retaking the example from figure \ref{fig:ref_icing}, in the same icing conditions, the online network correction was applied, resulting in the following results
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{Figures/Results/ref_icing_NN.PNG}
+\caption[Reference following in icing conditions with NN correction]{$V_a$, $\gamma$ and $\psi$ for measured and desired values in icing conditions, with NN correction}
+\label{fig:ref_icing_NN}
+\end{figure}
+
+Again, these are conditions that have a negative impact on the controllability of the aircraft: the increase of 200\% of the value of $C_D$ causes a decrease in the speed of the aircraft, rendering it unable to follow the desired speed of $200ms^{-1}$. Regarding the measured flight path angle $\gamma$, although  some oscillations are still present, error relative to the reference no longer goes up to $0.3 rad$, instead oscillating around $0.05rad$ at a much lower frequency and amplitude. The most noticeable improvement however can be seen in the heading following: the aircraft follows the desired $\psi^d$ during the full simulation, with little to no oscillations around that value. It is also interesting to notice that in the first moments of the learning process, up to $t=300s$, oscillations around the desired heading value are greater than in later moments of the simulation. This is explained by the fact that the weights of the neural network have not yet converged to their optimal values at $t<300s$.
+
+
 \section{Guidance controller}
 \label{section:results/guidance_control}
-
-

@@ -11,19 +11,42 @@
 \chapter{Conclusions}
 \label{chapter:conclusions}
 
-Insert your chapter material here...
+This final chapter will list the conclusions that can be drawn from chapter \ref{chapter:results}. Reiterating the goals initially established for this work, these were the following
+
+\begin{itemize}
+\item \textbf{Design and validate plane model}
+\item \textbf{Implement and test a feedback linearisation controller}
+\item \textbf{Adaptively improve control with an Online Neural Network}
+\end{itemize}
+
+These goals and the results obtained will be discussed, to finally conclude on the successfulness of the work made. 
+
+% ----------------------------------------------------------------------
+\section{Feedback Linearisation Controller}
+\label{section:conclusions/fbl_controller}
+
+The first step, before designing and implementing a controller, was to establish the model of a commercial airplane in a numeric simulation environment. The Boeing 747 as used, as information on this aircraft was readily available, simulated in Matlab Simulink. Note that for this work only cruise flight conditions were considered, as the chosen aircraft model was only validated in such conditions. The feedback linearisation controller was also designed having this assumption in mind. 
+
+Assuming cruise conditions, in section \ref{section:results/validation} it was demonstrated the airplane model followed the expected theoretical results. This was made using the FBL controller to make the simulation follow cruise conditions at the required speed. Once this first goal was achieved, it allowed to build the rest of the controller structure around it. 
+
+The nonlinear control law for fast dynamics was then submitted to different types of perturbations and inversion errors. The controller showed to be robust to not only to errors in inertia estimation as well as small system failures. For more serious control perturbations however, the aircraft could not, as would be expected, follow the desired inputs. Using a $99.5\%$ smaller inertia relative to its true value in the NLI algorithm, increasing by $200\%$ the drag coefficient or by heavily reducing the ability of the control surfaces to influence the plane's dynamics, the aircraft's behaviour showed much higher reference tracking errors, sometimes even becoming uncontrollable. Concluding this first section the designed controller, using a model based approach, proved to be robust to most external perturbations and internal errors. 
 
 
 % ----------------------------------------------------------------------
-\section{Achievements}
-\label{section:achievements}
+\section{Online Neural Network}
+\label{section:conclusions/online_neural_network}
 
-The major achievements of the present work...
+Once the limitations of the system were known, an online neural network was added to adaptively reduce these limitations for a wide range of perturbations (e.g. actuator failure, icing conditions, etc.). The network was at no point trained previously to the simulation. 
 
+Taking firstly the errors caused by errors in parameter estimations and gain tuning (for the linear law controlling the aircraft's model linearised by the FBL), the network showed improvements in robustness and reduced errors in airspeed and heading following, when compared to the same controller without the network. Similar tests were made with reduced control from actuators and in icing conditions. For the actuator failure case although the network slightly improve heading convergence times, reducing $C_{\delta_{ail}}, C_{\delta_{ele}}, C_{\delta_{rud}}$ by 80\% is still a too big perturbation for a commercial aircraft to recover from. For icing condition were simulated reduced lift coefficient, increased drag and reduced roll control ($C_{\delta_{ail}}$ was reduced by 30\%). For this case however, while the non corrected was unable to follow a heading and flight path angle references, this was not the case once the online neural network was added to the system. Indeed the network allowed the aircraft to follow a sinusoidal heading reference and to reduce the difference between $\gamma$ and its desired value. 
+
+The exact same network architecture was used for all cases described above. Taking this into account it can be concluded that the goal of designing a neural network that would make the original NLI law more robust and able to adapt to different perturbations was indeed achieved.
 
 % ----------------------------------------------------------------------
 \section{Future Work}
 \label{section:future}
 
-A few ideas for future work...
+In this work, the neural network used had a relatively simple architecture of one hidden layer, using both sigmoid and linear activation function. One way to continue this work is to try different architectures that have been used in other works, such as recurrent neural networks, Radial Basis Function neurons or larger numbers of hidden layer, to improve upon its adaptive capabilities. 
+
+This method was also only used to correct the control of the fast dynamics of a commercial aircraft, and a similar system could be used to adaptively improve its guidance laws. The results obtained however allow to make a commercial aircraft follow 4D trajectories, even case of external disturbances of system failures. The next step is now to use these trajectories to optimise air traffic management, allowing even several commercial aircraft to travel along these trajectories, reducing the work weight of air traffic controllers while increasing the capacity of a given air control zone.
 

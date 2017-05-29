@@ -286,7 +286,7 @@ Feedback linearisation, also known as dynamic inversion, is an approach based on
 \label{eq:nonlinear_system}
 \end{equation}
 
-one must find both a state transformation $z=z(x)$ and an input transformation $\upsilon = \upsilon(x,u)$ in order for the transformed system to be a linear and time-invariant system $\dot{z} = Az+B\upsilon$. This process is called Input-State linearisation. 
+one must find both a state transformation $z=z(x)$ and an input transformation $\upsilon = \upsilon(x,u)$ in order for the transformed system to be a linear and time-invariant system $\dot{z} = Az+B\upsilon$. This process is called Input-Output linearisation. 
 
 \begin{figure}[!htb]
   \centering
@@ -295,8 +295,34 @@ one must find both a state transformation $z=z(x)$ and an input transformation $
   \label{fig:nli}
 \end{figure}
 
-EXPLAIN NECESSARY MATHEMATICAL CONCEPTS HERE
+To better understand Input-Output linearisation, some mathematical tools must firstly be described. One of these tools is the Lie derivative, that represents the gradient of a given scalar function $h(x)$ projected along a given vector function $f(x)$. Such a Lie derivative is therefore represented as
 
+\begin{equation}
+L_fh(x) = \nabla h(x)f(x) = \Sigma^n_{i=1}\dfrac{\partial h(x)}{\partial x_i}f_i(x)
+\end{equation}
+
+A Lie derivative can also be applied multiple times, resulting in a $k^{th}$ order Lie derivative
+
+\begin{equation}
+L^k_fh(x)=L_f\left(L^{k-1}_fh(x)\right)=\nabla \left(L^{k-1}_fh(x)\right)f(x) \quad \text{with} \quad L^0_fh(x)=h(x)
+\end{equation}
+
+The second operator from Lie algebra to be introduced here, quite important in Input-Output linearisation is the Lie bracket, and these are defined as, given two vector fields $f$ and $g$,
+
+\begin{equation}
+[f,g] = ad_f g = \nabla g f - \nabla f g
+\end{equation}
+
+Once again Lie brackets can be defined recursively as
+
+\begin{equation}
+ad_f^ig=[f, ad_f^{i-1}g] \quad \text{with} \quad ad_f^0g=g
+\end{equation}
+
+Finally, the concept of \emph{diffeomorphism} must be described to fully understand this control technique. According to \cite{Slotine+Li}, it is a generalisation of the concept of coordinate transformation, and is formally stated as:
+
+\emph{A function $\phi: R^n\rightarrow R^n$, defined in a region $\Omega$, is called a diffeomorphism if it is smooth and its inverse $\phi^{-1}$ exists and is smooth \cite{Slotine+Li}}. 
+In Input-Output linearisation, a \emph{diffeomorphism} must be found to transform a non-linear system into a linear one.
 \subsection{SISO systems}
 \label{section:background/SISO_NLI}
 

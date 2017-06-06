@@ -11,7 +11,8 @@
 \chapter{Results}
 \label{chapter:results}
 
-This chapter will be presenting the results in the behaviour of the aircraft for the different solutions proposed to control and stabilise it. Once the goal for the results of this chapter is properly established, the first step will be to validate the model that was implemented. This will be done by controlling the aircraft into cruise conditions using the baseline feedback linearisation error. The effects of disturbances and inversion errors will then be studied regarding their effects in aircraft dynamics. The next step will be to achieve the goal of this thesis and demonstrate the effects of an on-line neural network in reducing the tracking error in the presence of these disturbances. Finally, from the adaptive controller, including the neural network, the guiding law described in chapter \ref{chapter:implementation} in \ref{eq:guidance_law} will be added to follow a given trajectory.
+This chapter will be presenting the results in the behaviour of the aircraft for the different solutions proposed to control and stabilise it. Once the goal for the results of this chapter is properly established, the first step will be to validate the model that was implemented. This will be done by controlling the aircraft into cruise conditions using the baseline feedback linearisation error. The effects of disturbances and inversion errors will then be studied regarding their effects in aircraft dynamics. The next step will be to achieve the goal of this thesis and demonstrate the effects of an on-line neural network in reducing the tracking error in the presence of these disturbances. Finally, from the adaptive controller, including the neural network, the guiding law described in chapter \ref{chapter:implementation} in \ref{eq:guidance_law} will be added to follow a given trajectory. 
+All the simulations described in this chapter were made on Matlab Simulink with a fixed step of $t_{sample} = 0.03333 s$.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,7 +129,7 @@ Changing the values of $\zeta$ to $0.5$ and $0.05$, increasing the inversion err
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/inversion_error.png}
-\caption[Plane trajectory with inertia estimation errors]{Plane trajectory for for $\zeta = 0.5$ (red) and $\zeta= 0.05$ (yellow)}
+\caption[Plane trajectory with inertia estimation errors]{Plane trajectory for $\zeta = 0.5$ (red) and $\zeta= 0.05$ (yellow)}
 \label{fig:inversion_error}
 \end{figure}
 

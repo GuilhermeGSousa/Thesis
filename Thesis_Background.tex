@@ -23,7 +23,7 @@ The work made in this thesis was built on top of the work done by H. Escamilla N
 
 \subsection{Frames of reference}
 \label{section:background/model/for}
-The first step before describing the dynamics of a commercial aircraft will be to define the frames of reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft's body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the axial directions of the wind frame. This frame is aligned to the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from the wind frame to the body frame by
+The first step before describing the dynamics of a commercial aircraft will be to define the frames of reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the axial directions of the wind frame. This frame is aligned to the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from the wind frame to the body frame by
 
 
 \begin{equation}
@@ -36,7 +36,7 @@ s_\alpha c_\beta & -s_\alpha s_\beta & c_\alpha
 \label{eq:wind2body}
 \end{equation}
 
-To describe the attitude of the plane Euler angles , roll, pitch and yaw, will also be used, namely $\phi\{-\pi,\pi\}; \theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}; \psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
+To describe the attitude of the plane Euler, roll, pitch and yaw angles, will also be used, namely $\phi\{-\pi,\pi\}; \theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}; \psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
 
 \begin{equation}
 R_{EB}=
@@ -240,9 +240,9 @@ An expression in the Earth frame can also be obtained
 
 \begin{equation}
 \begin{bmatrix}
-\ddot{x_E}\\
-\ddot{y_E}\\
-\ddot{z_E}
+\ddot{x}_E\\
+\ddot{y}_E\\
+\ddot{z}_E
 \end{bmatrix}
 = \dfrac{1}{m} R_{BE}
 \begin{bmatrix}
@@ -366,7 +366,7 @@ The remaining states are then obtained from $z(x) = [z_1 \quad L_fz_1 \quad ... 
 \subsection{MIMO systems}
 \label{section:background/MIMO_NLI}
 
-These concepts can also be extended to to MIMO systems in a similar manner, by similarly differentiating the outputs until the inputs explicitly appear. This time however, there are individual relative degrees per output. The sum of these relative degrees is called total degree $r$ and must satisfy $r<n$, $n$ being the order of the system. Given a MIMO system 
+These concepts can also be extended to MIMO systems in a similar manner, by differentiating the outputs until the inputs explicitly appear. This time however, there are individual relative degrees per output. The sum of these relative degrees is called total degree $r$ and must satisfy $r<n$, $n$ being the order of the system. Given a MIMO system 
 \begin{gather}
 \dot{x} = f(x) + G(x)u\\
 y=h(x)
@@ -404,28 +404,28 @@ There can be many causes for a dynamic inversion error to be present, as not onl
 \subsection{Fuzzy Logic Systems}
 \label{section:background/fuzzy_logic}
 
-Fuzzy logic systems are based on the paradigm of continuous levels of truth between 0 and 1, rather than the usual discrete true or false levels of truth. Using these continuous truth values, a set of IF-ELSE rules is chosen. The goal of this type of controller is to duplicate the way a pilot would respond to a given flight situation. These rules can base their control input based on variables such as roll, angle of attack and sideslip \cite{Comparison_IntelligentSys}. This control method is based on three main parts. The first one if \textit{fuzzification}, that consists of converting the plant outputs to fuzzy logic values. \textit{Rule-based inference}, using the previously mentioned set of rules, a fuzzyfied control input is computed, which then goes through the \textit{defuzzyfication} part of the control algorithm. 
-Fuzzy systems have some advantages: its linguistic interpretation of human knowledge facilitate the interpretation of results, and the knowledge base can be improved through addition of new rules. However, this method comes with some disadvantages. First of all, the set of rules that will will improve the control of the aircraft is entirely dependent on expert knowledge, thus resulting in an empiric set of rules. This also means the method has no capability of generalization, as the control is only applied to specific cases, of the form "if the error is greater than a given value, apply this compensation to control input". It is also not robust to topological changes of the system \cite{Neuro_fuzzy_survey}. For these reasons this method will not be further studied and implemented in this work.
+Fuzzy logic systems are based on the paradigm of continuous levels of truth between 0 and 1, rather than the usual discrete true or false levels of truth. Using these continuous truth values, a set of IF-ELSE rules is chosen. The goal of this type of controller is to duplicate the way a pilot would respond to a given flight situation. These rules can base their control input on variables such as roll, angle of attack and sideslip \cite{Comparison_IntelligentSys}. This control method is based on three main parts. The first one if \textit{fuzzification}, that consists of converting the plant outputs to fuzzy logic values. \textit{Rule-based inference}, using the previously mentioned set of rules, a fuzzyfied control input is computed, which then goes through the \textit{defuzzyfication} part of the control algorithm. 
+Fuzzy systems have some advantages: its linguistic interpretation of human knowledge facilitate the interpretation of results, and the knowledge base can be improved through addition of new rules. However, this method comes with some disadvantages. First of all, the set of rules that will improve the control of the aircraft is entirely dependent on expert knowledge, thus resulting in an empiric set of rules. This also means the method has no capability of generalization, as the control is only applied to specific cases, of the form "if the error is greater than a given value, apply this compensation to control input". It is also not robust to topological changes of the system \cite{Neuro_fuzzy_survey}. For these reasons this method will not be further studied and implemented in this work.
 
 
 \subsection{Neural Networks}
 \label{section:background/NN}
 
-Artificial Neural Networks (NN) are a biologically inspired simulation of brain's nervous system. They are composed of simulated neurons and synapses. The sum of the inputs of a neuron are summed and the result is fed into an activation function, which then return a bounded value, either between -1 and 1 or 0 and 1. The inputs and outputs of a neuron are multiplied by a weight, representing the synapses between neurons. We get the following equation for one neuron
+Artificial Neural Networks (NN) are a biologically inspired simulation of the brain nervous system. They are composed of simulated neurons and synapses. The sum of the inputs of a neuron are summed and the result is fed into an activation function, which then return a bounded value, either between -1 and 1 or 0 and 1. The inputs and outputs of a neuron are multiplied by a weight, representing the synapses between neurons. We get the following equation for one neuron
 \begin{equation}
 y(x_1,x_2,...,x_n)=f((\sum ^n_{i=1} w_i x_i)+b)
 \end{equation}
-where $b$ is the bias term and $f$ a given activation function. Neuron are then set in three different types of layers: the input, the output and the hidden layers. These are connected between each other, and the hidden part can be composed of several layers. The weights can then be tuned based on experience, making it suitable for intelligent learning. To tune these weights learning algorithms are used. There are two types of learning algorithms: batch and online training. It is called training to the process of iteratively reaching the ideal set of weights that will minimise the error between the output of the neural network and that of a given unknown function.
+where $b$ is a bias term and $f$ a given activation function. Neurons are then set in three different types of layers: the input, the output and the hidden layers. These are connected between each other, and the hidden part can be composed of several layers. The weights can then be tuned based on experience, making it suitable for intelligent learning. To tune these weights learning algorithms are used. There are two types of learning algorithms: batch and online training. It is called training to the process of iteratively reaching the ideal set of weights that will minimise the error between the output of the neural network and that of a given unknown function.
 
-Batch training is mostly based one a property NN is that, according to the Universal Approximation Theorem showed in 1989 by George Cybenko, a feed forward neural network can approximate any continuous function. The network is trained by providing input and output pairs. The weights are found in order to approximate the output of the neural network to that of the original function. Once these weights are computed, the network can then be used to compute outputs from inputs that were not part of the initial knowledge of input-output pairs.
+Batch training is mostly based on a property of Neural Networks that, according to the Universal Approximation Theorem showed in 1989 by George Cybenko, a feed forward neural network can approximate any continuous function. The network is trained by providing input and output pairs. The weights are found in order to approximate the output of the neural network to that of the original function. Once these weights are computed, the network can then be used to compute outputs from inputs that were not part of the initial knowledge of input-output pairs.
 
 Although this learning method approach is used in many of NN applications, it cannot however be easily used to improve an existing feedback linearisation  controller, as it requires an \textit{a priori} knowledge of the modelling error for each given input.
 
-Online training, contrary to batch training, can deal with dynamically changing environments. This training paradigm is not based on an \textit{a priori} knowledge set, and instead relies on update laws that compute the new weights after each control iteration. It is this method that will be retained to adaptively correct the inversion error from the feedback linearisation. Training a network online, however, is less trivial when compared to batch training. An algorithm named backpropagation will be presented to provide a way of training a network online.  
+Online training, contrary to batch training, can deal with dynamically changing environments. This training paradigm is not based on an \textit{a priori} knowledge set, and instead relies on update laws that compute the new weights after each control iteration. It is this method that will be retained to adaptively correct the inversion error from the feedback linearisation. Training a network online, however, is less trivial when compared to batch training. An algorithm named backpropagation will be presented to provide a way of training a network online. A description on the implementation of the neural network and how it will be used to improve the feedback linearisation controller will be given on chapter \ref{chapter:implementation}.
 
 
 %Backprop
-The backpropagation algorithm is one of the most common NN training algorithm, commonly used in batch training, used to update the weights of each layer of a network, in order to minimize a cost function. However, research has been done in order to use backpropagation techniques to create online adaptive and augmented control such as \cite{online_adaptiveNN}, \cite{UAV_adaptive}, \cite{UAV_adaptive2}. Indeed, it is also possible to use such algorithms to continuously update the weights of a network as the data is generated. Backpropagation can only be implemented if the activation function of the NN is differentiable. 
+The backpropagation algorithm is one of the most common NN training algorithm, commonly used in batch training, to update the weights of each layer of a network, in order to minimize a cost function. However, research has been done in order to use backpropagation techniques to create online adaptive and augmented control such as \cite{online_adaptiveNN}, \cite{UAV_adaptive}, \cite{UAV_adaptive2}. Indeed, it is also possible to use such algorithms to continuously update the weights of a network as the data is generated. Backpropagation can only be implemented if the activation function of the NN is differentiable. 
 
 The backpropagation algorithm can be described by a two phase cycle, Propagation and Weight update. During this last phase the gradient descent algorithm is used to optimize a cost function. As such, a cost function $E$ must be chosen, and must be a function of the outputs of the neural network. A commonly used error function is 
 \begin{equation}
@@ -441,7 +441,7 @@ Where $w_{ki}$ is the weight of the $k^{th}$ input of neuron $i$, and $x_k$ are 
 x_i = f(sum_i)
 \end{equation}
 
-In order to use the gradient descent algorithm, the derivative of the cost function with respect to a given weight $w_{ij}$ must be computed. To do so, the chain rule is used as such
+In order to use the gradient descent algorithm, the derivative of the cost function with respect to a given weight $w_{ij}$ must be computed. To do so, the chain rule is used as
 \begin{equation}\label{eq:gradient}
 \frac{\partial E}{\partial w_{ij}} = \frac{\partial E}{\partial x_j}\frac{\partial x_j}{\partial sum_j}\frac{\partial sum_j}{\partial w_{ij}}
 \end{equation}

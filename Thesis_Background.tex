@@ -19,7 +19,7 @@ In this chapter the aircraft model used for this work will be described firstly.
 \section{Airplane Model}
 \label{section:background/model}
 
-The work made in this thesis was built on top of the work done by H. Escamilla Nuñez and  F. Mora Camino on 4D trajectory tracking \cite{hector}. The model used in this work of a six degree of freedom transport aircraft will be described in this section. 
+The work made in this thesis was built on top of the work done by H. Escamilla Nuñez and  F. Mora Camino on 4D trajectory tracking \cite{hector}. The model used in this work is a six degree of freedom transport aircraft that will be described in this section. 
 
 \subsection{Frames of reference}
 \label{section:background/model/for}
@@ -127,26 +127,28 @@ V_as_\alpha c_\beta + V_{w_z}
 and $\alpha$ and $\beta$ can be computed by 
 \begin{subequations}
 	\begin{equation}
-		\alpha = arctan\left(\dfrac{w}{u}\right)
+		\alpha = arctan\left(\dfrac{w-V_{w_z}}{uV_{w_x}}\right)
 		\label{eq:alpha}
 	\end{equation}
 	\begin{equation}
-		\beta = arctan\left(\dfrac{v}{V_a}\right)
+		\beta = arctan\left(\dfrac{v-V_{w_y}}{V_a}\right)
 		\label{eq:beta}
 	\end{equation}
 \end{subequations}
 
-From these three equations, differentiating \ref{eq:alpha} and \ref{eq:beta} comes that 
+From these three equations, differentiating \ref{eq:alpha} and \ref{eq:beta}, and from equation \ref{eq:windtriangle} and the translation dynamics equation \ref{eq:boddy_acc} comes that 
 
 \begin{equation}
 \begin{bmatrix}
 \dot{\alpha}\\
-\dot{\beta}
+\dot{\beta}\\
+\dot{V_a}
 \end{bmatrix}
 = 
 \begin{bmatrix}
-H_{11} & 1 & H_{13}\\
-H_{21} & 0 & H_{23}
+H_{11} & H_{12} & H_{13}\\
+H_{21} & 0 & H_{23}\\
+H_{31} & H_{32} & H_{33}
 \end{bmatrix}
 \begin{bmatrix}
 p\\
@@ -156,12 +158,28 @@ r
 +
 \begin{bmatrix}
 Q_1\\
-Q_2
+Q_2\\
+Q_3
 \end{bmatrix}
 \label{eq:alphabetadot}
 \end{equation}
+Where the entries of the matrix are given by
 
-SEE ANNEX HERE
+\begin{gather*}
+H_{11}=\dfrac{-V_a c_\alpha s_\beta  c_\beta - V_{w_y} c_\alpha c_\beta}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
+H_{12}=\dfrac{V_a(c^2_\alpha c^2_\beta-s^2_\alpha c^2_\beta) + V_{w_x}c_\alpha c_\beta - V_{w_z}s_\alpha s_\beta}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
+H_{13}=\dfrac{-V_a s_\alpha s_\beta  c_\beta - V_{w_y} s_\alpha c_\beta}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
+H_{21}=\dfrac{V_a s_\alpha c_\beta + V_{w_z}}{V_a c_\beta}\\
+H_{23}=-\dfrac{V_a c_\alpha c_\beta + V_{w_x}}{V_a c_\beta}\\
+H_{31}=2 \left(-V_a s_\beta s_\alpha c_\beta - V_{w_x} s_\alpha c_\beta \right)\\
+H_{32}=2\left( -V_{w_z} c_\alpha c_\beta + V_as_\alpha c_\beta s_\beta
+ + V_{w_z}s_\beta + V_{w_x}s_\alpha c_\beta \right)\\
+H_{33}=2\left(V_{w_y}c_\alpha c_\beta - V_{w_x}s_\beta\right)\\
+Q_1=\dfrac{\left(\dfrac{1}{m}F_{za} + gc_\theta c_\phi - \dot{V}_{w_z} \right)c_\alpha c_\beta - \left(\dfrac{1}{m}(F_{xa} + T)-gs_\theta - \dot{V}_{w_x}\right)}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
+Q_2=\dfrac{\dfrac{1}{m}F_{ya}+g c_\theta s_\phi-\dot{V}_{w_y}}{c_\beta}\\
+Q_3=2 \left( \left(\dfrac{-1}{m}(F_{xa}+T) + g s_\theta - \dot{V}_{w_x} \right)c_\alpha c_\beta + \left( \dfrac{-1}{m}F_{ya} - \dot{V}_{w_y} \right)s_\beta + \left(\dfrac{-1}{m}F_{za} - \dot{V}_{w_z} \right)s_\alpha c_\beta \right)
+\end{gather*}
+The forces in the air frame $F_{xa}, F_{ya}, F_{za}$ will be further detailed in the next section on translation dynamics. 
 
 The angular rates are also related to the Euler angles. The relationship between the euler angles and the rotation rates is also one that will prove useful when implementing the model on a Matlab simulation, and is given by
 
@@ -326,7 +344,7 @@ In Input-Output linearisation, a \emph{diffeomorphism} must be found to transfor
 \subsection{SISO systems}
 \label{section:background/SISO_NLI}
 
-Although an aircraft is always considered as a MIMO system, a description of this control concept will firstly be provided for a general SISO case, before generalising to a MIMO case. Nonlinear systems that can be represented as $\dot{x}=f(x)+g(x)u$ will be discussed in this section. From \cite{Slotine+Li}, a definition of Input-State linearisation is to find, for a nonlinear system of relative degree $n$, a \emph{diffeomorphism} $\phi:\Omega \rightarrow R^n$ and nonlinear control law
+Although an aircraft is always considered as a MIMO system, a description of this control concept will firstly be provided for a general SISO case, before generalising to a MIMO case. Nonlinear systems that can be represented as affine systems $\dot{x}=f(x)+g(x)u$ will be discussed in this section. From \cite{Slotine+Li}, a definition of Input-State linearisation is to find, for a nonlinear system of relative degree $n$, a \emph{diffeomorphism} $\phi:\Omega \rightarrow R^n$ and nonlinear control law
 \begin{equation}
 u=\alpha(x) + \beta(x)\upsilon
 \label{eq:nli_control_law}
@@ -366,7 +384,9 @@ The remaining states are then obtained from $z(x) = [z_1 \quad L_fz_1 \quad ... 
 \subsection{MIMO systems}
 \label{section:background/MIMO_NLI}
 
-These concepts can also be extended to MIMO systems in a similar manner, by differentiating the outputs until the inputs explicitly appear. This time however, there are individual relative degrees per output. The sum of these relative degrees is called total degree $r$ and must satisfy $r<n$, $n$ being the order of the system. Given a MIMO system 
+These concepts can also be extended to MIMO systems in a similar manner, by differentiating the outputs until the inputs explicitly appear. This time however, there are individual relative degrees per output. The sum of these relative degrees is called total degree $r$ and must satisfy $r\leq n$, $n$ being the order of the system. Note however, that in the case of $r<n$, a part of the system dynamics is rendered unobservable in the input-output linearisation, as the closed loop dynamics will have a lower order $r$ than the whole dynamics of the system $n$. These internal dynamics must therefore be studied to establish the effectiveness of the feedback linearisation. For the case where the internal dynamics is stable, the input-output linearisation method can then be used. In the case of unstable internal dynamics however, these would lead to both undesirable and uncontrollable phenomena, in which case a different control design is needed.
+
+Given a MIMO system 
 \begin{gather}
 \dot{x} = f(x) + G(x)u\\
 y=h(x)
@@ -390,7 +410,7 @@ It is also interesting to note the resulting system is not only linear, but also
 
 \section{Limitations of feedback linearisation}
 \label{section:background/limitations}
-Although feedback control answers to many of the problems of linear controllers such as PID and LQR, it has a big downside. Indeed, being a model based controller, it requires the system model to be quite accurately known. Let $\upsilon$ be the vector of pseudo inputs, for a second order $\ddot{x} = f(x,\dot{x},u)$, if it is input-output linearisable and the exact system is known, then it comes that, from \cite{YANG+LIN_Adaptive_Flight_Control}
+Although feedback control answers to many of the problems of linear controllers such as PID and LQR, it has a some downsides. Indeed, being a model based controller, it requires the system model to be quite accurately known, and parameter uncertainties can lead to undesired responses. Let $\upsilon$ be the vector of pseudo inputs, for a second order $\ddot{x} = f(x,\dot{x},u)$, if it is input-output linearisable and the exact system is known, then it comes that, from \cite{YANG+LIN_Adaptive_Flight_Control}
 \begin{equation}
 \ddot{x}=\upsilon
 \end{equation}
@@ -458,13 +478,11 @@ For the case of a tangent sigmoid activation function $f(x)=tanh(x)$ comes
 \begin{equation}
 \frac{\partial f(sum_j)}{\partial sum_j}=1-f^2(sum_j)
 \end{equation}
-
 For the term $\frac{\partial sum_j}{\partial w_{ij}}$, from \ref{eq:def_sum} this partial derivative is easily computed
 
 \begin{equation}
 \frac{\partial sum_j}{\partial w_{ij}} = \frac{\partial \left(\sum ^n_{k=1} w_{kj} x_k\right)}{\partial w_{ij}} = x_i
 \end{equation}
-
 For the output layer, the first term of equation \ref{eq:gradient} can easily be evaluated, as $x_j=y$ for such a case, giving
 \begin{equation}
 \frac{\partial E}{\partial x_j}=\frac{\partial (\frac{1}{2} (y_d-y)^2)}{\partial y}= y-y_d

@@ -40,7 +40,7 @@ From the cruise conditions \ref{eq:cruise_cond}, knowing that $L=\dfrac{1}{2}\rh
 V=\sqrt{\dfrac{2mg}{\rho S C_L}}
 \label{eq:cruise_speed}
 \end{equation}
-The required thrust can also be computed from both \ref{eq:cruise_cond}, \ref{eq:cruise_speed} and \ref{eq:cd_cl}, knowing the $C_L$ for a given angle of attack. Proposing some values of $\alpha$, the following results are obtained
+The required thrust can also be computed from \ref{eq:cruise_cond}, \ref{eq:cruise_speed}, \ref{eq:forces} and \ref{eq:cd_cl}, knowing the $C_L$ for a given angle of attack. Proposing some values of $\alpha$, the following results are obtained
 
 \begin{table}[htbp]
   \centering
@@ -64,16 +64,16 @@ Following these constant reference values the results obtained were
 
 \begin{figure}
 \centering
-\begin{minipage}{0.49\textwidth}
-\includegraphics[width=\textwidth]{Figures/Results/aoa_check.PNG}
+\begin{minipage}{\textwidth}
+\includegraphics[width=0.7\textwidth]{Figures/Results/aoa_check.PNG}
 \end{minipage}
-\begin{minipage}{0.49\textwidth}
-\includegraphics[width=\textwidth]{Figures/Results/thrust_check.PNG}
+\begin{minipage}{\textwidth}
+\includegraphics[width=0.7\textwidth]{Figures/Results/thrust_check.PNG}
 \end{minipage}
 \caption[AoA and thrust validation]{Angle of Attack (degrees) and thrust (N) of the controlled aircraft}
 \end{figure}
 
-This simulation, made over 800 seconds, shows clearly that the angle oscillates around a $6^o$ degree angle of attack, with an amplitude of around $0.4^o$ degrees. As for the thrust, it also oscillates around $30000N$ with an amplitude of $2000N$. These values correspond to the theoretical values in table \ref{tab:cruise_cond} for $\alpha=6^o$, indicating that not only the modelled plane is well behaved, but also that the coefficient neural networks are able to simulate an accurate model of the aerodynamic coefficient's variation.
+This simulation, made over 800 seconds, shows clearly that the angle oscillates around a $6^o$ degree angle of attack. As for the thrust, it also oscillates around $30000N$. These values correspond to the theoretical values in table \ref{tab:cruise_cond} for $\alpha=6^o$, indicating that not only the modelled plane is well behaved, but also that the coefficient neural networks are able to simulate an accurate model of the aerodynamic coefficient's variation.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -118,7 +118,7 @@ Although the reference value is reached after each step, the convergence takes a
 \section{Disturbances and Errors}
 \label{section:results/disturbances_errors}
 
-From the results obtained in the previous section, it can be concluded the controller performs correctly following the desired reference. These results however were obtain supposing the exact model of the aircraft was known, without any kind of external perturbation or simulated system failure. It is these perturbations that will be simulated in this section and studied. To do so the same testing reference as described in equation \ref{eq:test_traj} will be used to compare the effects of different types of disturbances with the undisturbed system. 
+From the results obtained in the previous section, it can be concluded the controller performs correctly following the desired reference. These results however were obtained supposing the exact model of the aircraft was known, without any kind of external perturbation or simulated system failure. It is these perturbations that will be simulated in this section and studied. To do so the same testing reference as described in equation \ref{eq:test_traj} will be used to compare the effects of different types of disturbances with the undisturbed system. 
 
 \subsection{Inversion errors}
 
@@ -150,7 +150,7 @@ Indeed, a 50\% error in estimating the inertia of the aircraft when computing th
 
 \subsection{System failures}
 
-One other cause for inversion errors that can have a much greater impact on flight trajectory are system failures. This subsection will focus on methods to simulate these failures and observe the behaviour of the airplane trajectory for these cases. The reference trajectory that will be used shall be the same as used previously. The first failure to be simulated will be a control surfaces failure, that will lead to reduced controllability of the aircraft. In this work this was replicated in a simulated environment by reducing each moment coefficients for the elevon, aileron and rudder, namely $C_{\delta_{ele}}$, $C_{\delta_{ail}}$ and $C_{\delta_{rud}}$.
+One other cause for inversion errors that can have a much greater impact on flight trajectory are system failures. This subsection will focus on methods to simulate these failures and observe the behaviour of the airplane trajectory for these cases. The reference trajectory that will be used shall be the same as used previously. The first failure to be simulated will be a control surfaces failure, that will lead to reduced controllability of the aircraft. In this work this was replicated in a simulated environment by reducing each moment coefficients for the elevator, aileron and rudder, namely $C_{\delta_{ele}}$, $C_{\delta_{ail}}$ and $C_{\delta_{rud}}$.
 
 By setting each of these coefficients to 20\% of their initial values, the effect of the errors in followed trajectory become visible in figure \ref{fig:reduced_act}. This figure show that the reduced controllability results in a $20km$ difference to that of the undisturbed system. This sets the second goal for the performance of the neural network, to reduce this error as much as possible.
 
@@ -201,7 +201,7 @@ For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)
 \label{fig:ref_icing}
 \end{figure}
 
-From figure \ref{fig:ref_icing}, the system in such high drag conditions can be considered marginally stable, as it easily increases the error to either of the three commanded inputs to significantly high values. The impact of the increased drag in noticeable in the reduced speed in the simulation, going under $100ms^{-1}$ for the desired $V_a^d=200ms^{-1}$. The reduced roll capabilities and lift also cause errors and oscillations in heading and flight path angle following.
+From figure \ref{fig:ref_icing}, the system in such high drag conditions can be considered marginally stable, as it easily increases the error to either of the three commanded inputs to significantly high values. For the case of the flight path angle, the aircraft even reaches under $-20º$ at $t=600s$, a completely unrealistic value for a normal cruise flight. The impact of the increased drag in noticeable in the reduced speed in the simulation, going under $100ms^{-1}$ for the desired $V_a^d=200ms^{-1}$. The reduced roll capabilities and lift also cause errors and oscillations in heading and flight path angle following.
 
 %\subsection{Wind disturbances}
 

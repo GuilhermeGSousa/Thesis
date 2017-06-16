@@ -148,6 +148,25 @@ Indeed, a 50\% error in estimating the inertia of the aircraft when computing th
 \label{fig:ref_zeta_005}
 \end{figure}
 
+In order to more accurately visualise the influence of the $\xi$ coefficient on the NLI controller for this same case, several simulations were made for values of $\xi$ from $0$ to $1$. For each simulation the mean and maximum error were computed, in order to obtain a plot of these errors for each of the three references. From figures \ref{fig:xi_max_error} and \ref{fig:xi_mean_error} can be concluded that the error becomes considerable $\xi<0.05$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/error_xi.png}
+\caption[Maximum errors for $V_a$, $\gamma$ and $psi$]{Maximum errors for $V_a$, $\gamma$ and $psi$ for $\xi=[0,1]$}
+\label{fig:xi_max_error}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Figures/Results/mean_error_xi.png}
+\caption[Mean errors for $V_a$, $\gamma$ and $psi$]{Mean errors for $V_a$, $\gamma$ and $psi$ for $\xi=[0,1]$}
+\label{fig:xi_mean_error}
+\end{figure}
+
+
+
+
 \subsection{System failures}
 
 One other cause for inversion errors that can have a much greater impact on flight trajectory are system failures. This subsection will focus on methods to simulate these failures and observe the behaviour of the airplane trajectory for these cases. The reference trajectory that will be used shall be the same as used previously. The first failure to be simulated will be a control surfaces failure, that will lead to reduced controllability of the aircraft. In this work this was replicated in a simulated environment by reducing each moment coefficients for the elevator, aileron and rudder, namely $C_{\delta_{ele}}$, $C_{\delta_{ail}}$ and $C_{\delta_{rud}}$.
@@ -216,6 +235,8 @@ These perturbations change the expected behaviour of the aircraft, causing the f
 The application of neural networks to improve the overall performance of a controller has been studied for a few years, for different kinds of systems such as multicopters, UAVs and launch based vehicles (\cite{quad_NLI+NN}, \cite{YANG+LIN_Adaptive_Flight_Control}, \cite{NN_PID2}) as well as to improve different types of control laws. These go from simple PIDs in \cite{NN_PID}, \cite{NN_PID2} to  backstepping and nonlinear inversion techniques \cite{NN_backlash} and \citep{NN_NLI}. The applicability of this adaptive control technique has not, however, been studied to commercial aircraft, being usually applied to non manned vehicles. Most of the works that aim to use NN to create an adaptive controller improving upon another control law usually face the similar limitation of needing large amounts of flight data to batch train the network. This work therefore aims to solve this very problem introducing online training based on the backtracking algorithm. 
 
 In the previous section, the simulated controlled aircraft was submitted to conditions that severely limited its correct performance. These will be studied once again, this time using the online NN described in section \ref{section:NN}, comparing the results with the new adaptive component of the control law. The neural network architecture used has a single single hidden layer and used two activation functions, a sigmoid function for the hidden layer output and a linear function for the output of the network, as explained previously. 
+
+
 
 
 \subsection{Inversion Errors}

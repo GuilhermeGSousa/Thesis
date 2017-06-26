@@ -148,19 +148,13 @@ Indeed, a 50\% error in estimating the inertia of the aircraft when computing th
 \label{fig:ref_zeta_005}
 \end{figure}
 
-In order to more accurately visualise the influence of the $\xi$ coefficient on the NLI controller for this same case, several simulations were made for values of $\xi$ from $0$ to $1$. For each simulation the mean and maximum error were computed, in order to obtain a plot of these errors for each of the three references. From figures \ref{fig:xi_max_error} and \ref{fig:xi_mean_error} can be concluded that the error becomes considerable $\xi<0.05$.
+In order to more accurately visualise the influence of the $\xi$ coefficient on the NLI controller for this same case, several simulations were made for values of $\xi$ from $0$ to $1$. For each simulation the mean error was computed, in order to obtain a plot of these errors for each of the three references. From figure\ref{fig:xi_mean_error} can be concluded that the error becomes considerable $\xi<0.05$ for a controller without neural network compensation. For a compensated adaptive controller however, it is noticeable that errors only become considerable at $\xi<0.02$.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Figures/Results/error_xi.png}
-\caption[Maximum errors for $V_a$, $\gamma$ and $psi$]{Maximum errors for $V_a$, $\gamma$ and $psi$ for $\xi=[0,1]$}
-\label{fig:xi_max_error}
-\end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/mean_error_xi.png}
-\caption[Mean errors for $V_a$, $\gamma$ and $psi$]{Mean errors for $V_a$, $\gamma$ and $psi$ for $\xi=[0,1]$}
+\caption[Mean errors for $V_a$, $\gamma$ and $psi$]{Mean errors for $V_a$, $\gamma$ and $psi$ for $\xi=[0,0.5]$ with neural network compensation (orange) and without compensation (blue)}
 \label{fig:xi_mean_error}
 \end{figure}
 
@@ -301,3 +295,12 @@ Again, these are conditions that have a negative impact on the controllability o
 
 \section{Guidance controller}
 \label{section:results/guidance_control}
+
+This final section will focus on the results of the implementation of the guidance controller described in equations \ref{eq:guidance_law}. From the work implemented and results obtained thus far, a NN adaptive controller can now be used to follow references of airspeed, heading and flight path angle. From the equations \ref{eq:guidance_law} position references can now be used to compute $V_a,\gamma, \psi$. Choosing a path to follow using these equations the following results were obtained, showing the aircraft is able to correctly follow a trajectory from a constant feed of way points over time.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{Figures/Results/guidance.png}
+\caption[Trajectory following with guidance controller]{Trajectory reference (orange) and obtained trajectory (blue)}
+\label{fig:guidance}
+\end{figure}

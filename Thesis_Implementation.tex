@@ -169,8 +169,50 @@ Should all of the parameters mentioned in the equations above be known and no in
 \tau = -K_P (\Omega-\Omega^d)-K_D (\dot{\Omega}-\dot{\Omega}^d)+\ddot{\Omega}^d
 \label{eq:linear_controller}
 \end{equation}
-%Where the $K_P$ and $K_D$ coefficients are chosen to ensure stability and reference tracking 
-%(HOW TO DO IT NOT EMPIRICALLY?)
+Where the $K_P$ and $K_D$ coefficients are chosen to ensure stability and reference tracking. The previous equation can also be written as
+\begin{equation}
+\ddot{e}=-K_P e - K_D \dot{e}
+\end{equation}
+Assuming that an ideal inversion is obtained and $\tau=\ddot{\Omega}$, and where $e=\Omega-\Omega^d$. This way the initial non-linear system becomes a second order one, for which natural frequencies and damping values for each dimension must be chosen. Choosing $x_1=e_i$ and $x_2=\dot{x_1}$ for a given dimension $i$ of $\Omega$, either $p,q,r$. Then comes the state equation
+\begin{equation}
+\begin{bmatrix}
+\dot{x_1}\\
+\dot{x_2}
+\end{bmatrix}=
+\begin{bmatrix}
+0 & 1\\
+-K_{P_i} & -K_{D_i}
+\end{bmatrix}
+\begin{bmatrix}
+x_1\\
+x_2
+\end{bmatrix}
+\end{equation}
+The characteristic equation is then obtained as 
+\begin{equation}
+\text{det}(sI-A_i)= \lambda^2 + 2\xi_i \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
+\end{equation}
+\begin{gather}
+\xi_i = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
+\omega_{n_i}=\sqrt{K_{P_i}}
+\end{gather}
+The chosen values were
+
+\begin{table}[htbp]
+  \centering
+  \caption[Linearised system chosen dynamics]{Linearised system chosen dynamics}
+    \begin{tabular}{rcccc}
+    \toprule
+    $i$   & $K_{P_i}$ & $K_{D_i}$ & $\xi_i$ & $\omega_{n_i}$(rad $s^{-1}$) \\
+    \midrule
+    $p$   & 100   & 20    & 1     & 10 \\
+    $q$   & 5     & 1     & 0.223607 & 2.236067977 \\
+    $r$   & 100   & 20    & 1     & 10 \\
+    \bottomrule
+    \end{tabular}%
+  \label{tab:tau_dynamics}%
+\end{table}%
+
 
 From this point the next step shall be to obtain the desired values of $\Omega$. These were obtained using another PD controller, using Euler angle reference values to control rotation rates. Among these reference values to be followed, $\tau_r$ was set to zero. This was made to make use of the decoupling through feedback linearisation of the plane's movement, using a roll and pitch motion to turn the aircraft. This results in the following control of rotation rate
 \begin{subequations}
@@ -196,7 +238,7 @@ It is now possible to control the attitude of the aircraft, and the fast control
 \label{eq:gamma_dot}
 \end{equation}
 These equation can easily be obtained from the sum of forces in figure \ref{fig:flight_path_angle}. For the yaw rate comes that 
-(SEE ANNEX explanation)
+
 \begin{equation}
 \dot{\psi} = \dfrac{g}{V_a} \tan \phi
 \label{eq:psi_dot}

@@ -238,7 +238,7 @@ Y\\
 \end{bmatrix}
 \label{eq:body_forces}
 \end{equation}
-From Newton's Second Law comes the aircraft's acceleration
+From Newton's Second Law comes the aircraft acceleration
 
 \begin{equation}
 \begin{bmatrix}
@@ -355,8 +355,8 @@ such that the new state variables $z=\phi(x)$ and \emph{pseudo-input} $\upsilon$
 
 \begin{equation}
 	\begin{cases}
-		\dot{z_i}=z_{i+1} & if\quad i<n-1\\
-		\dot{z_n}=\upsilon & if\quad i=n-1
+		\dot{z_i}=z_{i+1} & if\quad i<n\\
+		\dot{z_n}=\upsilon & if\quad i=n
 	\end{cases}
 	\label{eq:SISO_state}
 \end{equation}
@@ -497,4 +497,4 @@ Note that the term $ \frac{\partial E}{\partial x_s} $ represent the all the der
 \Delta w_{ij} = - \alpha \frac{\partial E}{\partial w_{ij}}
 \end{equation}
 Where $\alpha$ is a learning coefficient, and its choice is crucial to assure a fast convergence of the solution. Indeed, while a exceedingly large learning coefficient can cause this algorithm to miss the minimum error, a small learning coefficient will also increase the convergence rate. The $-1$ factor is added in the equation above to converge to a local minima, removing it would make this algorithm maximize the cost function. A limitation of the backstepping algorithm that must also be taken into account is that it only guarantees local minima convergence. 
-
+A detailed description on the connection of this algorithm with the control of the aircraft will be given on the next chapter.

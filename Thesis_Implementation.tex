@@ -45,7 +45,7 @@ The time constants used for the actuators was $\xi_{\delta_i}50$ms and $\xi_T=4$
 \subsection{Plane Dynamics}
 \label{section:model/plane_dynamics}
 
-In order to simulate the aircraft's fast dynamics, its moments must firstly be computed in order to use equation \ref{eq:fast_dynamics}. The torque caused by the actuators as modelled as equation \ref{eq:cdelta}, using
+In order to simulate the aircraft fast dynamics, its moments must firstly be computed in order to use equation \ref{eq:fast_dynamics}. The torque caused by the actuators as modelled as equation \ref{eq:cdelta}, using
 \begin{gather*}
 C_{L_{\delta_{ail}}}=0.02 \quad rad^{-1}\\
 C_{L_{\delta_{rud}}}=0.002 \quad rad^{-1}\\
@@ -148,7 +148,7 @@ To do a feedback linearisation, a pseudo input must be chosen, in this case $\ta
 \delta^d_{ele}\\
 \delta^d_{rud}
 \end{bmatrix}
-=\dfrac{1}{V_a^2}\xi^{-1}C_\delta\left\lbrace\dfrac{2I}{\rho S}\tau - \dfrac{2}{\rho S}(\dfrac{1}{4}\rho S V_aC_k - I_n)\dot{\Omega} -2V_a\dot{V_a} \left(
+=\dfrac{1}{V_a^2}\xi^{-1}C_\delta^{-1}\left\lbrace\dfrac{2I}{\rho S}\tau - \dfrac{2}{\rho S}(\dfrac{1}{4}\rho S V_aC_k - I_n)\dot{\Omega} -2V_a\dot{V_a} \left(
 \begin{bmatrix}
 bC_l\\
 \bar{c}C_m\\
@@ -164,7 +164,7 @@ Indeed, by replacing \ref{eq:control_law} in the jerk equation \ref{eq:jerk}, th
 
 The wind effects will appear in the terms including $\dot{R}_a =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. The value of $\dot{R}_a$ can be computed from equation \ref{eq:Ra_dot}.
 
-Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\ddot{\Omega}=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]_T$. As mentioned in section \ref{section:background/NLI}, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs comes a control law for $\tau$, firstly considering without neural network adaptation
+Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\ddot{\Omega}=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]^T$. As mentioned in section \ref{section:background/NLI}, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs comes a control law for $\tau$, firstly considering without neural network adaptation
 \begin{equation}
 \tau = -K_P (\Omega-\Omega^d)-K_D (\dot{\Omega}-\dot{\Omega}^d)+\ddot{\Omega}^d
 \label{eq:linear_controller}
@@ -196,7 +196,7 @@ The characteristic equation is then obtained as
 \xi_i = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
 \omega_{n_i}=\sqrt{K_{P_i}}
 \end{gather}
-The chosen values were
+The chosen values are given in table \ref{tab:tau_dynamics}.
 
 \begin{table}[htbp]
   \centering
@@ -227,7 +227,7 @@ r=0
 \end{equation}
 \end{subequations}
 
-It is now possible to control the attitude of the aircraft, and the fast control loop design is finished. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far to achieve the goal of position tracking over time. Firstly the dynamics for the speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
+It is now possible to control the attitude of the aircraft, and the fast control loop design is completed. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far to achieve the goal of position tracking over time. Firstly the dynamics for the speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
 \begin{subequations}
 \begin{equation}
 \dot{V_a} = \dfrac{1}{m}(T\cos \alpha -D - mg\sin \gamma)
@@ -237,7 +237,7 @@ It is now possible to control the attitude of the aircraft, and the fast control
 \dot{\gamma} = \dfrac{1}{mV_a}(T\sin \alpha +L - mg\cos \gamma)
 \label{eq:gamma_dot}
 \end{equation}
-These equation can easily be obtained from the sum of forces in figure \ref{fig:flight_path_angle}. For the yaw rate comes that 
+These equations can easily be obtained from the sum of forces in figure \ref{fig:flight_path_angle}. For the yaw rate comes that 
 
 \begin{equation}
 \dot{\psi} = \dfrac{g}{V_a} \tan \phi
@@ -268,7 +268,7 @@ After choosing the desired dynamics to control these variables, the equations ab
 \end{equation}
 \end{subequations}
 
-The final step of the controller design will be to propose a guidance law to obtain the values of $V_a$, $\gamma$ and $\psi$ from the X,Y and Z reference values along time. For these laws was assumed that the position reference was given relative to a frame of reference with the origin on the surface, with the $Z$ axis pointing upwards. The guidance controller therefore implements the following equations, assuming the errors $\delta x = x_r - x$, $\delta y = y_r - y$ and $\delta z = z - z_r$.
+The final step of the controller design will be to propose a guidance law to obtain the values of $V_a$, $\gamma$ and $\psi$ from the X,Y and Z reference values along time. For these laws was assumed that the position reference was given relative to a frame of reference with the origin on the Earth surface, with the $Z$ axis pointing upwards. The guidance controller therefore implements the following equations, assuming the errors $\delta x = x_r - x$, $\delta y = y_r - y$ and $\delta z = z - z_r$.
 
 \begin{subequations}
 	\begin{gather}
@@ -287,7 +287,7 @@ The final step of the controller design will be to propose a guidance law to obt
 \label{section:NN}
 
 
-Over the years, intelligent control techniques using neural networks have become a growing research topic, addressing the limitations of state-of-the-art model based controllers such as linear quadratic Gaussian, model predictive control, backstepping and gain scheduling \citep{SotA_IFCS}. Indeed, variation in the plat dynamics (e.g., due to payload changes, actuator or sensor degradation) deteriorate the performance and reference tracking error of the controller. To compensate for such errors, adaptive online neural networks have been studied and implemented in several works \cite{quad_NLI+NN}, \cite{NN_PID}, \cite{UAV_adaptive} and \cite{NN_NLI} to name a few. These however, have been applied almost exclusively to UAV aircrafts, especially multicopters. For this work a feedforward network with one hidden layer, one of the most widely implemented neural network architecture \cite{SotA_IFCS} was used.
+Over the years, intelligent control techniques using neural networks have become a growing research topic, addressing the limitations of state-of-the-art model based controllers such as linear quadratic Gaussian, model predictive control, backstepping and gain scheduling \citep{SotA_IFCS}. Indeed, variations in the plane dynamics (e.g., due to payload changes, actuator or sensor degradation) deteriorate the performance and reference tracking error of the controller. To compensate for such errors, adaptive online neural networks have been studied and implemented in several works \cite{quad_NLI+NN}, \cite{NN_PID}, \cite{UAV_adaptive} and \cite{NN_NLI} to name a few. These however, have been applied almost exclusively to UAV aircraft, especially multicopters. For this work a feedforward network with one hidden layer, one of the most widely implemented neural network architecture \cite{SotA_IFCS} was used.
 
 \subsection{Network Architecture}
 From an error-less nonlinear inversion, the pseuso-input $\tau$ would directly control $\ddot{\Omega}$ as seen previously. However, in case of inversion errors, that can be caused by several factors, the resulting in an equation similar to \ref{eq:system+error}, that $\tau = \ddot{\Omega}^d + \Delta$, where $\Delta = \ddot{\Omega}- \ddot{\Omega} ^d$. This method adds an adaptive component $\tau_{NN}$ to the pseudo input that will approximate the behaviour of the $\Delta$ error. The resulting control law will be given by $\tau + \tau_{NN} = \ddot{\Omega}^d + \Delta$, in which as $t \rightarrow \infty$, $\tau_{NN} \rightarrow \Delta$, thus adaptively minimizing inversion errors. To do so a simple neural network architecture was chosen: a network with a single hidden layer with therefore two sets of weights $V$ and $W$ that will need to be trained, corresponding to the input weights and the hidden layer ones. As for the activation functions for the hidden layer a sigmoid function was chosen, $sig(x)=\dfrac{1}{(1+e^{-x})}$. As the outputs must not be bound between $[0;1]$, the chosen output function was a linear one. Indeed sigmoid output functions are usually used in applications where the output must be a boolean value. A description of the chosen architecture can be found in figure \ref{fig:NN}. Different numbers of neurons were used and the results obtained will be discussed in chapter \ref{chapter:results}.
@@ -305,7 +305,7 @@ There are quite some challenges in designing a feed forward neural network. Besi
 \item \textbf{Redundancy}: A large value of redundant and irrelevant input variables will not only increase the needed computational effort of the NN, but will also increase the difficulty to train the weights of the network and add noise to the system.
 \end{itemize}
 
-Another consideration about the chosen inputs that must also be taken into account is the range of values these might take. The sigmoid function $sing(x)$ used reaches around 75\% when $x=1$ and 100\% when $x=2$, as can be seen in figure \ref{fig:sigmoid}. For some cases the inputs might therefore need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained before even starting training, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The average of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$ the following equation is used
+Another consideration about the chosen inputs that must also be taken into account is their range. The sigmoid function $sig(x)$ used reaches around 75\% when $x=1$ and 100\% when $x=2$, as can be seen in figure \ref{fig:sigmoid}. For some cases the inputs might therefore need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained before even starting training, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The average of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$ the following equation is used
 
 \begin{equation}
 y=2\dfrac{x-x_{min}}{x_{max}-x_{min}}-1
@@ -323,7 +323,7 @@ For this  particular case, the state variables of the fast dynamics where used a
 
 \subsection{Training Algorithm}
 
-As mentioned in section \ref{section:background/NN}, a backpropagation algorithm was used to train both set of weights online. This algorithm, however, must have an error function that will be minimized by iteratively changing the values of the weights $V$ and $W$. As seen previously, due to inversion errors an error $\Delta$ will be present, where $\tau = \ddot{\Omega}^d + \Delta$. This error must be computed on each iteration to train the network to approximate this error. The error can be expressed as $\Delta=\tau - \ddot{\Omega}^d$. From the control law used to obtain $\tau$ (\ref{eq:linear_controller}) comes that
+As mentioned in section \ref{section:background/NN}, a backpropagation algorithm was used to train both set of weights online. This algorithm, however, must have an error function that will be minimized by iteratively changing the values of the weights $V$ and $W$. As seen previously, an inversion error $\Delta$ will be present, where $\tau = \ddot{\Omega}^d + \Delta$. This error must be computed on each iteration to train the network to approximate this error. The error can be expressed as $\Delta=\tau - \ddot{\Omega}^d$. From the control law used to obtain $\tau$ (\ref{eq:linear_controller}) comes that
 \begin{equation}
 \Delta = -K_P(\Omega-\Omega^d)-K_D(\dot{\Omega}-\dot{\Omega}^d)
 \label{eq:inversion_error}

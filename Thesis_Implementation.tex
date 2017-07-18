@@ -348,7 +348,7 @@ A simplified block diagram of the plane simulator is given by figure \ref{fig:pl
 \section{Controller Implementation}
 \label{section:control_implement}
 
-To invert such a complex system, two layers of inversion are proposed by H. Escamilla \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion control. 
+To invert such a complex system (figure \ref{fig:plane_model}), two layers of inversion are proposed by H. Escamilla \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion control. 
 
 \subsection{Fast Dynamics}
 To invert the fast dynamics the equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics \ref{eq:actuator_dynamics} and the effects of the wind. Doing so yields the jerk vector given by, as per \cite{hector}
@@ -450,7 +450,7 @@ Where the $K_P$ and $K_D$ coefficients are chosen to ensure stability and refere
 \begin{equation}
 \ddot{e}=-K_P e - K_D \dot{e}
 \end{equation}
-Assuming that an ideal inversion is obtained and $\tau=\ddot{\Omega}$, and where $e=\Omega-\Omega^d$. This way the initial non-linear system becomes a second order one, for which natural frequencies and damping values for each dimension must be chosen. Choosing $x_1=e_i$ and $x_2=\dot{x_1}$ for a given dimension $i$ of $\Omega$, either $p,q,r$. Then comes the state equation
+Assuming that an ideal inversion is obtained and $\tau=\ddot{\Omega}$, and where $e=\Omega-\Omega^d$. This way the initial non-linear system becomes a second order linear one, for which natural frequencies and damping values for each dimension must be chosen. Choosing $x_1=e_i$ and $x_2=\dot{x_1}$ for a given dimension $i$ of $\Omega$, either $p,q,r$. Then comes the state equation
 \begin{equation}
 \begin{bmatrix}
 \dot{x_1}\\
@@ -483,7 +483,7 @@ The chosen values are given in table \ref{tab:tau_dynamics}.
     $i$   & $K_{P_i}$ & $K_{D_i}$ & $\xi_i$ & $\omega_{n_i}$(rad $s^{-1}$) \\
     \midrule
     $p$   & 100   & 20    & 1     & 10 \\
-    $q$   & 5     & 1     & 0.223607 & 2.236067977 \\
+    $q$   & 5     & 1     & 0.22 & 2.24 \\
     $r$   & 100   & 20    & 1     & 10 \\
     \bottomrule
     \end{tabular}%
@@ -491,7 +491,7 @@ The chosen values are given in table \ref{tab:tau_dynamics}.
 \end{table}%
 
 
-From this point the next step shall be to obtain the desired values of $\Omega$. These were obtained using another PD controller, using Euler angle reference values to control rotation rates. Among these reference values to be followed, $\tau_r$ was set to zero. This was made to make use of the decoupling through feedback linearisation of the plane's movement, using a roll and pitch motion to turn the aircraft. This results in the following control of rotation rate
+From this point the next step shall be to obtain the desired values of $\Omega$. These were obtained using another PD controller, using Euler angle reference values to control rotation rates. Among these reference values to be followed, $\tau_r$ was set to zero. This was made to make use of the decoupling through feedback linearisation of the plane movement, using a roll and pitch motion to turn the aircraft. This results in the following control of rotation rate
 \begin{subequations}
 \begin{equation}
 p= k_P (\phi^d-\phi) + k_d (\dot{\phi^d}-\dot{\phi})
@@ -506,7 +506,7 @@ r=0
 
 \subsection{Slow Dynamics}
 
-It is now possible to control the attitude of the aircraft, and the fast control loop design is completed. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far to achieve the goal of position tracking over time. Firstly the dynamics for the speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
+It is now possible to control the attitude of the aircraft, and the fast control loop design is completed. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far to achieve the goal of position tracking over time. Firstly the dynamics for speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
 \begin{subequations}
 \begin{equation}
 \dot{V_a} = \dfrac{1}{m}(T\cos \alpha -D - mg\sin \gamma)
@@ -549,12 +549,12 @@ After choosing the desired dynamics to control these variables, the equations ab
 
 \subsection{Guidance Law}
 
-The final step of the controller design will be to propose a guidance law to obtain the values of $V_a$, $\gamma$ and $\psi$ from the X,Y and Z reference values along time. For these laws was assumed that the position reference was given relative to a frame of reference with the origin on the Earth surface, with the $Z$ axis pointing upwards. The guidance controller therefore implements the following equations, assuming the errors $\delta x = x_r - x$, $\delta y = y_r - y$ and $\delta z = z - z_r$.
+The final step of the controller design will be to propose a guidance law to obtain the values of $V_a^d$, $\gamma^d$ and $\psi^d$ from the X,Y and Z reference values along time. For these laws it was assumed that the position reference was given relative to a frame of reference with the origin on the Earth surface, with the $Z$ axis pointing upwards. The guidance controller therefore implements the following equations, assuming the errors $\delta x = x_r - x$, $\delta y = y_r - y$ and $\delta z = z - z_r$. The $z$ formula is slightly different to the other two as in the airplane frame of reference the z axis is pointing downwards, allowing this way to use a z reference relative to the Earth surface.
 
 \begin{subequations}
 	\begin{gather}
 	\delta V_a = \dfrac{1}{\tau_{V_a}}(\sqrt{\delta x^2 + \delta y^2 + \delta z^2})\\
-	V_a^d= \delta V_a  + 100 ms^{-1}
+	V_a^d= \delta V_a  + V_{a_0}
 	\end{gather}
 	\begin{equation}
 	\psi^d = atan2(\delta y,\delta x)
@@ -565,6 +565,12 @@ The final step of the controller design will be to propose a guidance law to obt
 	\label{eq:guidance_law}
 \end{subequations}
 
+This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. These trajectories can be a time parametrized Bezier curve, as per INSERT PAPER FROM HECTOR HERE. From these an airspeed, heading and Flight Path Angle must be computed an fed to the controller. 
+
+Taking firstly the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. A more accurate method of obtaining an airspeed reference from these equations is specified in \ref{eq:speed_guidance}. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
+%TODO
+
+
 Using solely equations \ref{eq:guidance_law} how ever will not grant optimal results, and may even sometimes cause loss of control of the aircraft. The goal for this guidance law and of this work is to, at any given time, be at a 3D coordinate point of a trajectory at said time. To do so, the references of speed, heading and flight path angle must be constantly adjusted to reach a 4D reference. Using the equations described previously for the guidance controller, it may happen that the aircraft would "overtake" the trajectory reference, causing the heading reference to increase to either $180^o$ or $-180^o$ and therefore making the aircraft diverge significantly from its original trajectory. To correct this, the following guidance strategy was used:
 
 \begin{itemize}
@@ -573,12 +579,13 @@ Using solely equations \ref{eq:guidance_law} how ever will not grant optimal res
 \item \textbf{Airspeed} Now that the aircraft no longer does $180^o$ turns when it overtakes the desired trajectory, the desired airspeed must now be adjusted in order to it slow down and therefore reaching the desired position at the desired time. To do so the guidance law was slightly modified to 
 \begin{equation}
 V_a^d=\begin{cases}
-\delta V_a  + 100 ms^{-1} \quad \text{if} \quad |atan2(\delta y,\delta x)|<90^o\\
-\delta V_a  - 100 ms^{-1} \quad \text{if} \quad |atan2(\delta y,\delta x)|>90^o
+\delta V_a  + V_{a_0} \quad \text{if} \quad |atan2(\delta y,\delta x)|<90^o\\
+\delta V_a  - V_{a_0} \quad \text{if} \quad |atan2(\delta y,\delta x)|>90^o
 \end{cases}
+\label{eq:speed_guidance}
 \end{equation}
 \end{itemize}
-Where $\delta V_a =  \dfrac{1}{\tau_{V_a}}(\sqrt{\delta x^2 + \delta y^2 + \delta z^2})$, $\delta x = x_r - x$ and $\delta y = y_r - y$.
+
 \section{Neural Network}
 \label{section:NN}
 

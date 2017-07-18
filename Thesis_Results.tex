@@ -77,7 +77,7 @@ This simulation, made over 800 seconds, shows clearly that the angle oscillates 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Feedback linearisation controller}
+\section{Feedback Linearisation Controller}
 \label{section:results/fl_contro}
 
 Once the model has been tested and validated, the described nonlinear inversion controller can now be tested. Reference tracking will firstly be observed with simple constant reference values, without any guidance control law. Reiterating the example from the previous section in cruise conditions for $V_a^d=200 ms^{-1}$, $\gamma^d = 0^o$ and $\psi^d = 0^o$ comes that
@@ -120,7 +120,7 @@ Although the reference value is reached after each step, the convergence takes a
 
 From the results obtained in the previous section, it can be concluded the controller performs correctly following the desired reference. These results however were obtained supposing the exact model of the aircraft was known, without any kind of external perturbation or simulated system failure. It is these perturbations that will be simulated in this section and studied. To do so the same testing reference as described in equation \ref{eq:test_traj} will be used to compare the effects of different types of disturbances with the undisturbed system. 
 
-\subsection{Inversion errors}
+\subsection{Inversion Errors}
 
 This error will be the most frequent when implementing such a controller, as some system parameters estimations may have considerable errors, namely the aircraft's inertial matrix. Fortunately, the controller used is, as will be demonstrated, tolerant to errors in the estimation of this parameter, but can result in an unstable system in extreme cases. To simulate estimation errors, the entries of the inertial matrix $A$,$B$,$C$ and $E$ were multiplied by a reducing factor $\zeta \in [0;1]$ when computing the nonlinear inversion in \ref{eq:control_law}. The inertial matrix used in this equation $I_{est}$ is therefore given by $I_{est} = \zeta I$.
 
@@ -161,7 +161,7 @@ In order to more accurately visualise the influence of the $\zeta$ coefficient o
 
 
 
-\subsection{System failures}
+\subsection{System Failures}
 
 One other cause for inversion errors that can have a much greater impact on flight trajectory are system failures. This subsection will focus on methods to simulate these failures and observe the behaviour of the airplane trajectory for these cases. The reference trajectory that will be used shall be the same as used previously. The first failure to be simulated will be a control surfaces failure, that will lead to reduced controllability of the aircraft. In this work this was replicated in a simulated environment by reducing each moment coefficients for the elevator, aileron and rudder, namely $C_{\delta_{ele}}$, $C_{\delta_{ail}}$ and $C_{\delta_{rud}}$.
 
@@ -293,7 +293,7 @@ Once again retaking the example from figure \ref{fig:ref_icing}, in the same ici
 Again, these are conditions that have a negative impact on the controllability of the aircraft: the increase of 200\% of the value of $C_D$ causes a decrease in the speed of the aircraft, rendering it unable to follow the desired speed of $200ms^{-1}$. Regarding the measured flight path angle $\gamma$, although  some oscillations are still present, error relative to the reference no longer goes up to $0.3 rad$, instead oscillating around $0.05rad$ at a much lower frequency and amplitude. The most noticeable improvement however can be seen in the heading following: the aircraft follows the desired $\psi^d$ during the full simulation, with little to no oscillations around that value. It is also interesting to notice that in the first moments of the learning process, up to $t=300s$, oscillations around the desired heading value are greater than in later moments of the simulation. This is explained by the fact that the weights of the neural network have not yet converged to their optimal values at $t<300s$.
 
 
-\section{Guidance controller}
+\section{Guidance Controller}
 \label{section:results/guidance_control}
 
 This final section will focus on the results of the implementation of the guidance controller described in equations \ref{eq:guidance_law}. From the work implemented and results obtained thus far, a NN adaptive controller can now be used to follow references of airspeed, heading and flight path angle. From the equations \ref{eq:guidance_law} position references can now be used to compute $V_a,\gamma, \psi$. Choosing a path to follow using these equations the following results were obtained, showing the aircraft is able to correctly follow a trajectory from a constant feed of way points over time.
@@ -305,17 +305,3 @@ This final section will focus on the results of the implementation of the guidan
 \label{fig:guidance}
 \end{figure}
 
-Using solely equations \ref{eq:guidance_law} how ever will not grant optimal results, and may even sometimes cause loss of control of the aircraft. The goal for this guidance law and of this work is to, at any given time, be at a 3D coordinate point of a trajectory at said time. To do so, the references of speed, heading and flight path angle must be constantly adjusted to reach a 4D reference. Using the equations described previously for the guidance controller, it may happen that the aircraft would "overtake" the trajectory reference, causing the heading reference to increase to either $180^o$ or $-180^o$ and therefore making the aircraft diverge significantly from its original trajectory. To correct this, the following guidance strategy was used:
-
-\begin{itemize}
-\item \textbf{Heading} To prevent the heading reference to excessively grow and make the aircraft do a $180^o$ turn, a small correction code in Simulink was added in order to detect large errors between the desired and measured heading, caused by the aircraft "overtaking" its trajectory. In case of large errors, this correction would force the desired heading to be equal to its measured value, thus preventing the aircraft from making large turns. 
-
-\item \textbf{Airspeed} Now that the aircraft no longer does $180^o$ turns when it overtakes the desired trajectory, the desired airspeed must now be adjusted in order to it slow down and therefore reaching the desired position at the desired time. To do so the guidance law was slightly modified to 
-\begin{equation}
-V_a^d=\begin{cases}
-\delta V_a  + 100 ms^{-1} \quad \text{if} \quad |atan2(\delta y,\delta x)|<90^o\\
-\delta V_a  - 100 ms^{-1} \quad \text{if} \quad |atan2(\delta y,\delta x)|>90^o
-\end{cases}
-\end{equation}
-\end{itemize}
-Where $\delta V_a =  \dfrac{1}{\tau_{V_a}}(\sqrt{\delta x^2 + \delta y^2 + \delta z^2})$, $\delta x = x_r - x$ and $\delta y = y_r - y$.

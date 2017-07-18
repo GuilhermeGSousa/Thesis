@@ -11,290 +11,13 @@
 \chapter{Background}
 \label{chapter:background}
 
-In this chapter the aircraft model used for this work will be described firstly. A theoretical model of the plane dynamics will be discussed, and implementation details will be provided in chapter \ref{chapter:implementation}. The control strategy used will then follow, giving an overview of the feedback linearisation approach, as well as its limitations, namely its sensitivity to inversion errors and external interferences. An attempt to solve these limitation will be made, suggesting some solutions and finally describing the chosen methodology for this case.
+In this chapter the tools used to approach the problematic of this project will be described firstly. A theoretical model of the plane dynamics will be discussed, and implementation details will be provided in chapter \ref{chapter:implementation}. The control strategy used will then follow, giving an overview of the feedback linearisation approach, as well as its limitations, namely its sensitivity to inversion errors and external interferences. An attempt to solve these limitation will be made, suggesting some solutions and finally describing the chosen methodology for this case.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Airplane Model}
-\label{section:background/model}
 
-The work made in this thesis was built on top of the work done by H. Escamilla Nuñez and  F. Mora Camino on 4D trajectory tracking \cite{hector}. The model used in this work is a six degree of freedom transport aircraft that will be described in this section. 
-
-\subsection{Frames of reference}
-\label{section:background/model/for}
-The first step before describing the dynamics of a commercial aircraft will be to define the frames of reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the axial directions of the wind frame. This frame is aligned to the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from the wind frame to the body frame by
-
-
-\begin{equation}
-R_{BW}=
-\begin{bmatrix}
-c_\alpha c_\beta & -c_\alpha s_\beta & -s_\alpha \\
-s_\beta & c_\beta & 0 \\
-s_\alpha c_\beta & -s_\alpha s_\beta & c_\alpha
-\end{bmatrix}
-\label{eq:wind2body}
-\end{equation}
-
-To describe the attitude of the plane Euler, roll, pitch and yaw angles, will also be used, namely $\phi\{-\pi,\pi\}; \theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}; \psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
-
-\begin{equation}
-R_{EB}=
-\begin{bmatrix}
-c_\theta c_\psi & s_\phi s_\theta c_\psi - c_\phi s_\psi & c_\phi s_\theta c_\psi + s_\phi s_\psi \\
-c_\theta c_\psi & s_\phi s_\theta s_\psi + c_\phi c_\psi & c_\phi s_\theta s_\psi - s_\phi c_\psi \\
--s_\theta & s_\phi c_\theta & c_\phi c_\theta
-\end{bmatrix}
-\label{eq:body2earth}
-\end{equation}
-
-\subsection{Fast Dynamics}
-\label{section:background/model/fast_dynamics}
-
-The considered actuators of the aircraft that control its attitude are given by the control surface deflection $\delta = [\delta_{ail} \delta_{ele} \delta_{rud}]^T$, each applying a torque along an axis of the body frame. These torques are given by
-
-\begin{equation}
-\begin{bmatrix}
-L'\\
-M\\
-N
-\end{bmatrix}
-= \dfrac{1}{2}\rho S V_a^2\left(
-\begin{bmatrix}
-bC_l\\
-\bar{c}C_m\\
-bC_n
-\end{bmatrix}
-+ C_\delta \delta\right)
-\label{eq:torque}
-\end{equation}
-
-where $\bar{c}$ and $b$ represent the wing mean chord and its span respectively, $C_\delta$ and the moment coefficients $[C_l C_m C_n]^T$ are given by
-
-\begin{equation}
-C_\delta = 
-\begin{bmatrix}
-bC_{l\delta_{ail}} & 0 & bC_{l\delta_{rud}} \\
-0 & \bar{c}C_{m\delta_{ele}} & 0 \\
-bC_{n\delta_{ail}} & 0 & bC_{n\delta_{rud}}\\
-\end{bmatrix}
-\label{eq:cdelta}
-\end{equation}
-\begin{equation}
-\begin{bmatrix}
-C_l\\
-C_m\\
-C_n
-\end{bmatrix} 
-=
-\begin{bmatrix}
-C_{l\beta} \beta + C_{l_p} p \dfrac{b}{2V_a} + C_{l_r} r \dfrac{b}{2V_a}\\
-C_{m_0} + C_{m_\alpha} \alpha + C_{m_q} q \dfrac{\bar{c}}{2V_a}\\
-C_{n\beta} \beta + C_{n_p} p \dfrac{b}{2V_a} + C_{n_r} r \dfrac{b}{2V_a}
-\end{bmatrix}
-\label{eq:cmoment}
-\end{equation}
-Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method for obtaining of the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft inertial matrix.
-\begin{subequations}
-	\begin{equation}
-		\dot{\Omega} = I^{-1} M_{ext} - I^{-1}\Omega \times (I\Omega)
-	\end{equation}
-	\begin{equation}
-		\dot{\Omega} = 
-		\dfrac{1}{2}\rho S I^{-1} V_a^2\left(
-		\begin{bmatrix}
-			bC_l\\
-			\bar{c}C_m\\
-			bC_n
-		\end{bmatrix}
-		+ C_\delta \delta\right)
-		- I^{-1}\Omega \times (I\Omega)	
-	\end{equation}
-
-\label{eq:fast_dynamics}
-\end{subequations}
-
-These two equations can be rearranged to account for the effect of the wind, allowing further on to simulate the behaviour of the airplane in the presence of wind disturbances. Let $\vec{V_G} = [u \quad v \quad w]^T$ be the speed of the CG relative to the ground, $\vec{V}$ the speed of the CG relative to the air mass and $\vec{W}$ the speed of the wind relative to the ground, then as per Etkin and Reid \cite{Etkin+Reid} 
-\begin{equation}
-\vec{V_G} = \vec{V} + \vec{W} = 
-\begin{bmatrix}
-V_ac_\alpha c_\beta + V_{w_x}\\
-V_as_\beta+V_{w_y}\\
-V_as_\alpha c_\beta + V_{w_z}
-\end{bmatrix}
-\label{eq:windtriangle}
-\end{equation}
-and $\alpha$ and $\beta$ can be computed by 
-\begin{subequations}
-	\begin{equation}
-		\alpha = arctan\left(\dfrac{w-V_{w_z}}{uV_{w_x}}\right)
-		\label{eq:alpha}
-	\end{equation}
-	\begin{equation}
-		\beta = arctan\left(\dfrac{v-V_{w_y}}{V_a}\right)
-		\label{eq:beta}
-	\end{equation}
-\end{subequations}
-
-From these three equations, differentiating \ref{eq:alpha} and \ref{eq:beta}, and from equation \ref{eq:windtriangle} and the translation dynamics equation \ref{eq:boddy_acc} comes that 
-
-\begin{equation}
-\begin{bmatrix}
-\dot{\alpha}\\
-\dot{\beta}\\
-\dot{V_a}
-\end{bmatrix}
-= 
-\begin{bmatrix}
-H_{11} & H_{12} & H_{13}\\
-H_{21} & 0 & H_{23}\\
-H_{31} & H_{32} & H_{33}
-\end{bmatrix}
-\begin{bmatrix}
-p\\
-q\\
-r
-\end{bmatrix}
-+
-\begin{bmatrix}
-Q_1\\
-Q_2\\
-Q_3
-\end{bmatrix}
-\label{eq:alphabetadot}
-\end{equation}
-Where the entries of the matrix are given by
-
-\begin{gather*}
-H_{11}=\dfrac{-V_a c_\alpha s_\beta  c_\beta - V_{w_y} c_\alpha c_\beta}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
-H_{12}=\dfrac{V_a(c^2_\alpha c^2_\beta-s^2_\alpha c^2_\beta) + V_{w_x}c_\alpha c_\beta - V_{w_z}s_\alpha s_\beta}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
-H_{13}=\dfrac{-V_a s_\alpha s_\beta  c_\beta - V_{w_y} s_\alpha c_\beta}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
-H_{21}=\dfrac{V_a s_\alpha c_\beta + V_{w_z}}{V_a c_\beta}\\
-H_{23}=-\dfrac{V_a c_\alpha c_\beta + V_{w_x}}{V_a c_\beta}\\
-H_{31}=2 \left(-V_a s_\beta s_\alpha c_\beta - V_{w_x} s_\alpha c_\beta \right)\\
-H_{32}=2\left( -V_{w_z} c_\alpha c_\beta + V_as_\alpha c_\beta s_\beta
- + V_{w_z}s_\beta + V_{w_x}s_\alpha c_\beta \right)\\
-H_{33}=2\left(V_{w_y}c_\alpha c_\beta - V_{w_x}s_\beta\right)\\
-Q_1=\dfrac{\left(\dfrac{1}{m}F_{za} + gc_\theta c_\phi - \dot{V}_{w_z} \right)c_\alpha c_\beta - \left(\dfrac{1}{m}(F_{xa} + T)-gs_\theta - \dot{V}_{w_x}\right)}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
-Q_2=\dfrac{\dfrac{1}{m}F_{ya}+g c_\theta s_\phi-\dot{V}_{w_y}}{c_\beta}\\
-Q_3=2 \left( \left(\dfrac{-1}{m}(F_{xa}+T) + g s_\theta - \dot{V}_{w_x} \right)c_\alpha c_\beta + \left( \dfrac{-1}{m}F_{ya} - \dot{V}_{w_y} \right)s_\beta + \left(\dfrac{-1}{m}F_{za} - \dot{V}_{w_z} \right)s_\alpha c_\beta \right)
-\label{eq:Ra_dot}
-\end{gather*}
-The forces in the air frame $F_{xa}, F_{ya}, F_{za}$ will be further detailed in the next section on translation dynamics. 
-
-The angular rates are also related to the Euler angles. The relationship between the euler angles and the rotation rates is also one that will prove useful when implementing the model on a Matlab simulation, and is given by
-
-\begin{equation}
-\begin{bmatrix}
-\dot{\phi}\\
-\dot{\theta}\\
-\dot{\psi}
-\end{bmatrix}
-=
-\begin{bmatrix}
-1 & tg_\theta s_\phi & tg_\theta c_\phi\\
-0 & c_\phi & -s_\phi\\
-0 & \dfrac{s_\phi}{c_\theta} & \dfrac{c_\phi}{c_\theta}
-\end{bmatrix}
-\begin{bmatrix}
-p\\
-q\\
-r
-\end{bmatrix}
-\label{eq:euler2omega}
-\end{equation}
-
-\subsection{Translation Dynamics}
-\label{section:background/model/guidance_dynamics}
-
-This subsection on the forces applied to aircraft, introducing a new actuation variable, the thrust force $T$. These forces are applied along the three axis of the wind frame, lift, drag and side force, given by
-\begin{equation}
-\begin{bmatrix}
-D\\
-Y\\
-L
-\end{bmatrix}
-= \dfrac{1}{2} \rho SV_a^2
-\begin{bmatrix}
-C_D\\
-C_Y\\
-C_L
-\end{bmatrix}
-\label{eq:forces}
-\end{equation}
-Once again, the method used to compute these coefficients will be given in the chapter \ref{chapter:implementation} in detail. These coefficients, similarly to the moment coefficient, are functions of the angle of attack, sideslip angle and airspeed, the three most relevant variables when determining aerodynamic forces and moments. Although aerodynamic forces are usually expressed on the wind frame, as the thrust is always applied along the $x$ axis of the body frame, it is necessary to rotate the aerodynamic forces to this frame. This way the sum of the airplane's forces can be obtained. 
-
-\begin{equation}
-\begin{bmatrix}
-F_{xa}\\
-F_{ya}\\
-F_{za}
-\end{bmatrix}
-= R_{WB}
-\begin{bmatrix}
--D\\
-Y\\
--L
-\end{bmatrix}
-\label{eq:body_forces}
-\end{equation}
-From Newton's Second Law comes the aircraft acceleration
-
-\begin{equation}
-\begin{bmatrix}
-\dot{u}\\
-\dot{v}\\
-\dot{w}
-\end{bmatrix}
-=
-\begin{bmatrix}
-\dfrac{1}{m}(F_{xa} + T) - gs_\theta +rv-qw\\
-\dfrac{1}{m}F_{ya} + gc_\theta s_\phi + pw - ru\\
-\dfrac{1}{m}F_{za} + gc_\theta c_\phi + qu - pv
-\end{bmatrix}
-\label{eq:boddy_acc}
-\end{equation}
-
-An expression in the Earth frame can also be obtained
-
-\begin{equation}
-\begin{bmatrix}
-\ddot{x}_E\\
-\ddot{y}_E\\
-\ddot{z}_E
-\end{bmatrix}
-= \dfrac{1}{m} R_{BE}
-\begin{bmatrix}
-F_{xa}+T\\
-F_{ya}\\
-F_{za}
-\end{bmatrix}
-+
-\begin{bmatrix}
-0\\
-0\\
-g
-\end{bmatrix}
-\end{equation}
-
-\subsection{Actuator Dynamics}
-\label{section:background/model/actuator_dynamics}
-
-Finally, to simulate the delay response in actuation in order to have a realistic simulation, first order systems were introduced to the actuator dynamics as per \cite{hector}. For the control surfaces $\delta_i$, given a desired $\delta_i^d$ comes
-
-\begin{equation}
-\dot{\delta_i} = \dfrac{1}{\xi_i}(\delta_i^d-\delta_i)
-\label{eq:actuator_dynamics}
-\end{equation}
-
-Similarly for thrust
-
-\begin{equation}
-\dot{T} = \dfrac{1}{\xi_T}(T^d-T)
-\end{equation}
-
-$\xi_i$ and $\xi_T$ being time constants. As the responsiveness of the resultant thrust will be much slower than that of the control surfaces, $\xi_T>>\xi_i$.
-\section{Feedback linearisation}
+\section{Feedback Linearisation}
 \label{section:background/NLI}
 % Aqui vamos nos!
 
@@ -342,7 +65,7 @@ Finally, the concept of \emph{diffeomorphism} must be described to fully underst
 
 \emph{A function $\phi: R^n\rightarrow R^n$, defined in a region $\Omega$, is called a diffeomorphism if it is smooth and its inverse $\phi^{-1}$ exists and is smooth \cite{Slotine+Li}}. 
 In Input-Output linearisation, a \emph{diffeomorphism} must be found to transform a non-linear system into a linear one.
-\subsection{SISO systems}
+\subsection{SISO Systems}
 \label{section:background/SISO_NLI}
 
 Although an aircraft is always considered as a MIMO system, a description of this control concept will firstly be provided for a general SISO case, before generalising to a MIMO case. Nonlinear systems that can be represented as affine systems $\dot{x}=f(x)+g(x)u$ will be discussed in this section. From \cite{Slotine+Li}, a definition of Input-State linearisation is to find, for a nonlinear system of relative degree $n$, a \emph{diffeomorphism} $\phi:\Omega \rightarrow R^n$ and nonlinear control law
@@ -382,7 +105,7 @@ The remaining states are then obtained from $z(x) = [z_1 \quad L_fz_1 \quad ... 
 	\end{equation}
 \end{subequations}
 
-\subsection{MIMO systems}
+\subsection{MIMO Systems}
 \label{section:background/MIMO_NLI}
 
 These concepts can also be extended to MIMO systems in a similar manner, by differentiating the outputs until the inputs explicitly appear. This time however, there are individual relative degrees per output. The sum of these relative degrees is called total degree $r$ and must satisfy $r\leq n$, $n$ being the order of the system. Note however, that in the case of $r<n$, a part of the system dynamics is rendered unobservable in the input-output linearisation, as the closed loop dynamics will have a lower order $r$ than the whole dynamics of the system $n$. These internal dynamics must therefore be studied to establish the effectiveness of the feedback linearisation. For the case where the internal dynamics is stable, the input-output linearisation method can then be used. In the case of unstable internal dynamics however, these would lead to both undesirable and uncontrollable phenomena, in which case a different control design is needed.
@@ -409,7 +132,7 @@ As this equation holds for $1<i<p$, $p$ being the number of outputs of the syste
 
 It is also interesting to note the resulting system is not only linear, but also completely decoupled, as each new pseudo input only affects one output.
 
-\section{Limitations of feedback linearisation}
+\section{Improving the Feedback Linearisation MSethod}
 \label{section:background/limitations}
 Although feedback control answers to many of the problems of linear controllers such as PID and LQR, it has a some downsides. Indeed, being a model based controller, it requires the system model to be quite accurately known, and parameter uncertainties can lead to undesired responses. Let $\upsilon$ be the vector of pseudo inputs, for a second order $\ddot{x} = f(x,\dot{x},u)$, if it is input-output linearisable and the exact system is known, then it comes that, from \cite{YANG+LIN_Adaptive_Flight_Control}
 \begin{equation}
@@ -429,7 +152,7 @@ Fuzzy logic systems are based on the paradigm of continuous levels of truth betw
 Fuzzy systems have some advantages: its linguistic interpretation of human knowledge facilitate the interpretation of results, and the knowledge base can be improved through addition of new rules. However, this method comes with some disadvantages. First of all, the set of rules that will improve the control of the aircraft is entirely dependent on expert knowledge, thus resulting in an empiric set of rules. This also means the method has no capability of generalization, as the control is only applied to specific cases, of the form "if the error is greater than a given value, apply this compensation to control input". It is also not robust to topological changes of the system \cite{Neuro_fuzzy_survey}. For these reasons this method will not be further studied and implemented in this work.
 
 
-\subsection{Neural Networks}
+\subsection{Neural NSetworks}
 \label{section:background/NN}
 
 Artificial Neural Networks (NN) are a biologically inspired simulation of the brain nervous system. They are composed of simulated neurons and synapses. The sum of the inputs of a neuron are summed and the result is fed into an activation function, which then return a bounded value, either between -1 and 1 or 0 and 1. The inputs and outputs of a neuron are multiplied by a weight, representing the synapses between neurons. We get the following equation for one neuron

@@ -502,6 +502,7 @@ q= k_P (\theta^d-\theta) + k_d (\dot{\theta^d}-\dot{\theta})
 \begin{equation}
 r=0
 \end{equation}
+\label{eq:omega_PD}
 \end{subequations}
 
 \subsection{Slow Dynamics}
@@ -546,6 +547,15 @@ After choosing the desired dynamics to control these variables, the equations ab
 \label{eq:psi_dot_des}
 \end{equation}
 \end{subequations}
+
+A block diagram of the controller used to compute the pseudo input $\tau$ is described in figure \ref{fig:slow_inversion}.
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=1\textwidth]{Figures/slow_inversion.png}
+  \caption[Slow dynamics controller]{This block diagram describes the method used to compute $\tau$, the pseudo input to the fast dynamics inversion. In block \textbf{1} equations \ref{eq:va_dot_des}, \ref{eq:gamma_dot_des}, \ref{eq:gamma_dot} and \ref{eq:gamma_dot} are solved to compute the desired $\theta^d$ and thrust. Similarly in block \textbf{2} equations \ref{eq:psi_dot_des} and \ref{eq:psi_dot} are also solved to obtain $\phi^d$. From these values in block \textbf{3} go through the PD controller described in equatio \ref{eq:omega_PD}, resulting in $\Omega^d$, the input of block \textbf{4}. This last block is the linear controller described by equation \ref{eq:linear_controller}, which output $\tau$.}
+  \label{fig:slow_inversion}
+\end{figure}
 
 \subsection{Guidance Law}
 
@@ -592,7 +602,7 @@ V_a^d=\begin{cases}
 Over the years, intelligent control techniques using neural networks have become a growing research topic, addressing the limitations of state-of-the-art model based controllers such as linear quadratic Gaussian, model predictive control, backstepping and gain scheduling \citep{SotA_IFCS}. Indeed, variations in the plane dynamics (e.g., due to payload changes, actuator or sensor degradation) deteriorate the performance and reference tracking error of the controller. To compensate for such errors, adaptive online neural networks have been studied and implemented in several works \cite{quad_NLI+NN}, \cite{NN_PID}, \cite{UAV_adaptive} and \cite{NN_NLI} to name a few. These however, have been applied almost exclusively to UAV aircraft, especially multicopters. For this work a feedforward network with one hidden layer, one of the most widely implemented neural network architecture \cite{SotA_IFCS} was used.
 
 \subsection{Network Architecture}
-From an error-less nonlinear inversion, the pseuso-input $\tau$ would directly control $\ddot{\Omega}$ as seen previously. However, in case of inversion errors, that can be caused by several factors, the resulting in an equation similar to \ref{eq:system+error}, that $\tau = \ddot{\Omega}^d + \Delta$, where $\Delta = \ddot{\Omega}- \ddot{\Omega} ^d$. This method adds an adaptive component $\tau_{NN}$ to the pseudo input that will approximate the behaviour of the $\Delta$ error. The resulting control law will be given by $\tau + \tau_{NN} = \ddot{\Omega}^d + \Delta$, in which as $t \rightarrow \infty$, $\tau_{NN} \rightarrow \Delta$, thus adaptively minimizing inversion errors. To do so a simple neural network architecture was chosen: a network with a single hidden layer with therefore two sets of weights $V$ and $W$ that will need to be trained, corresponding to the input weights and the hidden layer ones. As for the activation functions for the hidden layer a sigmoid function was chosen, $sig(x)=\dfrac{1}{(1+e^{-x})}$. As the outputs must not be bound between $[0;1]$, the chosen output function was a linear one. Indeed sigmoid output functions are usually used in applications where the output must be a boolean value. A description of the chosen architecture can be found in figure \ref{fig:NN}. Different numbers of neurons were used and the results obtained will be discussed in chapter \ref{chapter:results}.
+From an error-less nonlinear inversion, the pseuso-input $\tau$ would directly control $\ddot{\Omega}$ as it was seen previously. However, in case of inversion errors, that can be caused by several factors such as modelling errors or external disturbances, resulting in an equation similar to \ref{eq:system+error}, that $\tau = \ddot{\Omega}^d + \Delta$, where $\Delta = \ddot{\Omega}- \ddot{\Omega} ^d$. This method adds an adaptive component $\tau_{NN}$ to the pseudo input that will approximate the behaviour of the $\Delta$ error. The resulting control law will be given by $\tau + \tau_{NN} = \ddot{\Omega}^d + \Delta$, in which as $t \rightarrow \infty$, $\tau_{NN} \rightarrow \Delta$, thus adaptively minimizing inversion errors. To do so a simple neural network architecture was chosen: a network with a single hidden layer with therefore two sets of weights $V$ and $W$ that will need to be trained, corresponding to the input weights and the hidden layer ones. As for the activation functions for the hidden layer a sigmoid function was chosen, $sig(x)=\dfrac{1}{(1+e^{-x})}$. As the outputs must not be bound between $[0;1]$, the chosen output function was a linear one. Indeed sigmoid output functions are usually used in applications where the output must be a boolean value. A description of the chosen architecture can be found in figure \ref{fig:NN}. Different numbers of neurons were used and the results obtained will be discussed in chapter \ref{chapter:results}.
 
 \begin{figure}[!htb]
   \centering
@@ -603,11 +613,11 @@ From an error-less nonlinear inversion, the pseuso-input $\tau$ would directly c
 
 There are quite some challenges in designing a feed forward neural network. Besides choosing the number of layers and neurons per layer, the inputs of the network must also be chosen carefully. Some rules to choose the correct inputs are given in \cite{NN_inputs}:
 \begin{itemize}
-\item \textbf{Relevance}: Most important consideration to have while choosing inputs, this set must be sufficiently informative of the state of the system for the network to perform correctly. A NN will perform poorly is the output behaviour is not correlated to its input.
+\item \textbf{Relevance}: This is the most important consideration to have while choosing inputs, this set must be sufficiently informative of the state of the system for the network to perform correctly. A NN will perform poorly if the output behaviour is not correlated to its input.
 \item \textbf{Redundancy}: A large value of redundant and irrelevant input variables will not only increase the needed computational effort of the NN, but will also increase the difficulty to train the weights of the network and add noise to the system.
 \end{itemize}
 
-Another consideration about the chosen inputs that must also be taken into account is their range. The sigmoid function $sig(x)$ used reaches around 75\% when $x=1$ and 100\% when $x=2$, as can be seen in figure \ref{fig:sigmoid}. For some cases the inputs might therefore need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained before even starting training, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The average of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$ the following equation is used
+Another consideration about the chosen inputs that must also be taken into account is their range. The sigmoid function $sig(x)$ used reaches around 75\% when $x=1$ and 100\% when $x=2$, as can be seen in figure \ref{fig:sigmoid}. For some cases the inputs might therefore need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained before even starting training, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The average of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$, the following equation is used
 
 \begin{equation}
 y=2\dfrac{x-x_{min}}{x_{max}-x_{min}}-1
@@ -625,7 +635,8 @@ For this  particular case, the state variables of the fast dynamics where used a
 
 \subsection{Training Algorithm}
 
-As mentioned in section \ref{section:background/NN}, a backpropagation algorithm was used to train both set of weights online. This algorithm, however, must have an error function that will be minimized by iteratively changing the values of the weights $V$ and $W$. As seen previously, an inversion error $\Delta$ will be present, where $\tau = \ddot{\Omega}^d + \Delta$. This error must be computed on each iteration to train the network to approximate this error. The error can be expressed as $\Delta=\tau - \ddot{\Omega}^d$. From the control law used to obtain $\tau$ (\ref{eq:linear_controller}) comes that
+As mentioned in section \ref{section:background/NN}, a backpropagation algorithm was used to train both sets of weights online. This algorithm, however, must have an error function that will be minimized by iteratively changing the values of the weights $V$ and $W$. As seen previously, an inversion error $\Delta$ will be present, where $\tau = \ddot{\Omega}^d + \Delta$. This error must be computed for each iteration to train the network to approximate this error. The error can be expressed as $\Delta=\tau - \ddot{\Omega}^d$.
+From the control law used to obtain $\tau$ (\ref{eq:linear_controller}) it comes that
 \begin{equation}
 \Delta = -K_P(\Omega-\Omega^d)-K_D(\dot{\Omega}-\dot{\Omega}^d)
 \label{eq:inversion_error}
@@ -637,10 +648,10 @@ J=(\Delta-y_{NN})^2
 \label{eq:NN_cost}
 \end{equation}
 
-The values of $\dot{V}$ and $\dot{W}$ must now be computing, using the gradient descent method described in section \ref{section:background/NN}. As the name suggest, the back propagation algorithm firstly computes the weight update values for the last layers, propagating the errors to update the previous weight set. The weights are constantly updated until the error's absolute value in lesser than a given value $\xi$, in which case these are kept constant as $\dot{V}=\dot{W}=0$. 
+The values of $\dot{V}$ and $\dot{W}$ must now be computed, using the gradient descent method described in section \ref{section:background/NN}. As the name suggests, the back propagation algorithm firstly computes the weight update values for the last layers, propagating the errors to update the previous weight set. The weights are constantly updated until the error absolute value in lesser than a given value $\xi$, in which case these are kept constant as $\dot{V}=\dot{W}=0$. 
 One of the parameters that must be tuned that has the largest impact on the performance of the network is the learning rate $\alpha$. This coefficient can also be thought of as the step size in incrementing the weight sets. Let $V^*$ and $W^*$ be the two ideal set of weights that, for a given input, result in an absolutely minimal cost function. A small value will allow the weights to converge to their ideal value, although taking many iterations to do so. A large learning rate however might converge faster, but might also overshoot and miss its optimal value. The results of the variation of this rate will be studied in chapter \ref{chapter:results}.
 
-Finally, adding the online neural network to the baseline controller, the final control architecture is obtained. For the following chapter, the controller without the correction will be tested and compared in the same conditions to the same controller including the network. A simplified diagram of the controller can be seen in figure \ref{fig:full_controller}.
+Finally, adding the online neural network to the baseline controller, the final control architecture is obtained. For the following chapter, the controller without the correction will be tested and compared in the same conditions to the same controller including the network. A simplified diagram of the full system, (controller, model and neural network), can be seen in figure \ref{fig:full_controller}.
 \begin{figure}[!htb]
   
   \includegraphics[width=1.1\textwidth]{Figures/full_controller.png}

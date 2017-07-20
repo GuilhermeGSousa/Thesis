@@ -11,7 +11,7 @@
 \chapter{Results}
 \label{chapter:results}
 
-This chapter will present the results in the behaviour of the aircraft for the different solutions proposed to control and stabilise it. Once the goal for the results of this chapter is properly established, the first step will be to validate the model which has been implemented. This will be done by controlling the aircraft into cruise conditions using the baseline feedback linearisation error. The effects of disturbances and inversion errors will then be studied regarding their effects in aircraft dynamics. The next step will be to achieve the goal of this thesis and demonstrate the effects of an on-line neural network in reducing the tracking error in the presence of these disturbances. Finally, from the adaptive controller, including the neural network, the guiding law described in chapter \ref{chapter:implementation} in \ref{eq:guidance_law} will be added to follow a given trajectory. 
+This chapter presents the results in the behaviour of the aircraft for the different solutions proposed to control and stabilise it. Once the goal for the results of this chapter is properly established, the first step will be to validate the model which has been implemented. This will be done by controlling the aircraft into cruise conditions using the baseline feedback linearisation error. The effects of disturbances and inversion errors will then be studied regarding their effects in aircraft dynamics. The next step will be to achieve the goal of this thesis and demonstrate the effects of an on-line neural network in reducing the tracking error in the presence of these disturbances. Finally, from the adaptive controller, including the neural network, the guiding law described in chapter \ref{chapter:implementation} in \ref{eq:guidance_law} will be added to follow a given trajectory. 
 All the simulations described in this chapter were made on Matlab Simulink with a fixed step of $t_{sample} = 0.03333 s$.
 
 
@@ -59,8 +59,8 @@ The required thrust can also be computed from \ref{eq:cruise_cond}, \ref{eq:crui
   \label{tab:cruise_cond}%
 \end{table}%
 
-From these values, to test both the model (as well as the methods used to simulate the dynamics of the aircraft, including the coefficients neural networks)and the feedback linearisation controller, the following reference values $V_a^d=200 ms^{-1}$, $\gamma^d = 0 rad$ and $\psi^d=0 rad$ were used in an attempt to simulate cruise conditions. From there the values of thrust and angle of attack were computed and  compared to the theoretical values of table \ref{tab:cruise_cond}. 
-Following these constant reference values the results obtained were
+From these values, to test both the model (as well as the methods used to simulate the dynamics of the aircraft, including the coefficients neural networks) and the feedback linearisation controller, the following reference values $V_a^d=200 ms^{-1}$, $\gamma^d = 0 rad$ and $\psi^d=0 rad$ were used in an attempt to simulate cruise conditions. From there the values of thrust and angle of attack were computed and  compared to the theoretical values of table \ref{tab:cruise_cond}. 
+Following these constant reference values the results obtained can be seen in figure \ref{fig:model_validation}.
 
 \begin{figure}
 \centering
@@ -71,16 +71,17 @@ Following these constant reference values the results obtained were
 \includegraphics[width=1\textwidth]{Figures/Results/thrust_check.PNG}
 \end{minipage}
 \caption[AoA and thrust validation]{Angle of Attack (degrees) and thrust (N) of the controlled aircraft}
+\label{fig:model_validation}
 \end{figure}
 
-This simulation, made over 800 seconds, shows clearly that the angle oscillates around a $6^o$ degree angle of attack. As for the thrust, it also oscillates around $30000N$. These values correspond to the theoretical values in table \ref{tab:cruise_cond} for $\alpha=6^o$, indicating that not only the modelled plane is well behaved, but also that the coefficient neural networks are able to simulate an accurate model of the aerodynamic coefficient's variation.
+This simulation, made over 800 seconds, shows clearly that the angle oscillates around a $6^o$ degree angle of attack. As for the thrust, it also oscillates around $30000N$. These values correspond to the theoretical values in table \ref{tab:cruise_cond} for $\alpha=6^o$, indicating that not only the modelled plane is well behaved, but also that the NN coefficients are able to simulate an accurate model of the aerodynamic coefficient's variation.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Feedback Linearisation Controller}
 \label{section:results/fl_contro}
 
-Once the model has been tested and validated, the described nonlinear inversion controller can now be tested. Reference tracking will firstly be observed with simple constant reference values, without any guidance control law. Reiterating the example from the previous section in cruise conditions for $V_a^d=200 ms^{-1}$, $\gamma^d = 0^o$ and $\psi^d = 0^o$ comes that
+Once the model has been tested and validated, the described nonlinear inversion controller can now be tested. Reference tracking will firstly be observed with simple constant reference values, without any guidance control law. Reiterating the example from the previous section, the reference following for $V_a^d=200 ms^{-1}$, $\gamma^d = 0^o$ and $\psi^d = 0^o$ can be seen in figure \ref{fig:const_ref}.
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/nli_test_const.png}
@@ -88,7 +89,7 @@ Once the model has been tested and validated, the described nonlinear inversion 
 \label{fig:const_ref}
 \end{figure}
 
-As seen in the figure \ref{fig:const_ref} the reference is followed with minimal osculations for the three variables, although with the presence of some steady state error in the case of the airspeed $V_a$. To be able to follow trajectories however, a good control of the aircraft's heading will be necessary. Proposing this time the following variation in $\psi^d$
+In the figure \ref{fig:const_ref} the reference is followed with minimal osculations for the three variables, although with the presence of some steady state error in the case of the airspeed $V_a$. To be able to follow trajectories however, a good control of the aircraft heading will be necessary. Proposing this time the following variation in $\psi^d$ as a reference for the simulated aircraft to follow
 \begin{equation}
 \psi^d = \begin{cases}
 0^o & t < 100\\
@@ -122,7 +123,7 @@ From the results obtained in the previous section, it can be concluded the contr
 
 \subsection{Inversion Errors}
 
-This error will be the most frequent when implementing such a controller, as some system parameters estimations may have considerable errors, namely the aircraft's inertial matrix. Fortunately, the controller used is, as will be demonstrated, tolerant to errors in the estimation of this parameter, but can result in an unstable system in extreme cases. To simulate estimation errors, the entries of the inertial matrix $A$,$B$,$C$ and $E$ were multiplied by a reducing factor $\zeta \in [0;1]$ when computing the nonlinear inversion in \ref{eq:control_law}. The inertial matrix used in this equation $I_{est}$ is therefore given by $I_{est} = \zeta I$.
+This error will be the most frequent when implementing such a controller, as some system parameters estimations may have considerable errors, namely the aircraft inertial matrix. Fortunately, the controller used is, as it will be demonstrated, tolerant to errors in the estimation of this parameter, but can result in an unstable system in extreme cases. To simulate estimation errors, the entries of the inertial matrix $A$,$B$,$C$ and $E$ were multiplied by a reducing factor $\zeta \in [0;1]$ when computing the nonlinear inversion in \ref{eq:control_law}. The inertial matrix used in this equation $I_{est}$ is therefore given by $I_{est} = \zeta I$.
 
 Changing the values of $\zeta$ to $0.5$ and $0.05$, increasing the inversion error, results in the following trajectories in figure \ref{fig:inversion_error}
 
@@ -133,7 +134,7 @@ Changing the values of $\zeta$ to $0.5$ and $0.05$, increasing the inversion err
 \label{fig:inversion_error}
 \end{figure}
 
-Indeed, a 50\% error in estimating the inertia of the aircraft when computing the feedback linearisation law results in a negligible reference tracking error, as can be seen in figure \ref{fig:ref_zeta_05}. This however is not the case if $\zeta$ is reduced even further to $\zeta = 0.05$ and error of the system relative to its references becomes much greater (figure \ref{fig:ref_zeta_005}. As can be seen in this figure, the aircraft is unable to follow yaw commands in this case as it easily goes unstable. This establishes a first goal to measure the performance of the designed neural network, to try to approach the case of $\zeta = 0.05$ to the reduced errors of a nonlinear inversion with no inertia estimation errors.
+Indeed, a 50\% error in estimating the inertia of the aircraft when computing the feedback linearisation law results in a negligible reference tracking error, as can be seen in figure \ref{fig:ref_zeta_05}. This however is not the case if $\zeta$ is reduced even further to $\zeta = 0.05$ and if the error of the system relative to its references becomes much greater (figure \ref{fig:ref_zeta_005}). As can be seen in this figure, the aircraft is unable to follow yaw commands in this case as it easily goes unstable. This establishes a first goal to measure the performance of the designed neural network, to try to approach the case of $\zeta = 0.05$ to the reduced errors of a nonlinear inversion with no inertia estimation errors.
 
 \begin{figure}[H]
 \centering
@@ -216,11 +217,8 @@ For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)
 
 From figure \ref{fig:ref_icing}, the system in such high drag conditions can be considered marginally stable, as it easily increases the error to either of the three commanded inputs to significantly high values. For the case of the flight path angle, the aircraft even reaches under $-20º$ at $t=600s$, a completely unrealistic value for a normal cruise flight. The impact of the increased drag in noticeable in the reduced speed in the simulation, going under $100ms^{-1}$ for the desired $V_a^d=200ms^{-1}$. The reduced roll capabilities and lift also cause errors and oscillations in heading and flight path angle following.
 
-%\subsection{Wind disturbances}
 
-%TODO
-
-These perturbations change the expected behaviour of the aircraft, causing the feedback linearisation control law to perform poorly. In the next section of this work the results of the online neural network will be shown, demonstrating its ability to increase the stability of the aircraft in situations of strong perturbations, or even in cases of a poorly designed linear or feedback linearisation controller. Note however that that the conditions used here to induce the aircraft into unstable or marginally stable conditions mimic extreme perturbations, and the described controller can be said to perform well in cases when little to none of these perturbations are present.
+These perturbations change the expected behaviour of the aircraft, causing the feedback linearisation control law to perform poorly. In the next section of this work the results of the online neural network will be shown, demonstrating its ability to increase the stability of the aircraft in situations of strong perturbations, or even in cases of a poorly designed linear or feedback linearisation controller. Note however that the conditions used here to induce the aircraft into unstable or marginally stable conditions mimic extreme perturbations, and the described controller can be said to perform well in cases when little to none of these perturbations are present.
 
 
 \section{Neural Network}

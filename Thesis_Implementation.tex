@@ -517,7 +517,7 @@ It is now possible to control the attitude of the aircraft, and the fast control
 \dot{\gamma} = \dfrac{1}{mV_a}(T\sin \alpha +L - mg\cos \gamma)
 \label{eq:gamma_dot}
 \end{equation}
-These equations can easily be obtained from the sum of forces in figure \ref{fig:flight_path_angle}. For the yaw rate comes that 
+For the yaw rate comes that 
 
 \begin{equation}
 \dot{\psi} = \dfrac{g}{V_a} \tan \phi
@@ -525,12 +525,6 @@ These equations can easily be obtained from the sum of forces in figure \ref{fig
 \end{equation}
 \end{subequations}
 
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.75\textwidth]{Figures/flight_path_angle.png}
-  \caption[Aircraft frames of reference]{$\gamma$ representation and frames of reference \cite{FPA}}
-  \label{fig:flight_path_angle}
-\end{figure}
 
 After choosing the desired dynamics to control these variables, the equations above must be solved for both the thrust reference $T$, the desired AoA and $\psi$. From these last two, knowing the current roll angle $\theta$, the input for the fast dynamics controller is obtained. The desired dynamics were chosen as first order systems as
 \begin{subequations}
@@ -596,10 +590,20 @@ V_a^d=\begin{cases}
 \end{equation}
 \end{itemize}
 
+Finally, the block diagram of the controller described thus far is given by figure \ref{fig:controller_noNN}, in which the linear controller is described in more detail in figure \ref{fig:slow_inversion}, and the plane model in figure \ref{fig:plane_model}.
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=1.15\textwidth]{Figures/controller_noNN.png}
+  \caption[Diagram of the controller and model architecture, without NN compensation]{Diagram of the controller and model architecture, without NN compensation}
+  \label{fig:controller_noNN}
+\end{figure}
+
 \section{Neural Network}
 \label{section:NN}
 
 Over the years, intelligent control techniques using neural networks have become a growing research topic, addressing the limitations of state-of-the-art model based controllers such as linear quadratic Gaussian, model predictive control, backstepping and gain scheduling \citep{SotA_IFCS}. Indeed, variations in the plane dynamics (e.g., due to payload changes, actuator or sensor degradation) deteriorate the performance and reference tracking error of the controller. To compensate for such errors, adaptive online neural networks have been studied and implemented in several works \cite{quad_NLI+NN}, \cite{NN_PID}, \cite{UAV_adaptive} and \cite{NN_NLI} to name a few. These however, have been applied almost exclusively to UAV aircraft, especially multicopters. For this work a feedforward network with one hidden layer, one of the most widely implemented neural network architecture \cite{SotA_IFCS} was used.
+
 
 \subsection{Network Architecture}
 From an error-less nonlinear inversion, the pseuso-input $\tau$ would directly control $\ddot{\Omega}$ as it was seen previously. However, in case of inversion errors, that can be caused by several factors such as modelling errors or external disturbances, resulting in an equation similar to \ref{eq:system+error}, that $\tau = \ddot{\Omega}^d + \Delta$, where $\Delta = \ddot{\Omega}- \ddot{\Omega} ^d$. This method adds an adaptive component $\tau_{NN}$ to the pseudo input that will approximate the behaviour of the $\Delta$ error. The resulting control law will be given by $\tau + \tau_{NN} = \ddot{\Omega}^d + \Delta$, in which as $t \rightarrow \infty$, $\tau_{NN} \rightarrow \Delta$, thus adaptively minimizing inversion errors. To do so a simple neural network architecture was chosen: a network with a single hidden layer with therefore two sets of weights $V$ and $W$ that will need to be trained, corresponding to the input weights and the hidden layer ones. As for the activation functions for the hidden layer a sigmoid function was chosen, $sig(x)=\dfrac{1}{(1+e^{-x})}$. As the outputs must not be bound between $[0;1]$, the chosen output function was a linear one. Indeed sigmoid output functions are usually used in applications where the output must be a boolean value. A description of the chosen architecture can be found in figure \ref{fig:NN}. Different numbers of neurons were used and the results obtained will be discussed in chapter \ref{chapter:results}.

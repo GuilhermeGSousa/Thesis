@@ -12,7 +12,7 @@
 \label{chapter:results}
 
 This chapter presents the results in the behaviour of the aircraft for the different solutions proposed to control and stabilise it. Once the goal for the results of this chapter is properly established, the first step will be to validate the model which has been implemented. This will be done by controlling the aircraft into cruise conditions using the baseline feedback linearisation error. The effects of disturbances and inversion errors will then be studied regarding their effects in aircraft dynamics. The next step will be to achieve the goal of this thesis and demonstrate the effects of an on-line neural network in reducing the tracking error in the presence of these disturbances. Finally, from the adaptive controller, including the neural network, the guiding law described in chapter \ref{chapter:implementation} in \ref{eq:guidance_law} will be added to follow a given trajectory. 
-All the simulations described in this chapter were made on Matlab Simulink with a fixed step of $t_{sample} = 0.03333 s$.
+All the simulations described in this chapter were made on Matlab Simulink with a fixed step of $f_{sample} = 30$ Hz.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -27,7 +27,7 @@ The goal in this section will be to validate the behaviour of the model in cruis
 	L'=M=N=0
 \label{eq:cruise_cond}
 \end{gather}
-In order to verify the model described so far, the required thrust to have cruise conditions will be computed for a given plausible value of $\alpha$. From this point the airspeed of the aircraft can also be computed. The graph of $C_L$ versus alpha was also obtained from its respective neural network, given by \ref{fig:cl_alpha}
+In order to verify the model described so far, the required thrust to have cruise conditions will be computed for a given plausible value of $\alpha$. From this point the airspeed of the aircraft can also be computed. The graph of $C_L$ versus alpha was also obtained from its respective neural network, as detailed in subsection \ref{section:model/plane_dynamics}, given by figure \ref{fig:cl_alpha}
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.75\textwidth]{Figures/CL_alpha.png}
@@ -65,12 +65,12 @@ Following these constant reference values the results obtained can be seen in fi
 \begin{figure}
 \centering
 \begin{minipage}{\textwidth}
-\includegraphics[width=1\textwidth]{Figures/Results/aoa_check.PNG}
+\includegraphics[width=1.1\textwidth]{Figures/Results/aoa_check.PNG}
 \end{minipage}
 \begin{minipage}{\textwidth}
-\includegraphics[width=1\textwidth]{Figures/Results/thrust_check.PNG}
+\includegraphics[width=1.1\textwidth]{Figures/Results/thrust_check.PNG}
 \end{minipage}
-\caption[AoA and thrust validation]{Angle of Attack (degrees) and thrust (N) of the controlled aircraft}
+\caption[AoA and thrust validation]{Angle of Attack (degrees) and thrust (N) of the controlled aircraft as described in the block diagram \ref{fig:controller_noNN}}
 \label{fig:model_validation}
 \end{figure}
 
@@ -84,12 +84,12 @@ This simulation, made over 800 seconds, shows clearly that the angle oscillates 
 Once the model has been tested and validated, the described nonlinear inversion controller can now be tested. Reference tracking will firstly be observed with simple constant reference values, without any guidance control law. Reiterating the example from the previous section, the reference following for $V_a^d=200 ms^{-1}$, $\gamma^d = 0^o$ and $\psi^d = 0^o$ can be seen in figure \ref{fig:const_ref}.
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{Figures/Results/nli_test_const.png}
+\includegraphics[width=1.1\textwidth]{Figures/Results/nli_test_const.png}
 \caption[Constant reference following of feedback linearisation controller]{Reference (blue) following over $1000s$ of simulation time for $V_a^d=200 ms^{-1}$, $\psi^d = 0^o$ and $\gamma^d = 0^o$ respectively and measured values (yellow)}
 \label{fig:const_ref}
 \end{figure}
 
-In the figure \ref{fig:const_ref} the reference is followed with minimal osculations for the three variables, although with the presence of some steady state error in the case of the airspeed $V_a$. To be able to follow trajectories however, a good control of the aircraft heading will be necessary. Proposing this time the following variation in $\psi^d$ as a reference for the simulated aircraft to follow
+In figure \ref{fig:const_ref} the reference is followed with minimal osculations for the three variables, although with the presence of some steady state error in the case of the airspeed $V_a$. To be able to follow trajectories however, a good control of the aircraft heading will be necessary. Proposing this time the following variation in $\psi^d$ as a reference for the simulated aircraft to follow
 \begin{equation}
 \psi^d = \begin{cases}
 0^o & t < 100\\
@@ -98,8 +98,7 @@ In the figure \ref{fig:const_ref} the reference is followed with minimal osculat
 \end{cases}
 \label{eq:test_traj}
 \end{equation}
-
-The comparing the measured heading $\psi$ and its desired value comes 
+The comparing the measured heading $\psi$ and its desired value comes in figure \ref{fig:heading_test}.
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/heading_test.png}
@@ -138,13 +137,13 @@ Indeed, a 50\% error in estimating the inertia of the aircraft when computing th
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Figures/Results/ref_zeta_05.png}
+\includegraphics[width=1.1\textwidth]{Figures/Results/ref_zeta_05.png}
 \caption[Reference tracking for $\zeta=0.5$]{$V_a$, $\gamma$ and $\psi$ for measured and desired values for $\zeta=0.5$}
 \label{fig:ref_zeta_05}
 \end{figure}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Figures/Results/ref_zeta_005.png}
+\includegraphics[width=1.1\textwidth]{Figures/Results/ref_zeta_005.png}
 \caption[Reference tracking for $\zeta=0.05$]{$V_a$, $\gamma$ and $\psi$ for measured and desired values for $\zeta=0.05$}
 \label{fig:ref_zeta_005}
 \end{figure}
@@ -154,7 +153,7 @@ In order to more accurately visualise the influence of the $\zeta$ coefficient o
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Figures/Results/mean_error_xi.png}
+\includegraphics[width=1.1\textwidth]{Figures/Results/mean_error_xi.png}
 \caption[Mean errors for $V_a$, $\gamma$ and $psi$]{Mean errors for $V_a$, $\gamma$ and $psi$ for $\zeta=[0,0.5]$ with neural network compensation (orange) and without compensation (blue)}
 \label{fig:xi_mean_error}
 \end{figure}
@@ -210,7 +209,7 @@ For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1\textwidth]{Figures/Results/ref_icing.PNG}
+\includegraphics[width=1.1\textwidth]{Figures/Results/ref_icing.PNG}
 \caption[Reference following in icing conditions]{$V_a$, $\gamma$ and $\psi$ for measured and desired values in icing conditions}
 \label{fig:ref_icing}
 \end{figure}
@@ -239,7 +238,7 @@ This is caused due to the $\Delta$ component of equation \ref{eq:inversion_error
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Figures/Results/ref_zeta_005_NN.png}
+\includegraphics[width=1.1\textwidth]{Figures/Results/ref_zeta_005_NN.png}
 \caption[Reference tracking for $\zeta=0.05$ with NN correction]{$V_a$, $\gamma$ and $\psi$ for measured and desired values for $\zeta=0.05$ with NN correction}
 \label{fig:ref_zeta_005_NN}
 \end{figure}
@@ -284,7 +283,7 @@ Once again retaking the example from figure \ref{fig:ref_icing}, in the same ici
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1\textwidth]{Figures/Results/ref_icing_NN.PNG}
+\includegraphics[width=1.1\textwidth]{Figures/Results/ref_icing_NN.PNG}
 \caption[Reference following in icing conditions with NN correction]{$V_a$, $\gamma$ and $\psi$ for measured and desired values in icing conditions, with NN correction}
 \label{fig:ref_icing_NN}
 \end{figure}

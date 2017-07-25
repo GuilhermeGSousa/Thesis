@@ -570,9 +570,10 @@ The final step of the controller design will be to propose a guidance law to obt
 \end{subequations}
 
 This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. These trajectories can be a time parametrized Bezier curve, as per INSERT PAPER FROM HECTOR HERE. From these an airspeed, heading and Flight Path Angle must be computed an fed to the controller. 
+%TODO
 
 Taking firstly the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. A more accurate method of obtaining an airspeed reference from these equations is specified in \ref{eq:speed_guidance}. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
-%TODO
+
 
 
 Using solely equations \ref{eq:guidance_law} how ever will not grant optimal results, and may even sometimes cause loss of control of the aircraft. The goal for this guidance law and of this work is to, at any given time, be at a 3D coordinate point of a trajectory at said time. To do so, the references of speed, heading and flight path angle must be constantly adjusted to reach a 4D reference. Using the equations described previously for the guidance controller, it may happen that the aircraft would "overtake" the trajectory reference, causing the heading reference to increase to either $180^o$ or $-180^o$ and therefore making the aircraft diverge significantly from its original trajectory. To correct this, the following guidance strategy was used:

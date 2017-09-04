@@ -1,0 +1,41 @@
+\begin{thenomenclature} 
+
+ \nomgroup{A}
+
+  \item [{BP}]\begingroup Backpropagation\nomeqref {0}\nompageref{xvii}
+  \item [{DI}]\begingroup Dynamic Inversion\nomeqref {0}
+		\nompageref{xvii}
+  \item [{FBL}]\begingroup Feedback Linearisation\nomeqref {0}
+		\nompageref{xvii}
+  \item [{NN}]\begingroup Neural Network\nomeqref {0}\nompageref{xvii}
+
+ \nomgroup{G}
+
+  \item [{$\alpha$}]\begingroup Angle of attack\nomeqref {0}
+		\nompageref{xvii}
+  \item [{$\beta$}]\begingroup Angle of side-slip\nomeqref {0}
+		\nompageref{xvii}
+  \item [{$\Omega$}]\begingroup Angular velocity vector\nomeqref {0}
+		\nompageref{xvii}
+  \item [{$\phi,\theta, \psi$}]\begingroup Pitch, Roll and Yaw Euler angles\nomeqref {0}
+		\nompageref{xvii}
+  \item [{$\rho$}]\begingroup Density\nomeqref {0}\nompageref{xvii}
+
+ \nomgroup{R}
+
+  \item [{$p, q, r$}]\begingroup Angular Velocity Cartesian components\nomeqref {0}
+		\nompageref{xvii}
+  \item [{$V_a$}]\begingroup Airspeed\nomeqref {0}\nompageref{xvii}
+  \item [{$C_D$}]\begingroup Coefficient of drag\nomeqref {0}
+		\nompageref{xvii}
+  \item [{$C_L$}]\begingroup Coefficient of lift\nomeqref {0}
+		\nompageref{xvii}
+  \item [{$p$}]\begingroup Pressure\nomeqref {0}\nompageref{xvii}
+  \item [{$T$}]\begingroup Thrust\nomeqref {0}\nompageref{xvii}
+  \item [{$\bf u$}]\begingroup Velocity vector\nomeqref {0}
+		\nompageref{xvii}
+  \item [{$u,v,w$}]\begingroup Velocity Cartesian components\nomeqref {0}
+		\nompageref{xvii}
+  \item [{$W$}]\begingroup Weight\nomeqref {0}\nompageref{xvii}
+
+\end{thenomenclature}

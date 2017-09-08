@@ -156,7 +156,7 @@ Q_3
 \end{bmatrix}
 \label{eq:alphabetadot}
 \end{equation}
-Where the entries of the matrix are given IN ANNEX DO ANNEX
+Where the entries of the matrix are given in annex \ref{sec:ra_dot}.
 
 
 The forces in the air frame $F_{xa}, F_{ya}, F_{za}$ will be further detailed in the next section on translation dynamics. 
@@ -297,6 +297,10 @@ The ISA atmospheric model was used to measure the air density at any given heigh
     \end{tabular}%
   \label{tab:b737_parameters}
 \end{table}%
-The time constants used for the actuators was $\xi_{\delta_i}=50$ms and $\xi_T=4$s for the engines.
-
-A simplified block diagram of the plane simulator is given by POR EM ANEXO
+The time constants used for the actuators was $\xi_{\delta_i}=50$ms and $\xi_T=4$s for the engines. A simplified block diagram of the plane simulator is given by Figure \ref{fig:plane_model}.
+\begin{figure*}[h]
+  \centering
+  \includegraphics[width=0.75\textwidth]{../Figures/PlaneModel.png}
+  \caption[Plane dynamics simulator diagram]{Plane dynamics simulator diagram}
+  \label{fig:plane_model}
+\end{figure*}

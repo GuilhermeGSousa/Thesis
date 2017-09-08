@@ -1,10 +1,8 @@
 \section{Implementation}
 \label{sec:imple}
-To invert such a complex system (PLANE MODEL FIGURE HERE), two layers of inversion are proposed by \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion controller.
+To invert such a complex system (Figure \ref{fig:plane_model}), two layers of inversion are proposed by \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion controller.
 \subsection{Feedback Linearisation}
-
 To invert the fast dynamics the equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics \ref{eq:actuator_dynamics} and the effects of the wind. Doing so yields the jerk vector given by, as per \cite{hector}
-
 \begin{multline}
 \begin{bmatrix}
 \ddot{p}\\
@@ -91,7 +89,7 @@ bC_n
 Indeed, by replacing \ref{eq:control_law} in the jerk equation \ref{eq:jerk}, the equation $\ddot{\Omega} = \tau$ is obtained, resulting in a successfully inverted system.
 
 
-The wind effects will appear in the terms including $\dot{R}_a =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. The value of $\dot{R}_a$ can be computed from equation RA DOT EQ HERE.
+The wind effects will appear in the terms including $\dot{R}_a =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. The value of $\dot{R}_a$ can be computed from the equation in annex \ref{eq:Ra_dot}.
 
 Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\ddot{\Omega}=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]^T$. As mentioned in the previous section, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs comes a control law for $\tau$, firstly considering without neural network adaptation
 \begin{equation}
@@ -275,7 +273,7 @@ For input layers however, this derivative is less obvious to estimate. One can c
 
 \begin{multline}
 \frac{\partial J}{\partial x_j} = \sum _{s\in S}\left( \frac{\partial J}{\partial x_s}\frac{\partial x_s}{\partial sum_s}\frac{\partial sum_s}{\partial x_j}\right)=\\
-& \sum _{s\in S}\left( \frac{\partial J}{\partial x_s}\frac{\partial f(sum_s)}{\partial sum_s}w_{js}\right)
+\sum _{s\in S}\left( \frac{\partial J}{\partial x_s}\frac{\partial f(sum_s)}{\partial sum_s}w_{js}\right)
 \end{multline}
 
 Note that the term $ \frac{\partial J}{\partial x_s} $ represent the all the derivatives of the errors with respect to the outputs of the next layer of neurons. Once this derivative is computed the new set of weights for both layers can be estimated from the update law \ref{eq:update_law}.
@@ -300,4 +298,12 @@ The final step of the controller design will be to propose a guidance law to obt
 \end{subequations}
 
 This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. These trajectories can be a time parametrized Bezier curve, as per INSERT PAPER FROM HECTOR HERE. From these an airspeed, heading and Flight Path Angle must be computed an fed to the controller.
-Taking firstly the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. A more accurate method of obtaining an airspeed reference from these equations is specified in \ref{eq:speed_guidance}. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
+
+Taking firstly the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
+
+Finally, this control architecture is illustrated by the block diagram of Figure \ref{fig:full_controller}, specifying fast dynamics inversion, the slow dynamics controller and the guidance control law, as well as the online neural network use to improve the controller and adapt to inversion errors and system failures.
+\begin{figure*}[h]  
+  \includegraphics[width=1.1\textwidth]{../Figures/full_controller_special.png}
+  \caption[Diagram of the controller architecture]{Diagram of the full controller architecture. In orange is specified the neural network correction system of the initial controller}
+  \label{fig:full_controller}
+\end{figure*}

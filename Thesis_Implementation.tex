@@ -657,8 +657,7 @@ The values of $\dot{V}$ and $\dot{W}$ must now be computed, using the gradient d
 One of the parameters that must be tuned that has the largest impact on the performance of the network is the learning rate $\alpha$. This coefficient can also be thought of as the step size in incrementing the weight sets. Let $V^*$ and $W^*$ be the two ideal set of weights that, for a given input, result in an absolutely minimal cost function. A small value will allow the weights to converge to their ideal value, although taking many iterations to do so. A large learning rate however might converge faster, but might also overshoot and miss its optimal value. The results of the variation of this rate will be studied in chapter \ref{chapter:results}.
 
 Finally, adding the online neural network to the baseline controller, the final control architecture is obtained. For the following chapter, the controller without the correction will be tested and compared in the same conditions to the same controller including the network. A simplified diagram of the full system, (controller, model and neural network), can be seen in figure \ref{fig:full_controller}.
-\begin{figure}[!htb]
-  
+\begin{figure}[!htb]  
   \includegraphics[width=1.1\textwidth]{Figures/full_controller.png}
   \caption[Diagram of the controller architecture]{Diagram of the controller architecture}
   \label{fig:full_controller}

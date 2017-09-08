@@ -13,24 +13,21 @@
 \begin{document}
 \begin{frontmatter}
 
-\title{Style for IFAC Conferences \& Symposia: Use Title Case for
-  Paper Title\thanksref{footnoteinfo}} 
+\title{Nonlinear Control Applied to 4D Transport Aircraft Guidance} 
 % Title, preferably not more than 10 words.
 
-\thanks[footnoteinfo]{Sponsor and financial support acknowledgment
-goes here. Paper titles should be written in uppercase and lowercase
-letters, not all uppercase.}
+\thanks[footnoteinfo]{Acknowledgements go here...}
 
-\author[First]{First A. Author} 
-\author[Second]{Second B. Author, Jr.} 
-\author[Third]{Third C. Author}
+\author[First]{G. Sousa} 
+%\author[Second]{Second B. Author, Jr.} 
+%\author[Third]{Third C. Author}
 
-\address[First]{National Institute of Standards and Technology, 
-   Boulder, CO 80305 USA (e-mail: author@ boulder.nist.gov).}
-\address[Second]{Colorado State University, 
-   Fort Collins, CO 80523 USA (e-mail: author@lamar. colostate.edu)}
-\address[Third]{Electrical Engineering Department, 
-   Seoul National University, Seoul, Korea, (e-mail: author@snu.ac.kr)}
+\address[First]{Instituto Superior Técnico, Lisbon, Portugal (guilherme.sousa@ist.utl.pt
+).}
+%\address[Second]{Colorado State University, 
+%   Fort Collins, CO 80523 USA (e-mail: author@lamar. colostate.edu)}
+%\address[Third]{Electrical Engineering Department, 
+%   Seoul National University, Seoul, Korea, (e-mail: author@snu.ac.kr)}
 
 \input{ExtendedAbstract_abstr.tex}
 
@@ -42,12 +39,29 @@ letters, not all uppercase.}
 \input{ExtendedAbstract_imple.tex}
 \input{ExtendedAbstract_resul.tex}
 \input{ExtendedAbstract_concl.tex}
-\input{ExtendedAbstract_ackno.tex}
+
 
 \bibliography{ExtendedAbstract_ref_db}            
 
 \appendix
-\section{A summary of Latin grammar}    % Each appendix must have a short title.
-\section{Some Latin vocabulary}              % Sections and subsections are supported  
-                                                                         % in the appendices.
+ \section{$\dot{R_a}$ equation}
+\label{sec:ra_dot}
+
+\begin{gather*}
+H_{11}=\dfrac{-V_a c_\alpha s_\beta  c_\beta - V_{w_y} c_\alpha c_\beta}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
+H_{12}=\dfrac{V_a(c^2_\alpha c^2_\beta-s^2_\alpha c^2_\beta) + V_{w_x}c_\alpha c_\beta - V_{w_z}s_\alpha s_\beta}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
+H_{13}=\dfrac{-V_a s_\alpha s_\beta  c_\beta - V_{w_y} s_\alpha c_\beta}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
+H_{21}=\dfrac{V_a s_\alpha c_\beta + V_{w_z}}{V_a c_\beta}\\
+H_{23}=-\dfrac{V_a c_\alpha c_\beta + V_{w_x}}{V_a c_\beta}\\
+H_{31}=2 \left(-V_a s_\beta s_\alpha c_\beta - V_{w_x} s_\alpha c_\beta \right)\\
+H_{32}=2\left( -V_{w_z} c_\alpha c_\beta + V_as_\alpha c_\beta s_\beta
+ + V_{w_z}s_\beta + V_{w_x}s_\alpha c_\beta \right)\\
+H_{33}=2\left(V_{w_y}c_\alpha c_\beta - V_{w_x}s_\beta\right)\\
+Q_1=\dfrac{\left(\dfrac{1}{m}F_{za} + gc_\theta c_\phi - \dot{V}_{w_z} \right)c_\alpha c_\beta - \left(\dfrac{1}{m}(F_{xa} + T)-gs_\theta - \dot{V}_{w_x}\right)}{V_a(1+\tan^2\alpha)c^2_\alpha c^2_\beta}\\
+Q_2=\dfrac{\dfrac{1}{m}F_{ya}+g c_\theta s_\phi-\dot{V}_{w_y}}{c_\beta}\\
+Q_3=2 \left( \left(\dfrac{-1}{m}(F_{xa}+T) + g s_\theta - \dot{V}_{w_x} \right)c_\alpha c_\beta + \left( \dfrac{-1}{m}F_{ya} - \dot{V}_{w_y} \right)s_\beta \right.\\
+\left. + \left(\dfrac{-1}{m}F_{za} - \dot{V}_{w_z} \right)s_\alpha c_\beta \right)
+\label{eq:Ra_dot}
+\end{gather*}
+
 \end{document}

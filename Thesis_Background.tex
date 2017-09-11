@@ -8,10 +8,10 @@
 %                                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Background}
+\chapter{Background on Feedback Linearisation and Neural Networks}
 \label{chapter:background}
 
-In this chapter the tools used to approach the problematic of this project will be described firstly. A theoretical model of the plane dynamics will be discussed, and implementation details will be provided in chapter \ref{chapter:implementation}. The control strategy used will then follow, giving an overview of the feedback linearisation approach, as well as its limitations, namely its sensitivity to inversion errors and external interferences. An attempt to solve these limitation will be made, suggesting some solutions and finally describing the chosen methodology for this case.
+In this chapter the tools used to achieve the goals of this project will be described firstly. A theoretical model of the plane dynamics will be discussed, and implementation details will be provided in chapter \ref{chapter:implementation}. The control strategy used will then follow, giving an overview of the feedback linearisation approach, as well as its limitations, namely its sensitivity to inversion errors and external interferences. An attempt to solve these limitation will be made, suggesting some solutions and finally describing the chosen methodology for this case.
 
 
 
@@ -21,7 +21,7 @@ In this chapter the tools used to approach the problematic of this project will 
 \label{section:background/NLI}
 % Aqui vamos nos!
 
-Feedback linearisation, also known as dynamic inversion, is an approach based on the idea of algebraically transforming a non-linear system into a linear one, from which linear control laws can be used to control the resulting system. Unlike Jacobian linearisation, that assumes linearity of the system around an equilibrium value, feedback linearisation implements a feedback loop that cancels non-linearities of the given system \cite{Slotine+Li}. Given a nonlinear system 
+Feedback linearisation, also known as dynamic inversion, is an approach based on the idea of algebraically transforming a non-linear system into a linear one, from which linear control laws can be used to control the resulting system. Unlike Jacobian linearisation, that assumes linearity of the system around an equilibrium value, feedback linearisation implements a feedback loop that cancels non-linearities of the given system \cite{Slotine+Li}. Given a single-input $u$ nonlinear system
 
 \begin{equation}
 \dot{x} = f(x,u)
@@ -37,7 +37,7 @@ one must find both a state transformation $z=z(x)$ and an input transformation $
   \label{fig:nli}
 \end{figure}
 
-To better understand Input-Output linearisation, some mathematical tools must firstly be described. One of these tools is the Lie derivative, that represents the gradient of a given scalar function $h(x)$ projected along a given vector function $f(x)$. Such a Lie derivative is therefore represented as
+To better understand Input-Output linearisation, some mathematical tools must firstly be described. One of these tools is the Lie derivative, that represents the gradient of a given scalar function $h(x):R^n\rightarrow R$ projected along a given vector function $f(x):R^n\rightarrow R$. Such a Lie derivative is therefore represented as
 
 \begin{equation}
 L_fh(x) = \nabla h(x)f(x) = \Sigma^n_{i=1}\dfrac{\partial h(x)}{\partial x_i}f_i(x)
@@ -49,7 +49,7 @@ A Lie derivative can also be applied multiple times, resulting in a $k^{th}$ ord
 L^k_fh(x)=L_f\left(L^{k-1}_fh(x)\right)=\nabla \left(L^{k-1}_fh(x)\right)f(x) \quad \text{with} \quad L^0_fh(x)=h(x)
 \end{equation}
 
-The second operator from Lie algebra to be introduced here, quite important in Input-Output linearisation is the Lie bracket, and these are defined as, given two vector fields $f$ and $g$,
+The second operator from Lie algebra to be introduced here, quite important in Input-Output linearisation is the Lie bracket defined as, given two vector fields $f(x):R^n\rightarrow R$ and $g(x):R^n\rightarrow R$,
 
 \begin{equation}
 [f,g] = ad_f g = \nabla g f - \nabla f g
@@ -63,12 +63,26 @@ ad_f^ig=[f, ad_f^{i-1}g] \quad \text{with} \quad ad_f^0g=g
 
 Finally, the concept of \emph{diffeomorphism} must be described to fully understand this control technique. According to \cite{Slotine+Li}, it is a generalisation of the concept of coordinate transformation, and is formally stated as:
 
-\emph{A function $\phi: R^n\rightarrow R^n$, defined in a region $\Omega$, is called a diffeomorphism if it is smooth and its inverse $\phi^{-1}$ exists and is smooth \cite{Slotine+Li}}. 
-In Input-Output linearisation, a \emph{diffeomorphism} must be found to transform a non-linear system into a linear one.
+\emph{A function $\phi: R^n\rightarrow R^n$, defined in a region $\Omega$, is called a diffeomorphism if it is smooth and its inverse $\phi^{-1}$ exists and is smooth \cite{Slotine+Li}}. A diffeomorphism can be used to transform a nonlinear system into another in terms of a new set of states. Let us consider the following  dynamic system
+\begin{multline}
+\dot{x}=f(x)+g(x)u\\
+y=h(x)
+\end{multline}
+and a new set of states defined as
+\begin{equation}
+z=\Phi(x)
+\end{equation}
+Differentiating $z$, and using $x=\Phi^{-1}(z)$ comes that
+\begin{equation}
+\dot{z}=\dfrac{\partial \Phi}{\partial x}\dot{x}= \dfrac{\partial\Phi}{\partial x}(f(x)+g(x)u)=f*(z)+g*(z)u
+\label{eq:new_system_diffeo}
+\end{equation}
+
+In Input-Output linearisation, a \emph{diffeomorphism} must be found to transform such that the system from equation \ref{eq:new_system_diffeo} is a linear one.
 \subsection{SISO Systems}
 \label{section:background/SISO_NLI}
 
-Although an aircraft is always considered as a MIMO system, a description of this control concept will firstly be provided for a general SISO case, before generalising to a MIMO case. Nonlinear systems that can be represented as affine systems $\dot{x}=f(x)+g(x)u$ will be discussed in this section. From \cite{Slotine+Li}, a definition of Input-State linearisation is to find, for a nonlinear system of relative degree $n$, a \emph{diffeomorphism} $\phi:\Omega \rightarrow R^n$ and nonlinear control law
+Although an aircraft is always considered as a MIMO system, a description of this control concept will first be provided for a general SISO case, before generalising to a MIMO case. Nonlinear systems that can be represented as affine systems $\dot{x}=f(x)+g(x)u$ will be discussed in this section. From \cite{Slotine+Li}, a definition of Input-State linearisation is to find, for a nonlinear system of relative degree $n$, a \emph{diffeomorphism} $\phi:\Omega \rightarrow R^n$ and nonlinear control law
 \begin{equation}
 u=\alpha(x) + \beta(x)\upsilon
 \label{eq:nli_control_law}
@@ -108,7 +122,7 @@ The remaining states are then obtained from $z(x) = [z_1 \quad L_fz_1 \quad ... 
 \subsection{MIMO Systems}
 \label{section:background/MIMO_NLI}
 
-These concepts can also be extended to MIMO systems in a similar manner, by differentiating the outputs until the inputs explicitly appear. This time however, there are individual relative degrees per output. The sum of these relative degrees is called total degree $r$ and must satisfy $r\leq n$, $n$ being the order of the system. Note however, that in the case of $r<n$, a part of the system dynamics is rendered unobservable in the input-output linearisation, as the closed loop dynamics will have a lower order $r$ than the whole dynamics of the system $n$. These internal dynamics must therefore be studied to establish the effectiveness of the feedback linearisation. For the case where the internal dynamics is stable, the input-output linearisation method can then be used. In the case of unstable internal dynamics however, these would lead to both undesirable and uncontrollable phenomena, in which case a different control design is needed.
+These concepts can be extended to MIMO systems in a similar manner, by differentiating the outputs until the inputs explicitly appear. This time however, there are individual relative degrees per output. The sum of these relative degrees is called total degree $r$ and must satisfy $r\leq n$, $n$ being the order of the system. Note however, that in the case of $r<n$, a part of the system dynamics is rendered unobservable in the input-output linearisation, as the closed loop dynamics will have a lower order $r$ than the whole dynamics of the system $n$. These internal dynamics must therefore be studied to establish the effectiveness of the feedback linearisation. For the case where the internal dynamics is stable, the input-output linearisation method can then be used. In the case of unstable internal dynamics however, these would lead to both undesirable and uncontrollable phenomena, in which case a different control design is needed.
 
 Given a MIMO system 
 \begin{gather}
@@ -148,8 +162,11 @@ There can be many causes for a dynamic inversion error to be present, as not onl
 \subsection{Fuzzy Logic Systems}
 \label{section:background/fuzzy_logic}
 
-Fuzzy logic systems are based on the paradigm of continuous levels of truth between 0 and 1, rather than the usual discrete true or false levels of truth. Using these continuous truth values, a set of IF-ELSE rules is chosen. The goal of this type of controller is to duplicate the way a pilot would respond to a given flight situation. These rules can base their control input on variables such as roll, angle of attack and sideslip \cite{Comparison_IntelligentSys}. This control method is based on three main parts. The first one if \textit{fuzzification}, that consists of converting the plant outputs to fuzzy logic values. \textit{Rule-based inference}, using the previously mentioned set of rules, a fuzzyfied control input is computed, which then goes through the \textit{defuzzyfication} part of the control algorithm. 
-Fuzzy systems have some advantages: its linguistic interpretation of human knowledge facilitate the interpretation of results, and the knowledge base can be improved through addition of new rules. However, this method comes with some disadvantages. First of all, the set of rules that will improve the control of the aircraft is entirely dependent on expert knowledge, thus resulting in an empiric set of rules. This also means the method has no capability of generalization, as the control is only applied to specific cases, of the form "if the error is greater than a given value, apply this compensation to control input". It is also not robust to topological changes of the system \cite{Neuro_fuzzy_survey}. For these reasons this method will not be further studied and implemented in this work.
+Fuzzy logic systems are based on the paradigm of continuous levels of truth between 0 and 1, rather than the usual discrete true or false levels of truth. Using these continuous truth values, a set of IF-ELSE rules is chosen. The goal of this type of controller is to duplicate the way a pilot would respond to a given flight situation. These rules can base their control input on variables such as roll, angle of attack and sideslip \cite{Comparison_IntelligentSys}. 
+
+This control method is based on three main parts. The first one if \textit{fuzzification}, that consists of converting the plant outputs to fuzzy logic values. \textit{Rule-based inference}, using the previously mentioned set of rules, a fuzzyfied control input is computed, which then goes through the \textit{defuzzyfication} part of the control algorithm.
+
+Fuzzy systems have some advantages: its linguistic interpretation of human knowledge facilitates the interpretation of results, and the knowledge base can be improved through addition of new rules. However, this method comes with some disadvantages. First of all, the set of rules that will improve the control of the aircraft is entirely dependent on expert knowledge, thus resulting in an empiric set of rules. This also means the method has no capability of generalization, as the control is only applied to specific cases, of the form "if the error is greater than a given value, apply this compensation to control input". It is also not robust to topological changes of the system \cite{Neuro_fuzzy_survey}. For these reasons this method will not be further studied and implemented in this work.
 
 
 \subsection{Neural Networks}
@@ -159,13 +176,13 @@ Artificial Neural Networks (NN) are a biologically inspired simulation of the br
 \begin{equation}
 y(x_1,x_2,...,x_n)=f((\sum ^n_{i=1} w_i x_i)+b)
 \end{equation}
-where $b$ is a bias term and $f$ a given activation function. Neurons are then set in three different types of layers: the input, the output and the hidden layers. These are connected between each other, and the hidden part can be composed of several layers. The weights can then be tuned based on experience, making it suitable for intelligent learning. To tune these weights learning algorithms are used. There are two types of learning algorithms: batch and online training. It is called training to the process of iteratively reaching the ideal set of weights that will minimise the error between the output of the neural network and that of a given unknown function.
+where $b$ is a bias term and $f(x):R\rightarrow R$ a given activation function. Neurons are then set in three different types of layers: the input, the output and the hidden layers. These are connected between each other, and the hidden part can be composed of several layers. The weights can then be tuned based on experience, making it suitable for intelligent learning. To tune these weights learning algorithms are used. There are two types of learning algorithms: batch and online training. It is called training to the process of iteratively reaching the ideal set of weights that will minimise the error between the output of the neural network and that of a given function.
 
 Batch training is mostly based on a property of Neural Networks that, according to the Universal Approximation Theorem showed in 1989 by George Cybenko, a feed forward neural network can approximate any continuous function. The network is trained by providing input and output pairs. The weights are found in order to approximate the output of the neural network to that of the original function. Once these weights are computed, the network can then be used to compute outputs from inputs that were not part of the initial knowledge of input-output pairs.
 
-Although this learning method approach is used in many of NN applications, it cannot however be easily used to improve an existing feedback linearisation  controller, as it requires an \textit{a priori} knowledge of the modelling error for each given input.
+Although this learning method approach is used in many NN applications, it cannot however be easily used to improve an existing feedback linearisation  controller, as it requires an \textit{a priori} knowledge of the modelling error for each given input.
 
-Online training, contrary to batch training, can deal with dynamically changing environments. This training paradigm is not based on an \textit{a priori} knowledge set, and instead relies on update laws that compute the new weights after each control iteration. It is this method that will be retained to adaptively correct the inversion error from the feedback linearisation. Training a network online, however, is less trivial when compared to batch training. An algorithm named backpropagation will be presented to provide a way of training a network online. A description on the implementation of the neural network and how it will be used to improve the feedback linearisation controller will be given on chapter \ref{chapter:implementation}.
+Online training, in contrary to batch training, can deal with dynamically changing environments. This training paradigm is not based on an \textit{a priori} knowledge set, and instead relies on update laws that compute the new weights after each control iteration. It is this method that will be retained to adaptively correct the inversion error from the feedback linearisation. Training a network online, however, is less trivial when compared to batch training. An algorithm named backpropagation will be presented to provide a way of training a network online. A description on the implementation of the neural network and how it will be used to improve the feedback linearisation controller will be given on chapter \ref{chapter:implementation}.
 
 
 %Backprop
@@ -219,5 +236,5 @@ Note that the term $ \frac{\partial E}{\partial x_s} $ represent the all the der
 \begin{equation}\label{eq:update_law}
 \Delta w_{ij} = - \alpha \frac{\partial E}{\partial w_{ij}}
 \end{equation}
-Where $\alpha$ is a learning coefficient, and its choice is crucial to assure a fast convergence of the solution. Indeed, while a exceedingly large learning coefficient can cause this algorithm to miss the minimum error, a small learning coefficient will also increase the convergence rate. The $-1$ factor is added in the equation above to converge to a local minima, removing it would make this algorithm maximize the cost function. A limitation of the backstepping algorithm that must also be taken into account is that it only guarantees local minima convergence. 
-A detailed description on the connection of this algorithm with the control of the aircraft will be given on the next chapter.
+Where $\alpha$ is a learning coefficient, and its choice is crucial to assure a fast convergence of the solution. Indeed, while an exceedingly large learning coefficient can cause this algorithm to miss the minimum error, a small learning coefficient will also increase the convergence rate. A limitation of the backstepping algorithm that must also be taken into account is that it only guarantees local minima convergence. 
+A detailed description on the connection of this algorithm with the control of the aircraft will be given in the next chapter.

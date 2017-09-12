@@ -11,7 +11,7 @@
 \chapter{Implementation}
 \label{chapter:implementation}
 
-This section will go in depth on the implementation of the concepts presented in the chapter \ref{chapter:background}. The plane model to be controlled was firstly implemented and verified. The first goal after this first step was to design a controller that would allow the aircraft to follow a trajectory from several position waypoints through time. The influence of certain parameters and knowledge of the exact plane model will be studied and discussed in chapter \ref{chapter:results}. The final goal will be to improve the controller and its robustness by reducing tracking error through the use of an adaptive neural network.
+This section will go in depth into the implementation of the concepts presented in chapter \ref{chapter:background}. The plane model to be controlled is first implemented and verified. The first goal after this first step is to design a controller that will allow the aircraft to follow a trajectory from several position waypoints through time. The influence of certain parameters and knowledge of the exact plane model will be studied and discussed in chapter \ref{chapter:results}. The final goal will be to improve the controller and its robustness by reducing tracking error through the use of an adaptive neural network.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Plane Model}
@@ -20,7 +20,7 @@ The work made in this thesis was built on top of the work done by H. Escamilla N
 
 \subsection{Frames of Reference}
 \label{section:background/model/for}
-The first step before describing the dynamics of a commercial aircraft will be to define the frames of reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the axial directions of the wind frame. This frame is aligned to the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from the wind frame to the body frame by
+The first step before describing the dynamics of a commercial aircraft will be to define the frames of reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the axial directions of the wind frame. This frame is aligned with the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from wind frame to body frame by
 
 
 \begin{equation}
@@ -91,7 +91,7 @@ C_{n\beta} \beta + C_{n_p} p \dfrac{b}{2V_a} + C_{n_r} r \dfrac{b}{2V_a}
 \end{bmatrix}
 \label{eq:cmoment}
 \end{equation}
-Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method for obtaining of the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft inertial matrix.
+Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method for obtaining the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft inertial matrix.
 \begin{subequations}
 	\begin{equation}
 		\dot{\Omega} = I^{-1} M_{ext} - I^{-1}\Omega \times (I\Omega)
@@ -179,7 +179,7 @@ Q_3=2 \left( \left(\dfrac{-1}{m}(F_{xa}+T) + g s_\theta - \dot{V}_{w_x} \right)c
 \end{gather*}
 The forces in the air frame $F_{xa}, F_{ya}, F_{za}$ will be further detailed in the next section on translation dynamics. 
 
-The angular rates are also related to the Euler angles. The relationship between the euler angles and the rotation rates is also one that will prove useful when implementing the model on a Matlab simulation, and is given by
+The angular rates are also related to the Euler angles. The relationship between the Euler angles and the rotation rates is also one that will prove useful when implementing the model in a Matlab simulation, and is given by
 
 \begin{equation}
 \begin{bmatrix}
@@ -204,7 +204,7 @@ r
 \subsection{Translation Dynamics}
 \label{section:background/model/guidance_dynamics}
 
-This subsection on the forces applied to aircraft, introducing a new actuation variable, the thrust force $T$. These forces are applied along the three axis of the wind frame, lift, drag and side force, given by
+This subsection focuses on the forces applied to aircraft, introducing a new actuation variable, the thrust force $T$. These forces are applied along the three axes of the wind frame, lift, drag and side force, given by
 \begin{equation}
 \begin{bmatrix}
 D\\
@@ -219,7 +219,7 @@ C_L
 \end{bmatrix}
 \label{eq:forces}
 \end{equation}
-Once again, the method used to compute these coefficients will be given in the chapter \ref{chapter:implementation} in detail. These coefficients, similarly to the moment coefficient, are functions of the angle of attack, sideslip angle and airspeed, the three most relevant variables when determining aerodynamic forces and moments. Although aerodynamic forces are usually expressed on the wind frame, as the thrust is always applied along the $x$ axis of the body frame, it is necessary to rotate the aerodynamic forces to this frame. This way the sum of the airplane's forces can be obtained. 
+Once again, the method used to compute these coefficients will be given in the chapter \ref{chapter:implementation} in detail. These coefficients, similarly to the moment coefficients, are functions of the angle of attack, sideslip angle and airspeed, the three most relevant variables when determining aerodynamic forces and moments. Although aerodynamic forces are usually expressed in the wind frame, as the thrust is always applied along the $x$ axis of the body frame, it is necessary to rotate the aerodynamic forces to this frame. This way the sum of the airplane forces can be obtained. 
 
 \begin{equation}
 \begin{bmatrix}
@@ -290,7 +290,7 @@ Similarly for thrust
 \dot{T} = \dfrac{1}{\xi_T}(T^d-T)
 \end{equation}
 
-$\xi_i$ and $\xi_T$ being time constants. As the responsiveness of the resultant thrust will be much slower than that of the control surfaces, $\xi_T>>\xi_i$.
+$\xi_i$ and $\xi_T$ are time constants. As the responsiveness of the resultant thrust will be much slower than that of the control surfaces, $\xi_T>>\xi_i$.
 The chosen commercial aircraft that will be simulated is the Boeing 737-200, an aircraft with over 30 years of service for which some information of flight parameters is readily available, such as weight, wing span and mean chord. The simulation was made in a cruise flight environment, at $200$ m/s velocity at $10000$ m above the ground. The chosen inertial matrix for this aircraft is given by
 \begin{equation}
 \begin{bmatrix}
@@ -300,8 +300,8 @@ The chosen commercial aircraft that will be simulated is the Boeing 737-200, an 
 \end{bmatrix}
 kg.m^2
 \end{equation}
-The ISA atmospheric model was used to measure the air density at any given height.
-\begin{table}[htbp]
+The ISA atmospheric model was used to compute the air density at any given height.
+\begin{table}[H]
   \centering
   \caption{Boeing 737-2 parameters}
     \begin{tabular}{rr}
@@ -315,11 +315,12 @@ The ISA atmospheric model was used to measure the air density at any given heigh
     \end{tabular}%
   \label{tab:b737_parameters}
 \end{table}%
+
 The time constants used for the actuators was $\xi_{\delta_i}50$ms and $\xi_T=4$s for the engines.
 \subsection{Airplane Parameters and Coefficients}
 \label{section:model/plane_dynamics}
 
-In order to simulate the aircraft fast dynamics, its moments must firstly be computed in order to use equation \ref{eq:fast_dynamics}. The torque caused by the actuators as modelled as equation \ref{eq:cdelta}, using
+In order to simulate the aircraft fast dynamics, its moments must first be computed to use equation \ref{eq:fast_dynamics}. The torque caused by the actuators is modelled as equation \ref{eq:cdelta}, using
 \begin{gather*}
 C_{L_{\delta_{ail}}}=0.02 \quad rad^{-1}\\
 C_{L_{\delta_{rud}}}=0.002 \quad rad^{-1}\\
@@ -327,7 +328,9 @@ C_{M_{\delta_{ele}}}=-0.003 \quad rad^{-1}\\
 C_{N_{\delta_{ail}}}= -0.002 \quad rad^{-1}\\
 C_{N_{\delta_{rud}}}= -0.07 \quad rad^{-1}
 \end{gather*}
-The remaining aerodynamic coefficients from equation \ref{eq:cmoment} were obtained from the work of Hector Escamilla Nuñez in \cite{hector}. In this work, neural networks were used to interpolate data from the USAF Stability and Control Digital Data Compendium. A two layer feed forward network, with a hidden sigmoid activation function and a linear output activation function, was then trained using the gathered data with the Bayesian Regulation training algorithm \cite{hector}. Indeed as stated previously, neural networks can approximate any continuous function according to the Universal Approximation Theorem. This method is therefore optimal to accurately approximate the variation of these coefficients that mainly vary with the angle of attack $\alpha$ and airspeed $V_a$. The only exception to this method was the drag coefficient, given for this aircraft by
+The remaining aerodynamic coefficients from equation \ref{eq:cmoment} were obtained from the work of Hector Escamilla Nuñez in \cite{hector}.
+
+In this work, neural networks were used to interpolate data from the USAF Stability and Control Digital Data Compendium. A two layer feed forward network, with a hidden sigmoid activation function and a linear output activation function, was then trained using the gathered data with the Bayesian Regulation training algorithm \cite{hector}. Indeed as stated previously, neural networks can approximate any continuous function according to the Universal Approximation Theorem. This method is therefore optimal to accurately approximate the variation of these coefficients that mainly vary with the angle of attack $\alpha$ and airspeed $V_a$. The only exception to this method was the drag coefficient, given for this aircraft by
 \begin{equation}
 C_D=0.0176+0.0515 C_L^2
 \label{eq:cd_cl}
@@ -339,7 +342,7 @@ The effects of the wind were also taken into account by adding the wind speed to
 A simplified block diagram of the plane simulator is given by figure \ref{fig:plane_model}.
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.75\textwidth]{Figures/PlaneModel.png}
+  \includegraphics[width=1\textwidth]{Figures/PlaneModel.png}
   \caption[Plane dynamics simulator diagram]{Plane dynamics simulator diagram}
   \label{fig:plane_model}
 \end{figure}
@@ -351,7 +354,7 @@ A simplified block diagram of the plane simulator is given by figure \ref{fig:pl
 To invert such a complex system (figure \ref{fig:plane_model}), two layers of inversion are proposed by H. Escamilla \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion control. 
 
 \subsection{Fast Dynamics}
-To invert the fast dynamics the equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics \ref{eq:actuator_dynamics} and the effects of the wind. Doing so yields the jerk vector given by, as per \cite{hector}
+To invert the fast dynamics equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics \ref{eq:actuator_dynamics} and the wind effects. Doing so yields the jerk vector given by, as per \cite{hector}
 
 \begin{equation}
 \begin{bmatrix}
@@ -359,7 +362,7 @@ To invert the fast dynamics the equation \ref{eq:fast_dynamics} must be differen
 \ddot{q}\\
 \ddot{r}
 \end{bmatrix}
-= \dfrac{1}{2}\rho SI^{-1} \left\lbrace V_a^2 C_\delta \xi
+= \dfrac{1}{2}\rho SI^{-1} \left\lbrace V_a^2 C_\delta \xi^{-1}
 \begin{bmatrix}
 \delta^d_{ail}-\delta_{ail}\\
 \delta^d_{ele}-\delta_{ele}\\
@@ -381,7 +384,7 @@ bC_n
 \label{eq:jerk}
 \end{equation}
 
-Where
+where
 
 \begin{gather*}
 I=
@@ -398,9 +401,9 @@ I_n=
 \end{bmatrix}\\
 \xi=
 \begin{bmatrix}
-\dfrac{1}{\xi_{ail}} & 0 & 0\\
-0 & \dfrac{1}{\xi_{ele}} & 0\\
-0 & 0 & \dfrac{1}{\xi_{rud}}
+\xi_{ail} & 0 & 0\\
+0 & \xi_{ele} & 0\\
+0 & 0 & \xi_{rud}
 \end{bmatrix}\\
 C_c=
 \begin{bmatrix}
@@ -417,7 +420,7 @@ b^2C_{n_p} & 0 & b^2C_{n_r}
 \dot{Ra} =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T
 \end{gather*}
 
-To do a feedback linearisation, a pseudo input must be chosen, in this case $\tau = \ddot{\Omega}$. The feedback control law will therefore be, solving equation \ref{eq:jerk} to $\delta^d$,
+To do a feedback linearisation, a pseudo input must be chosen, in this case $\tau = \ddot{\Omega}$. The feedback control law will therefore be, solving equation \ref{eq:jerk} for $\delta^d$,
 
 \begin{equation}
 \begin{bmatrix}
@@ -425,7 +428,7 @@ To do a feedback linearisation, a pseudo input must be chosen, in this case $\ta
 \delta^d_{ele}\\
 \delta^d_{rud}
 \end{bmatrix}
-=\dfrac{1}{V_a^2}\xi^{-1}C_\delta^{-1}\left\lbrace\dfrac{2I}{\rho S}\tau - \dfrac{2}{\rho S}(\dfrac{1}{4}\rho S V_aC_k - I_n)\dot{\Omega} -2V_a\dot{V_a} \left(
+=\dfrac{1}{V_a^2}\xi C_\delta^{-1}\left\lbrace\dfrac{2I}{\rho S}\tau - \dfrac{2}{\rho S}(\dfrac{1}{4}\rho S V_aC_k - I_n)\dot{\Omega} -2V_a\dot{V_a} \left(
 \begin{bmatrix}
 bC_l\\
 \bar{c}C_m\\
@@ -441,16 +444,18 @@ Indeed, by replacing \ref{eq:control_law} in the jerk equation \ref{eq:jerk}, th
 
 The wind effects will appear in the terms including $\dot{R}_a =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. The value of $\dot{R}_a$ can be computed from equation \ref{eq:Ra_dot}.
 
-Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\ddot{\Omega}=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]^T$. As mentioned in section \ref{section:background/NLI}, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs comes a control law for $\tau$, firstly considering without neural network adaptation
+Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\ddot{\Omega}=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]^T$. As mentioned in section \ref{section:background/NLI}, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs comes a control law for $\tau$, first considering without neural network adaptation
 \begin{equation}
 \tau = -K_P (\Omega-\Omega^d)-K_D (\dot{\Omega}-\dot{\Omega}^d)+\ddot{\Omega}^d
 \label{eq:linear_controller}
 \end{equation}
-Where the $K_P$ and $K_D$ coefficients are chosen to ensure stability and reference tracking. The previous equation can also be written as
+Where $K_P$ and $K_D$ are chosen to ensure stability and reference tracking. The previous equation can also be written as
 \begin{equation}
 \ddot{e}=-K_P e - K_D \dot{e}
 \end{equation}
-Assuming that an ideal inversion is obtained and $\tau=\ddot{\Omega}$, and where $e=\Omega-\Omega^d$. This way the initial non-linear system becomes a second order linear one, for which natural frequencies and damping values for each dimension must be chosen. Choosing $x_1=e_i$ and $x_2=\dot{x_1}$ for a given dimension $i$ of $\Omega$, either $p,q,r$. Then comes the state equation
+assuming that an ideal inversion is obtained and $\tau=\ddot{\Omega}$, and where $e=\Omega-\Omega^d$. 
+
+This way the initial non-linear system becomes a second order linear one, for which natural frequencies and damping values for each dimension must be chosen. Choosing $x_1=e_i$ and $x_2=\dot{x_1}$ for a given dimension $i$ of $\Omega$, either $p,q,r$. Then comes the state equation
 \begin{equation}
 \begin{bmatrix}
 \dot{x_1}\\
@@ -467,10 +472,10 @@ x_2
 \end{equation}
 The characteristic equation is then obtained as 
 \begin{equation}
-\text{det}(sI-A_i)= \lambda^2 + 2\xi_i \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
+\text{det}(sI-A_i)= \lambda^2 + 2\lambda \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
 \end{equation}
 \begin{gather}
-\xi_i = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
+\lambda = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
 \omega_{n_i}=\sqrt{K_{P_i}}
 \end{gather}
 The chosen values are given in table \ref{tab:tau_dynamics}.
@@ -480,7 +485,7 @@ The chosen values are given in table \ref{tab:tau_dynamics}.
   \caption[Linearised system chosen dynamics]{Linearised system chosen dynamics}
     \begin{tabular}{rcccc}
     \toprule
-    $i$   & $K_{P_i}$ & $K_{D_i}$ & $\xi_i$ & $\omega_{n_i}$(rad $s^{-1}$) \\
+    $i$   & $K_{P_i}$ & $K_{D_i}$ & $\lambda$ & $\omega_{n_i}$(rad $s^{-1}$) \\
     \midrule
     $p$   & 100   & 20    & 1     & 10 \\
     $q$   & 5     & 1     & 0.22 & 2.24 \\
@@ -491,13 +496,14 @@ The chosen values are given in table \ref{tab:tau_dynamics}.
 \end{table}%
 
 
-From this point the next step shall be to obtain the desired values of $\Omega$. These were obtained using another PD controller, using Euler angle reference values to control rotation rates. Among these reference values to be followed, $\tau_r$ was set to zero. This was made to make use of the decoupling through feedback linearisation of the plane movement, using a roll and pitch motion to turn the aircraft. This results in the following control of rotation rate
+From this point the next step will be to obtain the desired values of $\Omega$. These are obtained using another PD controller, using Euler angles values to control rotation rates. The yaw rate was set to zero as the feedback linearisation decouples the plane movement, using roll and pitch motion to turn the aircraft.
+
 \begin{subequations}
 \begin{equation}
-p= k_P (\phi^d-\phi) + k_d (\dot{\phi^d}-\dot{\phi})
+p= k_{P_p} (\phi^d-\phi) + k_{D_p} (\dot{\phi^d}-\dot{\phi})
 \end{equation}
 \begin{equation}
-q= k_P (\theta^d-\theta) + k_d (\dot{\theta^d}-\dot{\theta})
+q= k_{P_q} (\theta^d-\theta) + k_{D_q} (\dot{\theta^d}-\dot{\theta})
 \end{equation}
 \begin{equation}
 r=0
@@ -507,7 +513,7 @@ r=0
 
 \subsection{Slow Dynamics}
 
-It is now possible to control the attitude of the aircraft, and the fast control loop design is completed. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far to achieve the goal of position tracking over time. Firstly the dynamics for speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
+It is now possible to control the attitude of the aircraft, and the fast control loop design is completed. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far and to achieve the goal of position tracking over time. First the dynamics for speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
 \begin{subequations}
 \begin{equation}
 \dot{V_a} = \dfrac{1}{m}(T\cos \alpha -D - mg\sin \gamma)
@@ -529,15 +535,15 @@ For the yaw rate comes that
 After choosing the desired dynamics to control these variables, the equations above must be solved for both the thrust reference $T$, the desired AoA and $\psi$. From these last two, knowing the current roll angle $\theta$, the input for the fast dynamics controller is obtained. The desired dynamics were chosen as first order systems as
 \begin{subequations}
 \begin{equation}
-\dot{V_a} = \dfrac{1}{\tau_{V_a}}(V_a^d-V_a)
+\dot{V_a} = \dfrac{1}{\xi_{V_a}}(V_a^d-V_a)
 \label{eq:va_dot_des}
 \end{equation}
 \begin{equation}
-\dot{\gamma} = \dfrac{1}{\tau_{\gamma}}(\gamma^d-\gamma)
+\dot{\gamma} = \dfrac{1}{\xi_{\gamma}}(\gamma^d-\gamma)
 \label{eq:gamma_dot_des}
 \end{equation}
 \begin{equation}
-\dot{\psi} = \dfrac{1}{\tau_{\psi}}(\psi^d-\psi)
+\dot{\psi} = \dfrac{1}{\xi_{\psi}}(\psi^d-\psi)
 \label{eq:psi_dot_des}
 \end{equation}
 \end{subequations}
@@ -569,19 +575,32 @@ The final step of the controller design will be to propose a guidance law to obt
 	\label{eq:guidance_law}
 \end{subequations}
 
-This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. These trajectories can be a time parametrized Bezier curve, as per INSERT PAPER FROM HECTOR HERE. From these an airspeed, heading and Flight Path Angle must be computed an fed to the controller. 
+This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. These trajectories can be a time parametrized Bezier curve, as per INSERT PAPER FROM HECTOR HERE. From these an airspeed, heading and FPA must be computed and fed to the controller. 
 %TODO
 
-Taking firstly the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. A more accurate method of obtaining an airspeed reference from these equations is specified in \ref{eq:speed_guidance}. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
+Taking first the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. A more accurate method of obtaining an airspeed reference from these equations is specified in \ref{eq:speed_guidance}. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
 
 
 
-Using solely equations \ref{eq:guidance_law} how ever will not grant optimal results, and may even sometimes cause loss of control of the aircraft. The goal for this guidance law and of this work is to, at any given time, be at a 3D coordinate point of a trajectory at said time. To do so, the references of speed, heading and flight path angle must be constantly adjusted to reach a 4D reference. Using the equations described previously for the guidance controller, it may happen that the aircraft would "overtake" the trajectory reference, causing the heading reference to increase to either $180^o$ or $-180^o$ and therefore making the aircraft diverge significantly from its original trajectory. To correct this, the following guidance strategy was used:
+Using solely equations \ref{eq:guidance_law} however will not grant optimal results, and may even sometimes cause loss of control of the aircraft. The goal for this 4D guidance law and of this work is to, at any given time, to be at a 3D coordinate point of a trajectory at that time. To do so, the references of speed, heading and flight path angle must be constantly adjusted to reach a 4D reference. Using the equations described previously for the guidance controller, it may happen that the aircraft would "overtake" the trajectory reference, causing the heading reference to increase to either $180^o$ or $-180^o$ and therefore making the aircraft diverge significantly from its original trajectory. To avoid this, the following guidance strategy was used:
 
 \begin{itemize}
-\item \textbf{Heading} To prevent the heading reference to excessively grow and make the aircraft do a $180^o$ turn, a small correction code in Simulink was added in order to detect large errors between the desired and measured heading, caused by the aircraft "overtaking" its trajectory. In case of large errors, this correction would force the desired heading to be equal to its measured value, thus preventing the aircraft from making large turns. 
+\item \textbf{Heading} To prevent the heading reference to excessively grow and make the aircraft do a $180^o$ turn, a small correction code in Simulink was added (see algorithm \ref{alg:psi_correction}) in order to detect large errors between the desired and measured heading, caused by the aircraft "overtaking" its trajectory. In case of large errors, this correction would force the desired heading to be equal to its measured value, thus preventing the aircraft from making large turns. 
 
-\item \textbf{Airspeed} Now that the aircraft no longer does $180^o$ turns when it overtakes the desired trajectory, the desired airspeed must now be adjusted in order to it slow down and therefore reaching the desired position at the desired time. To do so the guidance law was slightly modified to 
+\begin{algorithm}[H]
+	\KwData{$\Psi$ and $\Psi_d$}
+ \KwResult{$\Psi$ command}
+ error = $\Psi_d$ - $\Psi$\;
+ output = $\Psi_d$\;
+ \If{$error> 160º$ or $error< -160º$}{
+ output =  $\Psi$}
+ 
+ \caption{$\Psi$ command correction algorithm}
+ \label{alg:psi_correction}
+\end{algorithm}
+
+
+\item \textbf{Airspeed} Now that the aircraft no longer does $180^o$ turns when it overtakes the desired trajectory, the desired airspeed must now be adjusted in order to slow down and therefore reach the desired position at the desired time. To do so the guidance law was slightly modified to 
 \begin{equation}
 V_a^d=\begin{cases}
 \delta V_a  + V_{a_0} \quad \text{if} \quad |atan2(\delta y,\delta x)|<90^o\\
@@ -603,7 +622,7 @@ Finally, the block diagram of the controller described thus far is given by figu
 \section{Neural Network}
 \label{section:NN}
 
-Over the years, intelligent control techniques using neural networks have become a growing research topic, addressing the limitations of state-of-the-art model based controllers such as linear quadratic Gaussian, model predictive control, backstepping and gain scheduling \citep{SotA_IFCS}. Indeed, variations in the plane dynamics (e.g., due to payload changes, actuator or sensor degradation) deteriorate the performance and reference tracking error of the controller. To compensate for such errors, adaptive online neural networks have been studied and implemented in several works \cite{quad_NLI+NN}, \cite{NN_PID}, \cite{UAV_adaptive} and \cite{NN_NLI} to name a few. These however, have been applied almost exclusively to UAV aircraft, especially multicopters. For this work a feedforward network with one hidden layer, one of the most widely implemented neural network architecture \cite{SotA_IFCS} was used.
+Over the years, intelligent control techniques using neural networks have become a growing research topic, addressing the limitations of state-of-the-art model based controllers such as linear quadratic Gaussian, model predictive control, backstepping and gain scheduling \citep{SotA_IFCS}. Indeed, variations in the plane dynamics (e.g., due to payload changes, actuator or sensor degradation) deteriorate the error of the controller. To compensate for such errors, adaptive online neural networks have been studied and implemented in several works \cite{quad_NLI+NN}, \cite{NN_PID}, \cite{UAV_adaptive} and \cite{NN_NLI} to name a few. These however, have been applied almost exclusively to UAV aircraft, especially multicopters. For this work a feedforward network with one hidden layer (one of the most widely implemented neural network architecture \cite{SotA_IFCS}) was used.
 
 
 \subsection{Network Architecture}
@@ -622,7 +641,7 @@ There are quite some challenges in designing a feed forward neural network. Besi
 \item \textbf{Redundancy}: A large value of redundant and irrelevant input variables will not only increase the needed computational effort of the NN, but will also increase the difficulty to train the weights of the network and add noise to the system.
 \end{itemize}
 
-Another consideration about the chosen inputs that must also be taken into account is their range. The sigmoid function $sig(x)$ used reaches around 75\% when $x=1$ and 100\% when $x=2$, as can be seen in figure \ref{fig:sigmoid}. For some cases the inputs might therefore need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained before even starting training, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The average of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$, the following equation is used
+Another consideration about the chosen inputs that must also be taken into account is their range. The sigmoid function $sig(x)$ used reaches around 73\% when $x=1$ and 88\% when $x=2$, as can be seen in figure \ref{fig:sigmoid}. For some cases the inputs might therefore need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained before even starting training, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The mean of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$, the following equation is used
 
 \begin{equation}
 y=2\dfrac{x-x_{min}}{x_{max}-x_{min}}-1
@@ -653,12 +672,13 @@ J=\dfrac{1}{2}(\Delta-y_{NN})^2
 \label{eq:NN_cost}
 \end{equation}
 
-The values of $\dot{V}$ and $\dot{W}$ must now be computed, using the gradient descent method described in section \ref{section:background/NN}. As the name suggests, the back propagation algorithm firstly computes the weight update values for the last layers, propagating the errors to update the previous weight set. The weights are constantly updated until the error absolute value in lesser than a given value $\xi$, in which case these are kept constant as $\dot{V}=\dot{W}=0$. 
+The values of $\dot{V}$ and $\dot{W}$ must now be computed, using the gradient descent method described in section \ref{section:background/NN}. As the name suggests, the back propagation algorithm first computes the weight update values for the last layers, propagating the errors to update the previous weight set. The weights are constantly updated until the error absolute value in lesser than a given value $\Delta_{max}$, in which case these are kept constant as $\dot{V}=\dot{W}=0$. 
+
 One of the parameters that must be tuned that has the largest impact on the performance of the network is the learning rate $\alpha$. This coefficient can also be thought of as the step size in incrementing the weight sets. Let $V^*$ and $W^*$ be the two ideal set of weights that, for a given input, result in an absolutely minimal cost function. A small value will allow the weights to converge to their ideal value, although taking many iterations to do so. A large learning rate however might converge faster, but might also overshoot and miss its optimal value. The results of the variation of this rate will be studied in chapter \ref{chapter:results}.
 
 Finally, adding the online neural network to the baseline controller, the final control architecture is obtained. For the following chapter, the controller without the correction will be tested and compared in the same conditions to the same controller including the network. A simplified diagram of the full system, (controller, model and neural network), can be seen in figure \ref{fig:full_controller}.
 \begin{figure}[!htb]  
-  \includegraphics[width=1.1\textwidth]{Figures/full_controller.png}
-  \caption[Diagram of the controller architecture]{Diagram of the controller architecture}
+  \includegraphics[width=1.1\textwidth]{Figures/full_controller_special.png}
+  \caption[Diagram of the controller architecture]{Diagram of the controller architecture including NN correction (in orange)}
   \label{fig:full_controller}
 \end{figure}

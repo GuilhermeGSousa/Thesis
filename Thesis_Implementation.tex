@@ -389,15 +389,15 @@ where
 \begin{gather*}
 I=
 \begin{bmatrix}
-A & 0 & -E\\
-0 & B & 0\\
--E & 0 & C
+I_{xx} & 0 & -I_{xz}\\
+0 & I_{yy} & 0\\
+-I_{zx} & 0 & I_{zz}
 \end{bmatrix}\\
 I_n=
 \begin{bmatrix}
--Eq & (C-B)r-Ep & (C-B)q\\
-(A-C)r+2Ep & 0 & (A-C)p-2Er\\
-(B-A)q & (B-A)p+Er & Eq
+-I_{xz}q & (I_{zz}-I_{yy})r-I_{xz}p & (I_{zz}-I_{yy})q\\
+(I_{xx}-I_{zz})r+2I_{xz}p & 0 & (I_{xx}-I_{zz})p-2I_{xz}r\\
+(I_{yy}-I_{xx})q & (I_{yy}-I_{xx})p+I_{xz}r & I_{xz}q
 \end{bmatrix}\\
 \xi=
 \begin{bmatrix}
@@ -575,8 +575,8 @@ The final step of the controller design will be to propose a guidance law to obt
 	\label{eq:guidance_law}
 \end{subequations}
 
-This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. These trajectories can be a time parametrized Bezier curve, as per INSERT PAPER FROM HECTOR HERE. From these an airspeed, heading and FPA must be computed and fed to the controller. 
-%TODO
+This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. From these an airspeed, heading and FPA must be computed and fed to the controller. 
+%TODO Paper do Hector
 
 Taking first the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. A more accurate method of obtaining an airspeed reference from these equations is specified in \ref{eq:speed_guidance}. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
 

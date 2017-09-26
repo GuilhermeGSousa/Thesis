@@ -316,7 +316,7 @@ The ISA atmospheric model was used to compute the air density at any given heigh
   \label{tab:b737_parameters}
 \end{table}%
 
-The time constants used for the actuators was $\xi_{\delta_i}50$ms and $\xi_T=4$s for the engines.
+The time constants used for the actuators was $\xi_{\delta_i}=50$ms and $\xi_T=4$s for the engines.
 \subsection{Airplane Parameters and Coefficients}
 \label{section:model/plane_dynamics}
 
@@ -472,7 +472,7 @@ x_2
 \end{equation}
 The characteristic equation is then obtained as 
 \begin{equation}
-\text{det}(sI-A_i)= \lambda^2 + 2\lambda \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
+\text{det}(\lambda I-A_i)= \lambda^2 + 2\lambda \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
 \end{equation}
 \begin{gather}
 \lambda = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
@@ -600,7 +600,7 @@ Using solely equations \ref{eq:guidance_law} however will not grant optimal resu
 \end{algorithm}
 
 
-\item \textbf{Airspeed} Now that the aircraft no longer does $180^o$ turns when it overtakes the desired trajectory, the desired airspeed must now be adjusted in order to slow down and therefore reach the desired position at the desired time. To do so the guidance law was slightly modified to 
+\item \textbf{Airspeed} Now that the aircraft no longer does $180^o$ turns when it overtakes the desired trajectory, the desired airspeed must be adjusted in order to slow down and therefore reach the desired position at the desired time. To do so the guidance law was slightly modified to 
 \begin{equation}
 V_a^d=\begin{cases}
 \delta V_a  + V_{a_0} \quad \text{if} \quad |atan2(\delta y,\delta x)|<90^o\\

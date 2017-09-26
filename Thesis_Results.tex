@@ -92,7 +92,7 @@ Reiterating the example from the previous section, the reference following for $
 \label{fig:const_ref}
 \end{figure}
 
-In figure \ref{fig:const_ref} the reference is followed with minimal osculations for the three variables, although with the presence of some steady state error in the case of the airspeed $V_a$. The small initial convergence of $\gamma^d$ and $V_a^d$ can be explained by the simulation initial conditions. To maintain $V_a^d=200ms^{-1}$ at $t=0s$, as seen in table \ref{tab:cruise_cond}, the AoA must be $\alpha=6^o$. As this simulation starts in cruise condition with the initial condition $\theta=0 \text{ rad}$, for this reason $\gamma$ initially takes negative values before reaching and stabilizing at its desired reference. This also affects the airspeed of the aircraft, although only increasing the following error up to $0.4ms^{-1}$.
+In figure \ref{fig:const_ref} the reference is followed with small osculations for the three variables, although with the presence of some steady state error in the case of the airspeed $V_a$. The small initial convergence of $\gamma^d$ and $V_a^d$ can be explained by the simulation initial conditions. To maintain $V_a^d=200ms^{-1}$ at $t=0s$, as seen in table \ref{tab:cruise_cond}, the AoA must be $\alpha=6^o$. As this simulation starts in cruise condition with the initial condition $\theta=0 \text{ rad}$, for this reason $\gamma$ initially takes negative values before reaching and stabilizing at its desired reference. This also affects the airspeed of the aircraft, although only increasing the following error up to $0.4ms^{-1}$.
 
 To be able to follow trajectories however, a good control of the aircraft heading will be necessary. Proposing this time the following variation in $\psi^d$ as a reference for the simulated aircraft
 \begin{equation}
@@ -116,7 +116,7 @@ Although the reference value is reached after each step, the convergence takes a
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{Figures/Results/trajectory.png}
-\caption[Plane trajectory]{Plane trajectory for the nominal control input}
+\caption[Plane trajectory]{Plane trajectory for the nominal control input $\zeta=1$}
 \label{fig:trajectory}
 \end{figure}
 
@@ -199,7 +199,7 @@ Although the network does seem to provide an adaptive component to the controlle
 
 The designed controller, as detailed in section \ref{section:control_implement}, includes a linear controller for the system linearised by the nonlinear inversion, more precisely a PD controller for the plane's fast dynamics. A poorly tuned controller however will lead to an undesired behaviour. Using once again the condition used so far (see figure \ref{fig:ref_zeta_05}, with a perfect inertia estimation $\zeta = 1$ from a reduced controller, compared to the same controller corrected by the NN, comes that:
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \includegraphics[width=1.1\textwidth]{Figures/Results/ref_bad_control.png}
 \caption[Poorly tuned controller comparison]{$V_a$, $\gamma$ and $\psi$ for measured and desired values. In purple can be seen the three references, in blue can be seen the measured values where in equation \ref{eq:linear_controller} $K_D=0$ and $K_P = [1,1,1]^T$. In yellow the same controller is used, while applying NN adaptive corrections}
@@ -208,7 +208,6 @@ The designed controller, as detailed in section \ref{section:control_implement},
 
 The first observation that can be taken from figure \ref{fig:ref_bad_control} is that the difference the purple and yellow graphs is considerably smaller than that of the blue graph, particularly noticeable in the first $V_a$ plot. In the two last ones oscillations around the desired value are reduced, as is the yaw convergence time for the NN adaptive controller by $30s$.
 It is also curious to observe the oscillations of yellow neural network adapted plot decrease with time. This is explained as the weights of the network do not converge instantly to their optimal values.
-
 
 \section{System Failures}
 \label{section:results/system_failures}
@@ -220,14 +219,14 @@ By setting each of these coefficients to 20\% of their initial values, the effec
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Figures/Results/reduced_act.png}
+\includegraphics[width=0.8\textwidth]{Figures/Results/reduced_act.png}
 \caption[Trajectory with reduced actuation]{Trajectory with 20\% reduced actuation (blue) and trajectory without failures (red)}
 \label{fig:reduced_act}
 \end{figure}
 
 Studying as previously the values of $V_a$, $\gamma$ and $\psi$ for the case of actuator failures, the following results are obtained 
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \includegraphics[width=1.1\textwidth]{Figures/Results/ref_act_failure.png}
 \caption[$V_a$, $\gamma$ and $\psi$ measured and desired values on actuation failure]{$V_a$, $\gamma$ and $\psi$ desired  values (orange), measured without actuator failures (yellow) and with reduced actuation (blue)}

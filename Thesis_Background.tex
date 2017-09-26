@@ -21,7 +21,7 @@ In this chapter the tools used to achieve the goals of this project will be desc
 \label{section:background/NLI}
 % Aqui vamos nos!
 
-Feedback linearisation, also known as dynamic inversion, is an approach based on the idea of algebraically transforming a non-linear system into a linear one, from which linear control laws can be used to control the resulting system. Unlike Jacobian linearisation, that assumes linearity of the system around an equilibrium value, feedback linearisation implements a feedback loop that cancels non-linearities of the given system \cite{Slotine+Li}. Given a single-input $u$ nonlinear system
+Feedback linearisation, also known as dynamic inversion, is an approach based on the idea of algebraically transforming a non-linear system into a linear one, for which linear control laws can be used to control the resulting system. Unlike Jacobian linearisation, that assumes linearity of the system around an equilibrium value, feedback linearisation implements a feedback loop that cancels non-linearities of the given system \cite{Slotine+Li}. Given a single-input $u$ nonlinear system described by
 
 \begin{equation}
 \dot{x} = f(x,u)
@@ -236,5 +236,10 @@ Note that the term $ \frac{\partial E}{\partial x_s} $ represent the all the der
 \begin{equation}\label{eq:update_law}
 \Delta w_{ij} = - \alpha \frac{\partial E}{\partial w_{ij}}
 \end{equation}
-Where $\alpha$ is a learning coefficient, and its choice is crucial to assure a fast convergence of the solution. Indeed, while an exceedingly large learning coefficient can cause this algorithm to miss the minimum error, a small learning coefficient will also increase the convergence rate. A limitation of the backstepping algorithm that must also be taken into account is that it only guarantees local minima convergence. 
+Where $\alpha$ is a learning coefficient, and its choice is crucial to assure a fast convergence of the solution. Indeed, while an exceedingly large learning coefficient can cause this algorithm to miss the minimum error, a small learning coefficient will also increase the convergence rate. A limitation of the backstepping algorithm that must also be taken into account is that it only guarantees local minima convergence.
+
+The application of neural networks to improve the overall performance of a controller has been studied for a few years, for different kinds of systems such as multicopters, UAVs and launch based vehicles (\cite{quad_NLI+NN}, \cite{YANG+LIN_Adaptive_Flight_Control}, \cite{NN_PID2}) as well as to improve different types of control laws. These go from simple PIDs in \cite{NN_PID}, \cite{NN_PID2} to  backstepping and nonlinear inversion techniques \cite{NN_backlash} and \citep{NN_NLI}. The applicability of this adaptive control technique has not, however, been studied to commercial aircraft, being usually applied to non manned vehicles. Most of the works that aim to use NN to create an adaptive controller improving upon another control law usually face the similar limitation of needing large amounts of flight data to batch train the network. This work therefore aims to solve this very problem introducing online training based on the backtracking algorithm. 
+ 
 A detailed description on the connection of this algorithm with the control of the aircraft will be given in the next chapter.
+
+

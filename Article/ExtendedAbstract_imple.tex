@@ -1,21 +1,25 @@
 \section{Implementation}
 \label{sec:imple}
-To invert such a complex system (Figure \ref{fig:plane_model}), two layers of inversion are proposed by \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion controller.
-\subsection{Feedback Linearisation}
-To invert the fast dynamics the equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics \ref{eq:actuator_dynamics} and the effects of the wind. Doing so yields the jerk vector given by, as per \cite{hector}
-\begin{multline}
+To invert such a complex system (figure \ref{fig:plane_model}), two layers of inversion are proposed by H. Escamilla \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion control. 
+
+\subsection{Fast Dynamics}
+To invert the fast dynamics equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics \ref{eq:actuator_dynamics} and the wind effects. Doing so yields the jerk vector given by, as per \cite{hector}
+
+\begin{equation}
+\begin{split}
 \begin{bmatrix}
 \ddot{p}\\
 \ddot{q}\\
 \ddot{r}
 \end{bmatrix}
-= \dfrac{1}{2}\rho SI^{-1} \left\lbrace V_a^2 C_\delta \xi
+= \dfrac{1}{2}\rho SI^{-1} \left\lbrace V_a^2 C_\delta \xi^{-1}
 \begin{bmatrix}
 \delta^d_{ail}-\delta_{ail}\\
 \delta^d_{ele}-\delta_{ele}\\
 \delta^d_{rud}-\delta_{rud}
 \end{bmatrix}
-+V_a^2C_c\dot{R_a}\right. \\ \left. +2V_a\dot{V_a}\left(
++V_a^2C_c\dot{R_a}+\right.\\
+\left. 2V_a\dot{V_a}\left(
 \begin{bmatrix}
 bC_l\\
 \bar{c}C_m\\
@@ -29,28 +33,29 @@ bC_n
 \end{bmatrix}
 \right) \right \rbrace + I^{-1}\left(\dfrac{1}{4}\rho SV_aC_k-I_n\right)\dot{\Omega}
 \label{eq:jerk}
-\end{multline}
+\end{split}
+\end{equation}
 
-Where
+where
 
 \begin{gather*}
 I=
 \begin{bmatrix}
-A & 0 & -E\\
-0 & B & 0\\
--E & 0 & C
+I_{xx} & 0 & -I_{xz}\\
+0 & I_{yy} & 0\\
+-I_{zx} & 0 & I_{zz}
 \end{bmatrix}\\
 I_n=
-\begin{bmatrix}
--Eq & (C-B)r-Ep & (C-B)q\\
-(A-C)r+2Ep & 0 & (A-C)p-2Er\\
-(B-A)q & (B-A)p+Er & Eq
-\end{bmatrix}\\
+\left[\begin{smallmatrix}
+-I_{xz}q & (I_{zz}-I_{yy})r-I_{xz}p & (I_{zz}-I_{yy})q\\
+(I_{xx}-I_{zz})r+2I_{xz}p & 0 & (I_{xx}-I_{zz})p-2I_{xz}r\\
+(I_{yy}-I_{xx})q & (I_{yy}-I_{xx})p+I_{xz}r & I_{xz}q
+\end{smallmatrix}\right]\\
 \xi=
 \begin{bmatrix}
-\dfrac{1}{\xi_{ail}} & 0 & 0\\
-0 & \dfrac{1}{\xi_{ele}} & 0\\
-0 & 0 & \dfrac{1}{\xi_{rud}}
+\xi_{ail} & 0 & 0\\
+0 & \xi_{ele} & 0\\
+0 & 0 & \xi_{rud}
 \end{bmatrix}\\
 C_c=
 \begin{bmatrix}
@@ -67,15 +72,17 @@ b^2C_{n_p} & 0 & b^2C_{n_r}
 \dot{Ra} =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T
 \end{gather*}
 
-To do a feedback linearisation, a pseudo input must be chosen, in this case $\tau = \ddot{\Omega}$. The feedback control law will therefore be, solving equation \ref{eq:jerk} to $\delta^d$,
+To do a feedback linearisation, a pseudo input must be chosen, in this case $\tau = \ddot{\Omega}$. The feedback control law will therefore be, solving equation \ref{eq:jerk} for $\delta^d$,
 
-\begin{multline}
+\begin{equation}
+\begin{split}
 \begin{bmatrix}
 \delta^d_{ail}\\
 \delta^d_{ele}\\
 \delta^d_{rud}
 \end{bmatrix}
-=\dfrac{1}{V_a^2}\xi^{-1}C_\delta^{-1}\left\lbrace\dfrac{2I}{\rho S}\tau - \dfrac{2}{\rho S}(\dfrac{1}{4}\rho S V_aC_k - I_n)\dot{\Omega} \right. \\ \left.-2V_a\dot{V_a} \left(
+=\dfrac{1}{V_a^2}\xi C_\delta^{-1}\left\lbrace\dfrac{2I}{\rho S}\tau - \dfrac{2}{\rho S}(\dfrac{1}{4}\rho S V_aC_k - I_n)\dot{\Omega}\right.\\
+\left. -2V_a\dot{V_a} \left(
 \begin{bmatrix}
 bC_l\\
 \bar{c}C_m\\
@@ -83,24 +90,27 @@ bC_n
 \end{bmatrix}
 + C_\delta \delta\right)-V_a^2C_c\dot{R_a} \right\rbrace+ \delta
 \label{eq:control_law}
-\end{multline}
+\end{split}
+\end{equation}
 
 
 Indeed, by replacing \ref{eq:control_law} in the jerk equation \ref{eq:jerk}, the equation $\ddot{\Omega} = \tau$ is obtained, resulting in a successfully inverted system.
 
 
-The wind effects will appear in the terms including $\dot{R}_a =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. The value of $\dot{R}_a$ can be computed from the equation in annex \ref{eq:Ra_dot}.
+The wind effects will appear in the terms including $\dot{R}_a =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. The value of $\dot{R}_a$ can be computed from equation \ref{eq:Ra_dot}.
 
 Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\ddot{\Omega}=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]^T$. As mentioned in the previous section, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs comes a control law for $\tau$, firstly considering without neural network adaptation
 \begin{equation}
 \tau = -K_P (\Omega-\Omega^d)-K_D (\dot{\Omega}-\dot{\Omega}^d)+\ddot{\Omega}^d
 \label{eq:linear_controller}
 \end{equation}
-Where the $K_P$ and $K_D$ coefficients are chosen to ensure stability and reference tracking. The previous equation can also be written as
+Where $K_P$ and $K_D$ are chosen to ensure stability and reference tracking. The previous equation can also be written as
 \begin{equation}
 \ddot{e}=-K_P e - K_D \dot{e}
 \end{equation}
-Assuming that an ideal inversion is obtained and $\tau=\ddot{\Omega}$, and where $e=\Omega-\Omega^d$. This way the initial non-linear system becomes a second order linear one, for which natural frequencies and damping values for each dimension must be chosen. Choosing $x_1=e_i$ and $x_2=\dot{x_1}$ for a given dimension $i$ of $\Omega$, either $p,q,r$. Then comes the state equation
+assuming that an ideal inversion is obtained and $\tau=\ddot{\Omega}$, and where $e=\Omega-\Omega^d$. 
+
+This way the initial non-linear system becomes a second order linear one, for which natural frequencies and damping values for each dimension must be chosen. Choosing $x_1=e_i$ and $x_2=\dot{x_1}$ for a given dimension $i$ of $\Omega$, either $p,q,r$. Then comes the state equation
 \begin{equation}
 \begin{bmatrix}
 \dot{x_1}\\
@@ -115,14 +125,17 @@ x_1\\
 x_2
 \end{bmatrix}
 \end{equation}
+
 The characteristic equation is then obtained as 
+
 \begin{equation}
-\text{det}(sI-A_i)= \lambda^2 + 2\xi_i \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
+\text{det}(\lambda I-A_i)= \lambda^2 + 2\lambda\zeta_i \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
 \end{equation}
 \begin{gather}
-\xi_i = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
+\zeta_i = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
 \omega_{n_i}=\sqrt{K_{P_i}}
 \end{gather}
+
 The chosen values are given in table \ref{tab:tau_dynamics}.
 
 \begin{table}[htbp]
@@ -130,7 +143,7 @@ The chosen values are given in table \ref{tab:tau_dynamics}.
   \caption[Linearised system chosen dynamics]{Linearised system chosen dynamics}
     \begin{tabular}{rcccc}
     \toprule
-    $i$   & $K_{P_i}$ & $K_{D_i}$ & $\xi_i$ & $\omega_{n_i}$(rad $s^{-1}$) \\
+    $i$   & $K_{P_i}$ & $K_{D_i}$ & $\zeta_i$ & $\omega_{n_i}$(rad $s^{-1}$) \\
     \midrule
     $p$   & 100   & 20    & 1     & 10 \\
     $q$   & 5     & 1     & 0.22 & 2.24 \\
@@ -141,13 +154,14 @@ The chosen values are given in table \ref{tab:tau_dynamics}.
 \end{table}%
 
 
-From this point the next step shall be to obtain the desired values of $\Omega$. These were obtained using another PD controller, using Euler angle reference values to control rotation rates. Among these reference values to be followed, $\tau_r$ was set to zero. This was made to make use of the decoupling through feedback linearisation of the plane movement, using a roll and pitch motion to turn the aircraft. This results in the following control of rotation rate
+From this point the next step will be to obtain the desired values of $\Omega$. These are obtained using another PD controller, using Euler angles values to control rotation rates. The yaw rate was set to zero as the feedback linearisation decouples the plane movement, using roll and pitch motion to turn the aircraft.
+
 \begin{subequations}
 \begin{equation}
-p= k_P (\phi^d-\phi) + k_d (\dot{\phi^d}-\dot{\phi})
+p= k_{P_p} (\phi^d-\phi) + k_{D_p} (\dot{\phi^d}-\dot{\phi})
 \end{equation}
 \begin{equation}
-q= k_P (\theta^d-\theta) + k_d (\dot{\theta^d}-\dot{\theta})
+q= k_{P_q} (\theta^d-\theta) + k_{D_q} (\dot{\theta^d}-\dot{\theta})
 \end{equation}
 \begin{equation}
 r=0
@@ -155,7 +169,9 @@ r=0
 \label{eq:omega_PD}
 \end{subequations}
 
-It is now possible to control the attitude of the aircraft, and the fast control loop design is completed. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far to achieve the goal of position tracking over time. Firstly the dynamics for speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
+\subsection{Slow Dynamics}
+
+It is now possible to control the attitude of the aircraft, and the fast control loop design is completed. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far and to achieve the goal of position tracking over time. First the dynamics for speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
 \begin{subequations}
 \begin{equation}
 \dot{V_a} = \dfrac{1}{m}(T\cos \alpha -D - mg\sin \gamma)
@@ -177,15 +193,15 @@ For the yaw rate comes that
 After choosing the desired dynamics to control these variables, the equations above must be solved for both the thrust reference $T$, the desired AoA and $\psi$. From these last two, knowing the current roll angle $\theta$, the input for the fast dynamics controller is obtained. The desired dynamics were chosen as first order systems as
 \begin{subequations}
 \begin{equation}
-\dot{V_a} = \dfrac{1}{\tau_{V_a}}(V_a^d-V_a)
+\dot{V_a} = \dfrac{1}{\xi_{V_a}}(V_a^d-V_a)
 \label{eq:va_dot_des}
 \end{equation}
 \begin{equation}
-\dot{\gamma} = \dfrac{1}{\tau_{\gamma}}(\gamma^d-\gamma)
+\dot{\gamma} = \dfrac{1}{\xi_{\gamma}}(\gamma^d-\gamma)
 \label{eq:gamma_dot_des}
 \end{equation}
 \begin{equation}
-\dot{\psi} = \dfrac{1}{\tau_{\psi}}(\psi^d-\psi)
+\dot{\psi} = \dfrac{1}{\xi_{\psi}}(\psi^d-\psi)
 \label{eq:psi_dot_des}
 \end{equation}
 \end{subequations}
@@ -271,10 +287,10 @@ For the output layer, the first term of equation \ref{eq:gradient} can easily be
 
 For input layers however, this derivative is less obvious to estimate. One can consider that the error function $J$ is a function of the inputs of all neurons that take $x_j$ as input. Let $S$ be such a set of inputs, from the total derivative to $x_j$ comes that
 
-\begin{multline}
+\begin{gather}
 \frac{\partial J}{\partial x_j} = \sum _{s\in S}\left( \frac{\partial J}{\partial x_s}\frac{\partial x_s}{\partial sum_s}\frac{\partial sum_s}{\partial x_j}\right)=\\
 \sum _{s\in S}\left( \frac{\partial J}{\partial x_s}\frac{\partial f(sum_s)}{\partial sum_s}w_{js}\right)
-\end{multline}
+\end{gather}
 
 Note that the term $ \frac{\partial J}{\partial x_s} $ represent the all the derivatives of the errors with respect to the outputs of the next layer of neurons. Once this derivative is computed the new set of weights for both layers can be estimated from the update law \ref{eq:update_law}.
 
@@ -297,13 +313,13 @@ The final step of the controller design will be to propose a guidance law to obt
 	\label{eq:guidance_law}
 \end{subequations}
 
-This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. These trajectories can be a time parametrized Bezier curve, as per INSERT PAPER FROM HECTOR HERE. From these an airspeed, heading and Flight Path Angle must be computed an fed to the controller.
+This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. From these an airspeed, heading and flight path angle must be computed an fed to the controller.
 
 Taking firstly the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
 
 Finally, this control architecture is illustrated by the block diagram of Figure \ref{fig:full_controller}, specifying fast dynamics inversion, the slow dynamics controller and the guidance control law, as well as the online neural network use to improve the controller and adapt to inversion errors and system failures.
 \begin{figure*}[h]  
-  \includegraphics[width=1.1\textwidth]{../Figures/full_controller_special.png}
+  \includegraphics[width=1\textwidth]{../Figures/full_controller_special.png}
   \caption[Diagram of the controller architecture]{Diagram of the full controller architecture. In orange is specified the neural network correction system of the initial controller}
   \label{fig:full_controller}
 \end{figure*}

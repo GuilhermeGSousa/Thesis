@@ -17,7 +17,7 @@ The work made in this article was built on top of the work done by \cite{hector}
 
 \subsection{Frames of Reference}
 
-The first step before describing the dynamics of a commercial aircraft will be to define the frames of reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the axial directions of the wind frame. This frame is aligned to the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from the wind frame to the body frame by
+The first step before describing the dynamics of a commercial aircraft will be to define the frames of reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the axial directions of the wind frame. This frame is aligned with the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from wind frame to body frame by
 
 
 \begin{equation}
@@ -30,7 +30,7 @@ s_\alpha c_\beta & -s_\alpha s_\beta & c_\alpha
 \label{eq:wind2body}
 \end{equation}
 
-To describe the attitude of the plane Euler, roll, pitch and yaw angles, will also be used, namely $\phi\{-\pi,\pi\}$, $\theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}$, $\psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
+To describe the attitude of the plane Euler, roll, pitch and yaw angles, will also be used, namely $\phi\{-\pi,\pi\}; \theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}; \psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
 
 \begin{equation}
 R_{EB}=
@@ -87,7 +87,7 @@ C_{n\beta} \beta + C_{n_p} p \dfrac{b}{2V_a} + C_{n_r} r \dfrac{b}{2V_a}
 \end{bmatrix}
 \label{eq:cmoment}
 \end{equation}
-Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method for obtaining of the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft inertial matrix.
+Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method for obtaining the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft inertial matrix.
 \begin{subequations}
 	\begin{equation}
 		\dot{\Omega} = I^{-1} M_{ext} - I^{-1}\Omega \times (I\Omega)
@@ -107,7 +107,7 @@ Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and
 \label{eq:fast_dynamics}
 \end{subequations}
 
-These two equations can be rearranged to account for the effect of the wind, allowing further on to simulate the behaviour of the airplane in the presence of wind disturbances. Let $\vec{V_G} = [u \quad v \quad w]^T$ be the speed of the CG relative to the ground, $\vec{V}$ the speed of the CG relative to the air mass and $\vec{W}$ the speed of the wind relative to the ground, then as per \cite{Etkin+Reid} 
+These two equations can be rearranged to account for the effect of the wind, allowing further on to simulate the behaviour of the airplane in the presence of wind disturbances. Let $\vec{V_G} = [u \quad v \quad w]^T$ be the speed of the CG relative to the ground, $\vec{V}$ the speed of the CG relative to the air mass and $\vec{W}$ the speed of the wind relative to the ground, then as per Etkin and Reid \cite{Etkin+Reid} 
 \begin{equation}
 \vec{V_G} = \vec{V} + \vec{W} = 
 \begin{bmatrix}

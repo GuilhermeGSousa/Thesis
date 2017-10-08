@@ -472,10 +472,10 @@ x_2
 \end{equation}
 The characteristic equation is then obtained as 
 \begin{equation}
-\text{det}(\lambda I-A_i)= \lambda^2 + 2\lambda \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
+\text{det}(\lambda I-A_i)= \lambda^2 + 2\lambda\zeta_i \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
 \end{equation}
 \begin{gather}
-\lambda = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
+\zeta_i = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
 \omega_{n_i}=\sqrt{K_{P_i}}
 \end{gather}
 The chosen values are given in table \ref{tab:tau_dynamics}.
@@ -485,7 +485,7 @@ The chosen values are given in table \ref{tab:tau_dynamics}.
   \caption[Linearised system chosen dynamics]{Linearised system chosen dynamics}
     \begin{tabular}{rcccc}
     \toprule
-    $i$   & $K_{P_i}$ & $K_{D_i}$ & $\lambda$ & $\omega_{n_i}$(rad $s^{-1}$) \\
+    $i$   & $K_{P_i}$ & $K_{D_i}$ & $\zeta_i$ & $\omega_{n_i}$(rad $s^{-1}$) \\
     \midrule
     $p$   & 100   & 20    & 1     & 10 \\
     $q$   & 5     & 1     & 0.22 & 2.24 \\

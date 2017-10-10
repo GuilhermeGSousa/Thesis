@@ -30,7 +30,7 @@ s_\alpha c_\beta & -s_\alpha s_\beta & c_\alpha
 \label{eq:wind2body}
 \end{equation}
 
-To describe the attitude of the plane Euler, roll, pitch and yaw angles, will also be used, namely $\phi\{-\pi,\pi\}; \theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}; \psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
+To describe the attitude of the plane Euler, roll, pitch and yaw angles, will also be used, namely $\phi\{-\pi,\pi\}$; $\theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}$; $\psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
 
 \begin{equation}
 R_{EB}=
@@ -107,7 +107,7 @@ Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and
 \label{eq:fast_dynamics}
 \end{subequations}
 
-These two equations can be rearranged to account for the effect of the wind, allowing further on to simulate the behaviour of the airplane in the presence of wind disturbances. Let $\vec{V_G} = [u \quad v \quad w]^T$ be the speed of the CG relative to the ground, $\vec{V}$ the speed of the CG relative to the air mass and $\vec{W}$ the speed of the wind relative to the ground, then as per Etkin and Reid \cite{Etkin+Reid} 
+These two equations can be rearranged to account for the effect of the wind, allowing further on to simulate the behaviour of the airplane in the presence of wind disturbances. Let $\vec{V_G} = [u \quad v \quad w]^T$ be the speed of the CG relative to the ground, $\vec{V}$ the speed of the CG relative to the air mass and $\vec{W}$ the speed of the wind relative to the ground, then, as per Etkin and Reid \cite{Etkin+Reid}, comes equation \ref{eq:windtriangle}
 \begin{equation}
 \vec{V_G} = \vec{V} + \vec{W} = 
 \begin{bmatrix}

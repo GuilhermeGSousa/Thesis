@@ -3,7 +3,7 @@
 To invert such a complex system (figure \ref{fig:plane_model}), two layers of inversion are proposed by H. Escamilla \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion control. 
 
 \subsection{Fast Dynamics}
-To invert the fast dynamics equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics \ref{eq:actuator_dynamics} and the wind effects. Doing so yields the jerk vector given by, as per \cite{hector}
+To invert the fast dynamics equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics in equation \ref{eq:actuator_dynamics} and the wind effects. Doing so yields the jerk vector given by, as per \cite{hector}
 
 \begin{equation}
 \begin{split}
@@ -94,7 +94,7 @@ bC_n
 \end{equation}
 
 
-Indeed, by replacing \ref{eq:control_law} in the jerk equation \ref{eq:jerk}, the equation $\ddot{\Omega} = \tau$ is obtained, resulting in a successfully inverted system.
+Indeed, by replacing the equation from annex \ref{eq:control_law} in the jerk equation \ref{eq:jerk}, the equation $\ddot{\Omega} = \tau$ is obtained, resulting in a successfully inverted system.
 
 
 The wind effects will appear in the terms including $\dot{R}_a =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. The value of $\dot{R}_a$ can be computed from equation \ref{eq:Ra_dot}.
@@ -129,7 +129,9 @@ x_2
 The characteristic equation is then obtained as 
 
 \begin{equation}
-\text{det}(\lambda I-A_i)= \lambda^2 + 2\lambda\zeta_i \omega_{n_i} +  \omega_{n_i}^2 = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
+\begin{split}
+\text{det}(\lambda I-A_i)= \lambda^2 + 2\lambda\zeta_i \omega_{n_i} +  \omega_{n_i}^2\\ = \lambda^2 + \lambda K_{D_i} + K_{P_i} = 0
+\end{split}
 \end{equation}
 \begin{gather}
 \zeta_i = \dfrac{K_{D_i}\sqrt{K_{P_i}}}{2K_{P_i}}\\
@@ -223,7 +225,7 @@ There are quite some challenges in designing a feed forward neural network. Besi
 \item \textbf{Redundancy}: A large value of redundant and irrelevant input variables will not only increase the needed computational effort of the NN, but will also increase the difficulty to train the weights of the network and add noise to the system.
 \end{itemize}
 
-Another consideration about the chosen inputs that must also be taken into account is their range. The sigmoid function $sig(x)$ used reaches around 75\% when $x=1$ and 100\% when $x=2$. For some cases the inputs might therefore need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained before even starting training, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The average of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$, the following equation is used
+Another consideration about the chosen inputs that must also be taken into account is their range. The sigmoid function $sig(x)$ used reaches around 73\% when $x=1$ and 88\% when $x=2$. For some cases the inputs might therefore need to be normalized. While this is quite a trivial task in the case of batch training, as the minimum and maximum value of each input is easily obtained before even starting training, such is not the case for online training, and a maximum and minimum value must be proposed \emph{a priori} for each input. The average of these values should also be close to zero. Should the input not be normalized and reach absolute values much greater than the unity, its activation function output would be constant and the system would therefore not react to input change. This, clearly, is not desirable. To map the input $x$ knowing its minimum and maximum values to its normalized equivalent $y$, the following equation is used
 
 \begin{equation}
 y=2\dfrac{x-x_{min}}{x_{max}-x_{min}}-1
@@ -297,7 +299,7 @@ Note that the term $ \frac{\partial J}{\partial x_s} $ represent the all the der
 
 \subsection{Guidance Law}
 
-The final step of the controller design will be to propose a guidance law to obtain the values of $V_a^d$, $\gamma^d$ and $\psi^d$ from the X,Y and Z reference values along time. For these laws it was assumed that the position reference was given relative to a frame of reference with the origin on the Earth surface, with the $Z$ axis pointing upwards. The guidance controller therefore implements the following equations, assuming the errors $\delta x = x_r - x$, $\delta y = y_r - y$ and $\delta z = z - z_r$.
+The final step of the controller design will be to propose a guidance law to obtain the values of $V_a^d$, $\gamma^d$ and $\psi^d$ from the X,Y and Z reference values along time. For these laws it was assumed that the position reference was given relative to a frame of reference with the origin on the Earth surface, with the $Z$ axis pointing upwards. The guidance controller therefore implements the following equations, assuming the errors $\delta x = x_r - x$, $\delta y = y_r - y$ and $\delta z = z_r-z$.
 
 \begin{subequations}
 	\begin{gather}

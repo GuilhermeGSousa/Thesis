@@ -163,7 +163,7 @@ Indeed, a 50\% error in estimating the inertia of the aircraft when computing th
 \subsection{Neural Network Correction}
 The first adaptive capability of this method that will be described is the compensation of inversion error due to an incorrect estimation of the plane's inertia. Taking the previous example of \ref{fig:ref_zeta_005}, it can be observed that the aircraft becomes unstable at $t=600s$, leading to a significant increase of airspeed from the desired $200ms^{-1}$ to $350ms^{-1}$. The heading of the aircraft also becomes uncontrollable, oscillating and slowly increasing. 
 
-This is due to the $\Delta$ component of equation \ref{eq:inversion_error}. At each time step the online Neural Network will converge to this value, compensating this error and therefore decreasing the reference following errors and preventing the aircraft from becoming unstable. Using the same conditions as used to obtain \ref{fig:ref_zeta_005} comes that:
+This is due to the $\Delta$ component of equation \ref{eq:inversion_error}. At each time step the online Neural Network will converge to this value, compensating this error and therefore decreasing the reference following errors and preventing the aircraft from becoming unstable. Using the same conditions as used to obtain \ref{fig:ref_zeta_005} comes fig. \ref{fig:ref_zeta_005_NN}
 
 \begin{figure}[H]
 \centering
@@ -327,7 +327,7 @@ Again, these are conditions that have a negative impact on the controllability o
 
 This final section will focus on the results of the implementation of the guidance controller described in equations \ref{eq:guidance_law}. From the work implemented and results obtained thus far, a NN adaptive controller can now be used to follow references of airspeed, heading and flight path angle. From the equations \ref{eq:guidance_law} position references can now be used to compute $V_a,\gamma, \psi$. Choosing a path to follow using these equations the following results were obtained, showing the aircraft is able to correctly follow a trajectory from a constant feed of way points over time.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \includegraphics[width=1\textwidth]{Figures/Results/guidance.png}
 \caption[Trajectory following with guidance controller]{Trajectory reference (orange) and obtained trajectory (blue)}
@@ -336,14 +336,14 @@ This final section will focus on the results of the implementation of the guidan
 
 
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \includegraphics[width=1.15\textwidth]{Figures/Results/guidance_ref.png}
 \caption[Reference following of $V_a$, $\gamma$ and $\psi$ from guidance controller]{$V_a$, $\gamma$ and $\psi$ for measured (blue) and desired values (orange) obtained from the guidance controller}
 \label{fig:guidance_ref}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \includegraphics[width=1.15\textwidth]{Figures/Results/guidance_ref_NN.png}
 \caption[Reference following of $V_a$, $\gamma$ and $\psi$ from guidance controller with NN correction]{$V_a$, $\gamma$ and $\psi$ for measured (blue) and desired values (orange) obtained from the guidance controller using NN correction}

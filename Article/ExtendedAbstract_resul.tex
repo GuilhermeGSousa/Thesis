@@ -25,7 +25,7 @@ This section will focus in testing and comparing the control algorithm developed
 
 This error will be the most frequent when implementing such a controller, as some system parameters estimations may have considerable errors, namely the aircraft inertial matrix. Fortunately, the controller used is, as it will be demonstrated, tolerant to errors in the estimation of this parameter, but can result in an unstable system in extreme cases. To simulate estimation errors, the entries of the inertial matrix $I_{xx}$,$I_{yy}$,$I_{zz}$ and $I_{xz}$ were multiplied by a reducing factor $\zeta \in [0;1]$ when computing the nonlinear inversion in \ref{eq:control_law}. The inertial matrix used in this equation $I_{est}$ is therefore given by $I_{est} = \zeta I$.
 
-In order to more accurately visualise the influence of the $\zeta$ coefficient on the NLI controller for this same case, several simulations were made for values of $\zeta$ from $0$ to $1$. For each simulation the mean error was computed, in order to obtain a plot of these errors for each of the three references. From Figure \ref{fig:xi_mean_error} can be concluded that the error becomes considerable $\zeta<0.05$ for a controller without neural network compensation. For a compensated adaptive controller however, it is noticeable that errors only become considerable at $\zeta<0.02$.
+In order to more accurately visualise the influence of the $\zeta$ coefficient on the NLI controller for this same case, several simulations were made for values of $\zeta$ from $0$ to $1$. For each simulation the mean error was computed, in order to obtain a plot of these errors for each of the three references. From Figure \ref{fig:xi_mean_error} we may that the error becomes considerable $\zeta<0.05$ for a controller without neural network compensation. For a compensated adaptive controller however, it is noticeable that errors only become considerable at $\zeta<0.02$.
 
 \begin{figure}[h]
 \centering
@@ -67,7 +67,7 @@ One second type of flight perturbation that was studied is the effects of icing 
 
 \item \textbf{Drag }Drag will increase directly with the amount of ice accumulated on the wing, reaching usual values of 100\% of the initial drag coefficient.
 
-\item \textbf{Roll }Icing on the main wings will also affect roll control. As the thickness of the wing decreases towards its tip, so increases its efficiency to collect ice, leading to a partial stall in the tip of the wings, according to the AOPA manual \cite{icing_aopa}.
+\item \textbf{Roll }Icing on the main wings will also affect roll control. As the thickness of the wing decreases towards its tip, so increases its efficiency to collect ice, leading to a partial stall in the tip of the wings, according to the \cite{icing_aopa}.
 \end{itemize}
 
 Following these indications to simulate heavy icing condition, the lift coefficient $C_{L_{max}}$ was reduced by 30\%, and the stall angle reduced to $15^o$. The value of the drag coefficient was also augmented by 200\%. Finally, in order to simulate roll control limitations, the value of $C_{\delta_{ail}}$ was reduced by 30\%. These values were chosen in order to deteriorate the control of the aircraft, while allowing for the possibility of reference following without reaching actuator saturation (for both control surface deflections and thrust). 
@@ -77,7 +77,7 @@ For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{../Figures/Results/ref_icing.PNG}
-\caption[Reference following in icing conditions]{$V_a$, $\gamma$ and $\psi$ for measured and desired values in icing conditions without NN correction}
+\caption[Reference following in icing conditions]{$V_a$, $\gamma$ and $\psi$ for measured (blue) and desired (red) values in icing conditions without NN correction}
 \label{fig:ref_icing}
 \end{figure}
 
@@ -88,6 +88,38 @@ For this case a sinusoidal yaw reference was given of $\psi^d= 45 \sin (1.1459t)
 \label{fig:ref_icing_NN}
 \end{figure}
 
-From figure \ref{fig:ref_icing}, the system in such high drag conditions can be considered marginally stable, as it easily increases the error to either of the three commanded inputs to significantly high values. For the case of the flight path angle, the aircraft even reaches under $-20º$ at $t=600s$, a completely unrealistic value for a normal cruise flight. The impact of the increased drag in noticeable in the reduced speed in the simulation, going under $100ms^{-1}$ for the desired $V_a^d=200ms^{-1}$. The reduced roll capabilities and lift also cause errors and oscillations in heading and flight path angle following.
+From figure \ref{fig:ref_icing}, the system in such high drag conditions can be considered marginally stable, as it easily increases the error to either of the three commanded inputs to significantly high values. For the case of the flight path angle, the aircraft even reaches under $-20º$ at $t=600s$, a completely unrealistic value for a normal cruise flight. The impact of the increased drag is noticed in the reduced speed in the simulation, going under $100ms^{-1}$ for the desired $V_a^d=200ms^{-1}$. The reduced roll capabilities and lift also cause errors and oscillations in heading and flight path angle following.
 
-In Figure \ref{fig:ref_icing_NN}, the aircraft shows a more stable behaviour and smaller tracking errors. Again, these are conditions that have a negative impact on the controllability of the aircraft: the increase of 200\% of the value of $C_D$ causes a decrease in the speed of the aircraft, rendering it unable to follow the desired speed of $200ms^{-1}$. Regarding the measured flight path angle $\gamma$, although  some oscillations are still present, error relative to the reference no longer goes up to $0.3 rad$, instead oscillating around $0.05rad$ at a much lower frequency and amplitude. The most noticeable improvement however can be seen in the heading following: the aircraft follows the desired $\psi^d$ during the full simulation, with little to no oscillations around the desired value. It is also interesting to notice that in the first moments of the learning process, up to $t=300s$, oscillations around the desired heading value are greater than in later moments of the simulation. This is explained by the fact that the weights of the neural network have not yet converged to their optimal values at $t<300s$.
+In Figure \ref{fig:ref_icing_NN}, the aircraft shows a more stable behaviour and smaller tracking errors. Again, these are conditions that have a negative impact on the controllability of the aircraft: the increase of 200\% of the value of $C_D$ causes a decrease in the speed of the aircraft, rendering it unable to follow the desired speed of $200ms^{-1}$. Regarding the measured flight path angle $\gamma$, although  some oscillations are still present, error relative to the reference no longer goes up to $0.3 rad$, instead oscillating around $0.05rad$ at a much lower frequency and amplitude. The most noticeable improvement however can be seen in the heading following: the aircraft follows the desired $\psi^d$ during the full simulation, with little to no oscillations around the desired value. It is also interesting to notice that in the first moments of the learning process, up to $t=300s$, oscillations around the desired heading value are greater than in later moments of the simulation. This is explained by the fact that the weights of the neural network have not yet converged to their optimal values for $t<300s$.
+
+\subsection{Guidance Controller}
+\label{section:results/guidance_control}
+
+From the work implemented and results obtained thus far, a NN adaptive controller can now be used to follow references of airspeed, heading and flight path angle. From the equations \ref{eq:guidance_law} position references can now be used to compute $V_a,\gamma, \psi$. Choosing a path to follow using these equations the following results were obtained, showing the aircraft is able to correctly follow a trajectory from a constant feed of way points over time.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{../Figures/Results/guidance.png}
+\caption[Trajectory following with guidance controller]{Trajectory reference (orange) and obtained trajectory (blue)}
+\label{fig:guidance}
+\end{figure}
+
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{../Figures/Results/guidance_ref.png}
+\caption[Reference following of $V_a$, $\gamma$ and $\psi$ from guidance controller]{$V_a$, $\gamma$ and $\psi$ for measured (blue) and desired values (orange) obtained from the guidance controller}
+\label{fig:guidance_ref}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{../Figures/Results/guidance_ref_NN.png}
+\caption[Reference following of $V_a$, $\gamma$ and $\psi$ from guidance controller with NN correction]{$V_a$, $\gamma$ and $\psi$ for measured (blue) and desired values (orange) obtained from the guidance controller using NN correction}
+\label{fig:guidance_ref_NN}
+\end{figure}
+
+Figure \ref{fig:guidance} shows the trajectory of the aircraft for a given trajectory, showing slight errors on sudden heading changes. Analysing figure \ref{fig:guidance_ref}, for a non corrected system, although a small overshoot in airspeed following, the three variable otherwise follow their references with minimal error. The $\gamma$ graph however shows that this variable oscillates around $0$ rad.
+
+Comparing these results with the NN corrected controller however, although no disturbance was added to the simulation, the flight path angle oscillations are greatly reduced. It is also interesting to notice that while the network is still converging its weights to reach their optimal values for the first $1000s$, these oscillations are greater than in the $4000s$.

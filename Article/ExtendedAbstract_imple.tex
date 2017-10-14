@@ -1,6 +1,6 @@
 \section{Implementation}
 \label{sec:imple}
-To invert such a complex system (figure \ref{fig:plane_model}), two layers of inversion are proposed by H. Escamilla \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion control. 
+To invert such a complex system (figure \ref{fig:plane_model}), two layers of inversion are proposed by \cite{hector}, namely for the fast and slow dynamics. Directly controlling these are three of the four actuator control inputs, the control surfaces for the aileron, elevon and rudder. These will therefore be the output of the nonlinear inversion control. 
 
 \subsection{Fast Dynamics}
 To invert the fast dynamics equation \ref{eq:fast_dynamics} must be differentiated once, to account for both the actuator dynamics in equation \ref{eq:actuator_dynamics} and the wind effects. Doing so yields the jerk vector given by, as per \cite{hector}
@@ -94,12 +94,12 @@ bC_n
 \end{equation}
 
 
-Indeed, by replacing the equation from annex \ref{eq:control_law} in the jerk equation \ref{eq:jerk}, the equation $\ddot{\Omega} = \tau$ is obtained, resulting in a successfully inverted system.
+Indeed, by replacing the equation from equation \ref{eq:control_law} in the jerk equation \ref{eq:jerk}, the equation $\ddot{\Omega} = \tau$ is obtained, resulting in a successfully inverted system.
 
 
-The wind effects will appear in the terms including $\dot{R}_a =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. The value of $\dot{R}_a$ can be computed from equation \ref{eq:Ra_dot}.
+The wind effects will appear in the terms including $\dot{R}_a =  [\dot{\alpha} \quad \dot{\beta} \quad \dot{V_a}]^T$, as the equation defining $\dot{V_a}$ can be obtained differentiating the norm of the speed relative to the ground. The value of $\dot{R}_a$ can be computed from equation \ref{eq:alphabetadot}.
 
-Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\ddot{\Omega}=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]^T$. As mentioned in the previous section, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs comes a control law for $\tau$, firstly considering without neural network adaptation
+Should all of the parameters mentioned in the equations above be known and no inversion error be made, the resulting system $\ddot{\Omega}=\tau$ will be both linear and decoupled, having three pseudo inputs $\tau = [\tau_p \quad \tau_q \quad \tau_r]^T$. As mentioned in the previous section, the next step of the nonlinear inversion shall be to propose a linear controller for this resulting system. Taking the desired rotation rates $\Omega^d$ as inputs a control law for $\tau$ may be defined, first considering no neural network adaptation
 \begin{equation}
 \tau = -K_P (\Omega-\Omega^d)-K_D (\dot{\Omega}-\dot{\Omega}^d)+\ddot{\Omega}^d
 \label{eq:linear_controller}
@@ -108,7 +108,7 @@ Where $K_P$ and $K_D$ are chosen to ensure stability and reference tracking. The
 \begin{equation}
 \ddot{e}=-K_P e - K_D \dot{e}
 \end{equation}
-assuming that an ideal inversion is obtained and $\tau=\ddot{\Omega}$, and where $e=\Omega-\Omega^d$. 
+assuming that an ideal inversion is obtained and $\tau=\ddot{\Omega}$, and introducing an error variable $e=\Omega-\Omega^d$. 
 
 This way the initial non-linear system becomes a second order linear one, for which natural frequencies and damping values for each dimension must be chosen. Choosing $x_1=e_i$ and $x_2=\dot{x_1}$ for a given dimension $i$ of $\Omega$, either $p,q,r$. Then comes the state equation
 \begin{equation}
@@ -173,7 +173,7 @@ r=0
 
 \subsection{Slow Dynamics}
 
-It is now possible to control the attitude of the aircraft, and the fast control loop design is completed. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far and to achieve the goal of position tracking over time. First the dynamics for speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$) are given by, neglecting wind disturbances, from Newton's Law in the wind frame
+It is now possible to control the attitude of the aircraft, and the fast control loop design is completed. To follow 4D trajectories however, a guidance control loop must be designed to feed attitude and thrust reference values to the system described so far and to achieve the goal of position tracking over time. First the dynamics for speed ($V_a$), heading ($\psi$) and flight path angle ($\gamma = \theta - \alpha$), neglecting wind disturbances, from Newton's Law in the wind frame, are given by
 \begin{subequations}
 \begin{equation}
 \dot{V_a} = \dfrac{1}{m}(T\cos \alpha -D - mg\sin \gamma)
@@ -183,7 +183,7 @@ It is now possible to control the attitude of the aircraft, and the fast control
 \dot{\gamma} = \dfrac{1}{mV_a}(T\sin \alpha +L - mg\cos \gamma)
 \label{eq:gamma_dot}
 \end{equation}
-For the yaw rate comes that 
+For the yaw rate it comes that 
 
 \begin{equation}
 \dot{\psi} = \dfrac{g}{V_a} \tan \phi
@@ -192,7 +192,7 @@ For the yaw rate comes that
 \end{subequations}
 
 
-After choosing the desired dynamics to control these variables, the equations above must be solved for both the thrust reference $T$, the desired AoA and $\psi$. From these last two, knowing the current roll angle $\theta$, the input for the fast dynamics controller is obtained. The desired dynamics were chosen as first order systems as
+After choosing the desired dynamics to control these variables, the equations above must be solved for both the thrust reference $T$, the desired AoA and $\psi$. From these last two, knowing the current pitch angle $\theta$, the input for the fast dynamics controller is obtained. The desired dynamics were chosen as first order systems as
 \begin{subequations}
 \begin{equation}
 \dot{V_a} = \dfrac{1}{\xi_{V_a}}(V_a^d-V_a)
@@ -217,11 +217,11 @@ This method adds an adaptive component $\tau_{NN}$ to the pseudo input that will
 \begin{equation}
 \tau + \tau_{NN} = \ddot{\Omega}^d + \Delta
 \end{equation}
-In which as $t \rightarrow \infty$, $\tau_{NN} \rightarrow \Delta$, thus adaptively minimizing inversion errors. To do so a simple neural network architecture was chosen: a network with a single hidden layer with therefore two sets of weights $V$ and $W$ that will need to be trained, corresponding to the input weights and the hidden layer ones. As for the activation functions for the hidden layer a sigmoid function was chosen, $sig(x)=\dfrac{1}{(1+e^{-x})}$. As the outputs must not be bound between $[0;1]$, the chosen output function was a linear one. Indeed sigmoid output functions are usually used in applications where the output must be a boolean value.
+For which as $t \rightarrow \infty$, $\tau_{NN} \rightarrow \Delta$, thus adaptively minimizing inversion errors. To do so a simple neural network architecture was chosen: a network with a single hidden layer with therefore two sets of weights $V$ and $W$ that will need to be trained, corresponding to the input weights and the hidden layer ones. As for the activation functions for the hidden layer a sigmoid function was chosen, $sig(x)=\dfrac{1}{(1+e^{-x})}$. As the outputs do not need to be bound between $[0;1]$, the chosen output function was a linear one. Indeed sigmoid output functions are usually used in applications where the output must be a boolean value.
 
 There are quite some challenges in designing a feed forward neural network. Besides choosing the number of layers and neurons per layer, the inputs of the network must also be chosen carefully. Some rules to choose the correct inputs are given by \cite{NN_inputs}:
 \begin{itemize}
-\item \textbf{Relevance}: This is the most important consideration to have while choosing inputs, this set must be sufficiently informative of the state of the system for the network to perform correctly. A NN will perform poorly if the output behaviour is not correlated to its input.
+\item \textbf{Relevance}: This is the most important consideration to have while choosing a set of inputs, this set must be sufficiently informative of the state of the system for the network to perform correctly. A NN will perform poorly if the output behaviour is not correlated to its input.
 \item \textbf{Redundancy}: A large value of redundant and irrelevant input variables will not only increase the needed computational effort of the NN, but will also increase the difficulty to train the weights of the network and add noise to the system.
 \end{itemize}
 
@@ -262,14 +262,14 @@ Where $\alpha$ is the learning coefficient. The chain rule can be used to comput
 Where $sum_j$ is given by
 
 \begin{equation}\label{eq:def_sum}
-sum_i = \sum ^n_{k=1} w_{ki} x_k
+sum_j = \sum ^n_{k=1} w_{kj} x_k
 \end{equation}
 
 Where $x_k$ is the output of the $k^{th}$ neuron of the previous layer (or of the $k^{th}$ input in the case of the first weight layer).
 
 These three factors of equation \ref{eq:gradient} can now be easily computed. The last two factors are independent of weather $x_j$ is a hidden or output layer and will for this reason be calculated firstly. 
 
-For an output layer, where values may be unbounded, linear output functions may be used, for which $\frac{\partial f(sum_j)}{\partial sum_j}$ has a trivial solution. For the case of a logistic sigmoid activation function comes that 
+For an output layer, where values may be unbounded, linear output functions may be used, for which $\frac{\partial f(sum_j)}{\partial sum_j}$ has a trivial solution. For the case of a logistic sigmoid activation function it comes that 
 
 \begin{equation}
 \frac{\partial f(sum_j)}{\partial sum_j}=f(sum_j)(1-f(sum_j))
@@ -287,14 +287,14 @@ For the output layer, the first term of equation \ref{eq:gradient} can easily be
 \frac{\partial J}{\partial x_j}=\frac{\partial (\frac{1}{2} (\Delta-y_{NN})^2)}{\partial y_{NN}}= \Delta-y_{NN}
 \end{equation}
 
-For input layers however, this derivative is less obvious to estimate. One can consider that the error function $J$ is a function of the inputs of all neurons that take $x_j$ as input. Let $S$ be such a set of inputs, from the total derivative to $x_j$ comes that
+For input layers however, this derivative is less obvious to estimate. One can consider that the error function $J$ is a function of the inputs of all neurons that take $x_j$ as input. Let $S$ be such a set of inputs, from the total derivative to $x_j$ it comes that
 
 \begin{gather}
 \frac{\partial J}{\partial x_j} = \sum _{s\in S}\left( \frac{\partial J}{\partial x_s}\frac{\partial x_s}{\partial sum_s}\frac{\partial sum_s}{\partial x_j}\right)=\\
 \sum _{s\in S}\left( \frac{\partial J}{\partial x_s}\frac{\partial f(sum_s)}{\partial sum_s}w_{js}\right)
 \end{gather}
 
-Note that the term $ \frac{\partial J}{\partial x_s} $ represent the all the derivatives of the errors with respect to the outputs of the next layer of neurons. Once this derivative is computed the new set of weights for both layers can be estimated from the update law \ref{eq:update_law}.
+Note that the term $ \frac{\partial J}{\partial x_s} $ represents the all the derivatives of the errors with respect to the outputs of the next layer of neurons. Once this derivative is computed the new set of weights for both layers can be estimated from the update law \ref{eq:update_law}.
 
 
 \subsection{Guidance Law}
@@ -315,13 +315,13 @@ The final step of the controller design will be to propose a guidance law to obt
 	\label{eq:guidance_law}
 \end{subequations}
 
-This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. From these an airspeed, heading and flight path angle must be computed an fed to the controller.
+This guidance law is intended to be used having at each time interval a $x_r$, $y_r$ and $z_r$ position of a desired trajectory. From these an airspeed, heading and flight path angle must be computed and fed to the controller.
 
-Taking firstly the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
+Taking first the airspeed equation from \ref{eq:guidance_law}, $V_{a_0}$ is the desired speed of the aircraft in cruise conditions when following the trajectory. This speed is then corrected by the term $\delta V_a$, increasing or decreasing aircraft airspeed depending on its position relative to the trajectory desired position at a given time, i.e the distance error. By dividing this error by $\tau_{V_a}$, a desired convergence time, the speed correction to the initial value $V_{a_0}$ necessary to follow a 4D trajectory is obtained. Also, from the $x$ and $y$ position errors between the aircraft and the current trajectory waypoint the desired heading can also be computed using the $atan2$ function. Finally, the method used to obtain the Flight Path Angle relies on the error between the height of the aircraft and the desired one to compute it. 
 
 Finally, this control architecture is illustrated by the block diagram of Figure \ref{fig:full_controller}, specifying fast dynamics inversion, the slow dynamics controller and the guidance control law, as well as the online neural network use to improve the controller and adapt to inversion errors and system failures.
 \begin{figure*}[h]  
-  \includegraphics[width=1\textwidth]{../Figures/full_controller_special.png}
+  \includegraphics[width=1.05\textwidth]{../Figures/full_controller_special.png}
   \caption[Diagram of the controller architecture]{Diagram of the full controller architecture. In orange is specified the neural network correction system of the initial controller}
   \label{fig:full_controller}
 \end{figure*}

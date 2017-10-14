@@ -17,7 +17,7 @@ The work made in this article was built on top of the work done by \cite{hector}
 
 \subsection{Frames of Reference}
 
-The first step before describing the dynamics of a commercial aircraft will be to define the frames of reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the axial directions of the wind frame. This frame is aligned with the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from wind frame to body frame by
+The first step before describing the dynamics of a commercial aircraft will be to define the frames of reference used to do so. The first frame of reference, on which 4D trajectories are described, corresponds to the WGS84 frame of reference. A second frame of reference corresponding to the aircraft body frame will be used to provide its fast rotational dynamics. Lastly all aerodynamic forces will be applied in the directions of the wind frame. This frame is aligned with the wind speed vector relative to the airplane, given by both the angle of attack $\alpha$ and the sideslip angle $\beta$. For these last two frames of reference, a rotation matrix can be defined from wind frame to body frame by
 
 
 \begin{equation}
@@ -30,10 +30,10 @@ s_\alpha c_\beta & -s_\alpha s_\beta & c_\alpha
 \label{eq:wind2body}
 \end{equation}
 
-To describe the attitude of the plane Euler, roll, pitch and yaw angles, will also be used, namely $\phi\{-\pi,\pi\}$; $\theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}$; $\psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
+To describe the attitude of the plane Euler will also be used, namely roll, pitch and yaw, respectively $\phi\{-\pi,\pi\}$; $\theta \{-\dfrac{\pi}{2},\dfrac{\pi}{2}\}$; $\psi \{-\pi,\pi\}$. From these angles the rotation matrix from the body to the earth frame is given by
 
 \begin{equation}
-R_{EB}=
+R_{BE}=
 \begin{bmatrix}
 c_\theta c_\psi & s_\phi s_\theta c_\psi - c_\phi s_\psi & c_\phi s_\theta c_\psi + s_\phi s_\psi \\
 c_\theta c_\psi & s_\phi s_\theta s_\psi + c_\phi c_\psi & c_\phi s_\theta s_\psi - s_\phi c_\psi \\
@@ -47,6 +47,7 @@ c_\theta c_\psi & s_\phi s_\theta s_\psi + c_\phi c_\psi & c_\phi s_\theta s_\ps
 The considered actuators of the aircraft that control its attitude are given by the control surface deflection $\delta = [\delta_{ail} \delta_{ele} \delta_{rud}]^T$, each applying a torque along an axis of the body frame. These torques are given by
 
 \begin{equation}
+M_{ext}=
 \begin{bmatrix}
 L'\\
 M\\
@@ -87,7 +88,7 @@ C_{n\beta} \beta + C_{n_p} p \dfrac{b}{2V_a} + C_{n_r} r \dfrac{b}{2V_a}
 \end{bmatrix}
 \label{eq:cmoment}
 \end{equation}
-Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method for obtaining the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft inertial matrix.
+Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and $V_a$ is the airspeed. The method for obtaining the coefficients of equation \ref{eq:cmoment} will be provided in the chapter to follow. Having defined the torques applied to the aircraft, the rotational dynamics equation can now be stated as per \cite{hector}, $I$ being the aircraft inertial matrix.
 \begin{subequations}
 	\begin{equation}
 		\dot{\Omega} = I^{-1} M_{ext} - I^{-1}\Omega \times (I\Omega)
@@ -107,7 +108,7 @@ Where $p, q, r$ are the body angular rates ($\Omega = [p\quad q\quad  r]^T$) and
 \label{eq:fast_dynamics}
 \end{subequations}
 
-These two equations can be rearranged to account for the effect of the wind, allowing further on to simulate the behaviour of the airplane in the presence of wind disturbances. Let $\vec{V_G} = [u \quad v \quad w]^T$ be the speed of the CG relative to the ground, $\vec{V}$ the speed of the CG relative to the air mass and $\vec{W}$ the speed of the wind relative to the ground, then, as per Etkin and Reid \cite{Etkin+Reid}, comes equation \ref{eq:windtriangle}
+These two equations can be rearranged to account for the effect of the wind, allowing further on to simulate the behaviour of the airplane in the presence of wind disturbances. Let $\vec{V_G} = [u \quad v \quad w]^T$ be the speed of the CG relative to the ground, $\vec{V}$ the speed of the CG relative to the air mass and $\vec{W}$ the speed of the wind relative to the ground, then, as per \cite{Etkin+Reid}, comes equation \ref{eq:windtriangle}
 \begin{equation}
 \vec{V_G} = \vec{V} + \vec{W} = 
 \begin{bmatrix}
@@ -129,39 +130,9 @@ and $\alpha$ and $\beta$ can be computed by
 	\end{equation}
 \end{subequations}
 
-From these three equations, differentiating \ref{eq:alpha} and \ref{eq:beta}, and from equation \ref{eq:windtriangle} and the translation dynamics equation \ref{eq:boddy_acc} comes that 
-
-\begin{equation}
-\begin{bmatrix}
-\dot{\alpha}\\
-\dot{\beta}\\
-\dot{V_a}
-\end{bmatrix}
-= 
-\begin{bmatrix}
-H_{11} & H_{12} & H_{13}\\
-H_{21} & 0 & H_{23}\\
-H_{31} & H_{32} & H_{33}
-\end{bmatrix}
-\begin{bmatrix}
-p\\
-q\\
-r
-\end{bmatrix}
-+
-\begin{bmatrix}
-Q_1\\
-Q_2\\
-Q_3
-\end{bmatrix}
-\label{eq:alphabetadot}
-\end{equation}
-Where the entries of the matrix are given in annex \ref{sec:ra_dot}.
-
-
 The forces in the air frame $F_{xa}, F_{ya}, F_{za}$ will be further detailed in the next section on translation dynamics. 
 
-The angular rates are also related to the Euler angles. The relationship between the euler angles and the rotation rates is also one that will prove useful when implementing the model on a Matlab simulation, and is given by
+The angular rates are also related to the Euler angles. The relationship between the Euler angles and the rotation rates is also one that will prove useful when implementing the model in a Matlab simulation, and is given by
 
 \begin{equation}
 \begin{bmatrix}
@@ -184,7 +155,7 @@ r
 \end{equation}
 
 \subsection{Translation Dynamics}
-This subsection on the forces applied to aircraft, introducing a new actuation variable, the thrust force $T$. These forces are applied along the three axis of the wind frame, lift, drag and side force, given by
+This subsection focuses on the forces applied to aircraft, introducing a new actuation variable, the thrust force $T$. These forces are applied along the three axis of the wind frame, lift, drag and side force, given by
 \begin{equation}
 \begin{bmatrix}
 D\\
@@ -200,7 +171,7 @@ C_L
 \label{eq:forces}
 \end{equation}
 
-Although aerodynamic forces are usually expressed on the wind frame, as the thrust is always applied along the $x$ axis of the body frame, it is necessary to rotate the aerodynamic forces to this frame. This way the sum of the airplane's forces can be obtained. 
+Although aerodynamic forces are usually expressed on the wind frame, as thrust is always applied along the $x$ axis of the body frame, it is necessary to rotate the aerodynamic forces to this frame. This way the sum of the airplane forces can be obtained. 
 
 \begin{equation}
 \begin{bmatrix}
@@ -255,9 +226,38 @@ g
 \end{bmatrix}
 \end{equation}
 
+Differentiating \ref{eq:alpha} and \ref{eq:beta}, and from equation \ref{eq:windtriangle} and the translation dynamics equation \ref{eq:boddy_acc} comes that 
+
+\begin{equation}
+\begin{bmatrix}
+\dot{\alpha}\\
+\dot{\beta}\\
+\dot{V_a}
+\end{bmatrix}
+= 
+\begin{bmatrix}
+H_{11} & H_{12} & H_{13}\\
+H_{21} & 0 & H_{23}\\
+H_{31} & H_{32} & H_{33}
+\end{bmatrix}
+\begin{bmatrix}
+p\\
+q\\
+r
+\end{bmatrix}
++
+\begin{bmatrix}
+Q_1\\
+Q_2\\
+Q_3
+\end{bmatrix}
+\label{eq:alphabetadot}
+\end{equation}
+Where the entries of the matrix are given in annex \ref{sec:ra_dot}.
+
 \subsection{Actuator Dynamics}
 
-Finally, to simulate the delay response in actuation in order to have a realistic simulation, first order systems were introduced to the actuator dynamics as per \cite{hector}. For the control surfaces $\delta_i$, given a desired $\delta_i^d$ comes
+Finally, to simulate the delay response by actuation in order to have a realistic simulation, first order systems were introduced to the actuator dynamics as per \cite{hector}. For the control surfaces $\delta_i$, given a desired $\delta_i^d$, its dynamics is then
 
 \begin{equation}
 \dot{\delta_i} = \dfrac{1}{\xi_i}(\delta_i^d-\delta_i)
@@ -270,7 +270,7 @@ Similarly for thrust
 \dot{T} = \dfrac{1}{\xi_T}(T^d-T)
 \end{equation}
 
-$\xi_i$ and $\xi_T$ being time constants. As the responsiveness of the resultant thrust will be much slower than that of the control surfaces, $\xi_T>>\xi_i$.
+Where $\xi_i$ and $\xi_T$ are time constants. As the responsiveness of the thrust output will be much slower than that of the control surfaces, then $\xi_T>>\xi_i$.
 The chosen commercial aircraft that will be simulated is the Boeing 737-200, an aircraft with over 30 years of service for which some information of flight parameters is readily available, such as weight, wing span and mean chord. The simulation was made in a cruise flight environment, at $200$ m/s velocity at $10000$ m above the ground. The chosen inertial matrix for this aircraft is given by
 
 \begin{equation}
@@ -297,7 +297,7 @@ The ISA atmospheric model was used to measure the air density at any given heigh
     \end{tabular}%
   \label{tab:b737_parameters}
 \end{table}%
-The time constants used for the actuators was $\xi_{\delta_i}=50$ms and $\xi_T=4$s for the engines. A simplified block diagram of the plane simulator is given by Figure \ref{fig:plane_model}.
+The time constants used for the actuators were $\xi_{\delta_i}=50$ms and $\xi_T=4$s for the engines. A simplified block diagram of the plane simulator is given by Figure \ref{fig:plane_model}.
 \begin{figure*}[h]
   \centering
   \includegraphics[width=0.75\textwidth]{../Figures/PlaneModel.png}

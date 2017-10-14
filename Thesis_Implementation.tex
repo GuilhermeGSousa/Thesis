@@ -559,7 +559,7 @@ A block diagram of the controller used to compute the pseudo input $\tau$ is des
 
 \subsection{Guidance Law}
 
-The final step of the controller design will be to propose a guidance law to obtain the values of $V_a^d$, $\gamma^d$ and $\psi^d$ from the X,Y and Z reference values along time. For these laws it was assumed that the position reference was given relative to a frame of reference with the origin on the Earth surface, with the $Z$ axis pointing upwards. The guidance controller therefore implements the following equations, assuming the errors $\delta x = x_r - x$, $\delta y = y_r - y$ and $\delta z = z - z_r$. The $z$ formula is slightly different to the other two as in the airplane frame of reference the z axis is pointing downwards, allowing this way to use a z reference relative to the Earth surface.
+The final step of the controller design will be to propose a guidance law to obtain the values of $V_a^d$, $\gamma^d$ and $\psi^d$ from the X,Y and Z reference values along time. For these laws it was assumed that the position reference was given relative to a frame of reference with the origin on the Earth surface, with the $Z$ axis pointing upwards. The guidance controller therefore implements the following equations, assuming the errors $\delta x = x_r - x$, $\delta y = y_r - y$ and $\delta z = z_r - z$. The $z$ formula is slightly different to the other two as in the airplane frame of reference the z axis is pointing downwards, allowing this way to use a z reference relative to the Earth surface.
 
 \begin{subequations}
 	\begin{gather}
@@ -622,7 +622,7 @@ Finally, the block diagram of the controller described thus far is given by figu
 \section{Neural Network}
 \label{section:NN}
 
-Over the years, intelligent control techniques using neural networks have become a growing research topic, addressing the limitations of state-of-the-art model based controllers such as linear quadratic Gaussian, model predictive control, backstepping and gain scheduling \citep{SotA_IFCS}. Indeed, variations in the plane dynamics (e.g., due to payload changes, actuator or sensor degradation) deteriorate the error of the controller. To compensate for such errors, adaptive online neural networks have been studied and implemented in several works \cite{quad_NLI+NN}, \cite{NN_PID}, \cite{UAV_adaptive} and \cite{NN_NLI} to name a few. These however, have been applied almost exclusively to UAV aircraft, especially multicopters. For this work a feedforward network with one hidden layer (one of the most widely implemented neural network architecture \cite{SotA_IFCS}) was used.
+Over the years, intelligent control techniques using neural networks have become a growing research topic, addressing the limitations of state-of-the-art model based controllers such as linear quadratic Gaussian, model predictive control, backstepping and gain scheduling \citep{SotA_IFCS}. Indeed, variations in the plane dynamics (e.g., due to payload changes, actuator or sensor degradation) deteriorate the error of the controller. To compensate for such errors, adaptive online neural networks have been studied and implemented in several works \cite{NLI+NN_IFCS}, \cite{NN_PID}, \cite{UAV_adaptive} and \cite{NN_NLI} to name a few. These however, have been applied almost exclusively to UAV aircraft, especially multicopters. For this work a feedforward network with one hidden layer (one of the most widely implemented neural network architecture \cite{SotA_IFCS}) was used.
 
 
 \subsection{Network Architecture}
